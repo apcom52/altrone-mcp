@@ -1,5 +1,5 @@
 {
-  "name": "altrone-mcp",
+  "name": "@altrone/mcp",
   "version": "4.0.0-dev.1",
   "description": "MCP server for Altrone UI component library documentation",
   "type": "module",
