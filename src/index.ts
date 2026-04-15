@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { readdir, readFile } from "fs/promises";
@@ -46,7 +48,7 @@ server.tool(
         },
       ],
     };
-  }
+  },
 );
 
 server.tool(
@@ -56,7 +58,7 @@ server.tool(
   async ({ component }) => {
     const components = await listComponents();
     const match = components.find(
-      (c) => c.toLowerCase() === component.toLowerCase()
+      (c) => c.toLowerCase() === component.toLowerCase(),
     );
 
     if (!match) {
@@ -75,7 +77,7 @@ server.tool(
     return {
       content: [{ type: "text", text: docs }],
     };
-  }
+  },
 );
 
 server.tool(
@@ -87,7 +89,7 @@ server.tool(
     return {
       content: [{ type: "text", text: guidelines }],
     };
-  }
+  },
 );
 
 const transport = new StdioServerTransport();

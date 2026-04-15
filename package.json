@@ -4,6 +4,13 @@
   "description": "MCP server for Altrone UI component library documentation",
   "type": "module",
   "main": "dist/index.js",
+  "files": [
+    "dist",
+    "docs"
+  ],
+  "bin": {
+    "altrone-mcp": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
