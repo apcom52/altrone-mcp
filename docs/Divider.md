@@ -1,6 +1,6 @@
 # Divider
 
-A thin visual separator line. Renders an `<hr>` element. Can be horizontal (default) or vertical.
+A thin visual separator line. Renders a native `<hr>` (implicit `separator` role). Horizontal by default; `direction="vertical"` also sets `aria-orientation="vertical"` and makes it stretch to the flex row's height.
 
 ## Import
 

@@ -31,7 +31,7 @@ import { AutocompleteInput } from 'altrone-ui';
 |------|------|---------|-------------|
 | `getSuggestions` | `(ctx: { value: string }) => T[] \| Promise<T[]>` | — | **Required.** Called with the current input value after debounce. Returns suggestions synchronously or as a promise. |
 | `getSuggestionValue` | `(suggestion: T) => string` | `String(suggestion)` | Extracts the string that will be written to the input after selection. Required when `T` is not `string`. |
-| `renderSuggestion` | `(ctx: AutocompleteRenderSuggestionContext<T>) => ReactElement` | — | Custom renderer for each suggestion row. When omitted, a default `Dropdown.Action` is rendered. |
+| `renderSuggestion` | `(ctx: AutocompleteRenderSuggestionContext<T>) => ReactNode` | — | Custom renderer for the **content** of a suggestion row. The field itself wraps it in the interactive row — click target, keyboard navigation, and the sliding hover/focus highlight — so the renderer only returns what goes inside. When omitted, the plain `getSuggestionValue` string is shown. |
 | `onSelect` | `(suggestion: T, inputValue: string, event) => void` | — | Called when the user selects a suggestion (click or Enter). |
 | `onError` | `(error: unknown) => void` | — | Called when `getSuggestions` throws. |
 | `minChars` | `number` | `1` | Minimum input length required before `getSuggestions` is called. |
@@ -40,7 +40,7 @@ import { AutocompleteInput } from 'altrone-ui';
 
 ### Inherited from TextInput
 
-All `TextInput` props are supported: `value`, `onChange`, `placeholder`, `invalid`, `size`, `variant`, `disabled`, `readOnly`, `wrapperClassName`, `wrapperStyle`, and so on.
+All `TextInput` props are supported: `value`, `onChange`, `placeholder`, `invalid`, `size`, `variant`, `disabled`, `readOnly`, `wrapperClassName`, `wrapperStyle`, and so on. `ref` points at the visual wrapper; use `inputRef` for the `<input>` node.
 
 ### renderSuggestion context
 
@@ -48,9 +48,12 @@ All `TextInput` props are supported: `value`, `onChange`, `placeholder`, `invali
 type AutocompleteRenderSuggestionContext<T> = {
   inputValue: string;    // current value of the input
   suggestion: T;         // the suggestion item
-  onSelect: (value: string, event: React.MouseEvent<HTMLElement>) => void;
 };
 ```
+
+Selection is handled by the row wrapper — a click or `Enter` on the highlighted
+row writes `getSuggestionValue(suggestion)` to the input and fires `onSelect`.
+The renderer does not wire selection itself.
 
 ---
 
@@ -118,18 +121,21 @@ const getSuggestions = async ({ value }: { value: string }): Promise<Language[]>
 
 ### Custom suggestion renderer
 
+Return only the row's content — the field supplies the button, the highlight and
+keyboard navigation.
+
 ```tsx
 <AutocompleteInput<Language>
   value={value}
   onChange={setValue}
   getSuggestions={getSuggestions}
   getSuggestionValue={(lang) => lang.name}
-  renderSuggestion={({ suggestion, inputValue, onSelect }) => (
-    <button onClick={(e) => onSelect(suggestion.name, e)}>
+  renderSuggestion={({ suggestion, inputValue }) => (
+    <>
       <strong>{suggestion.name.slice(0, inputValue.length)}</strong>
       {suggestion.name.slice(inputValue.length)}
       <span>{suggestion.year}</span>
-    </button>
+    </>
   )}
 />
 ```
@@ -171,7 +177,7 @@ import { Globe } from 'lucide-react';
   onChange={setValue}
   getSuggestions={getSuggestions}
 >
-  <TextInput.IconIsland icon={<Globe size={16} />} placement="left" />
+  <TextInput.IconIsland icon={<Globe size={16} />} placement="start" />
 </AutocompleteInput>
 ```
 

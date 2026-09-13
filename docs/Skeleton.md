@@ -1,6 +1,6 @@
 # Skeleton
 
-An animated shimmer placeholder for loading states. Renders a `<div>` with a pulsing shimmer animation via `motion/react`. Use in place of real content while data is loading.
+An animated placeholder for loading states — a `<div>` with a background-colour pulse (stopped under `prefers-reduced-motion`). Use in place of real content while data loads. It's `aria-hidden`; announce the loading state on a wrapper (`aria-busy` / `role="status"`).
 
 ## Import
 
@@ -21,12 +21,14 @@ import { Skeleton } from 'altrone-ui';
 | `minHeight` | `string` | same as `height` | CSS min-height override |
 | `maxHeight` | `string` | same as `height` | CSS max-height override |
 | `radius` | `string` | — | CSS `border-radius` value |
+| `animateLayout` | `boolean` | `false` | Smoothly animate size/position changes via `motion`'s `layout`. Off by default — a static placeholder doesn't need the per-render FLIP measuring. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `children`).
 
-> **Note:** `Skeleton` has layout animation enabled (`layout` prop from `motion/react`) — it animates size changes smoothly when dimensions update.
+> **Note:** With `animateLayout` off (the default) `Skeleton` renders a plain `<div>` — no `motion` overhead. Turn it on only when a skeleton's dimensions actually change between renders.
 
-> **DummyBox vs Skeleton:** Use `DummyBox` for static image/color placeholders. Use `Skeleton` when you need the animated shimmer loading state for text, cards, or any repeating content skeleton.
+> **Hatched `Box` vs `Skeleton`:** Use `Box` with `material="hatch"` for a static "content goes here" placeholder or an empty drop target. Use `Skeleton` for the animated shimmer loading state of text, cards or repeating content.
 
 ---
 

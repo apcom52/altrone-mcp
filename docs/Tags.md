@@ -1,6 +1,14 @@
 # Tags
 
-A horizontal wrapping list of tag/chip links. `Tags` is the flex container; `Tags.Item` renders each tag as an `<a>` element.
+A horizontal, wrapping list of short labels — article topics, filters, keywords. `Tags` is the flex container; each `Tags.Item` is one label.
+
+`Tags.Item` picks its element from its props:
+
+- `href` → an `<a>` (a real, focusable anchor)
+- `onClick` (no `href`) → a `role="button"` `<span>`, operable with `Enter` / `Space`
+- neither → a plain, inert `<span>` (no cursor, no hover state, not focusable)
+
+Only the interactive forms get the hover underline and pointer cursor.
 
 ## Import
 
@@ -30,17 +38,19 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | `string` | — | **Required.** Tag text |
-| `asChild` | `boolean` | `false` | Merge tag styles onto the single child element (Slot pattern). Use for router links or other interactive elements. |
-| `children` | `ReactElement` | — | Child element when `asChild={true}` |
-| `ref` | `Ref<HTMLAnchorElement>` | — | Forwarded ref |
+| `href` | `string` | — | Renders the item as an `<a>` |
+| `onClick` | `(e) => void` | — | Without `href`, renders a keyboard-operable `role="button"` span |
+| `asChild` | `boolean` | `false` | Merge tag styles onto the single child element (Slot pattern). Use for router links. Treated as interactive. |
+| `children` | `ReactNode` | — | Child element when `asChild={true}` |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the rendered element (`<a>` or `<span>`) |
 
-All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (except `children` in non-asChild mode).
+All standard `AnchorHTMLAttributes` are also accepted (except `children` in non-asChild mode).
 
 ---
 
 ## Examples
 
-### Basic
+### Display only (inert)
 
 ```tsx
 <Tags>

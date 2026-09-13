@@ -24,7 +24,7 @@ The component uses a **discriminated union** — mutually exclusive props select
 | Prop      | Value       | Rendered element             |
 | --------- | ----------- | ---------------------------- |
 | _(none)_  | —           | `<span>`                     |
-| `block`   | `true`      | `<p>`                        |
+| `block`   | `true`      | `<p>` (prose leading, `line-height: 1.6` unless `size` is set) |
 | `list`    | `"numeric"` | `<ol>`                       |
 | `list`    | `"marked"`  | `<ul>`                       |
 | `item`    | `true`      | `<li>`                       |

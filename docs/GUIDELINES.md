@@ -60,8 +60,8 @@ When you feel the urge to create a custom element, use this table instead.
 | A modal dialog (declarative) | `Modal` |
 | A loading spinner | `Loading` |
 | A skeleton loading placeholder | `Skeleton` |
-| An image / content placeholder | `DummyBox` |
-| An empty state | `Empty` |
+| An image / content placeholder | `Box` with `material="hatch"` |
+| An empty state / feedback (error, success, …) | `Result` |
 | A progress bar | `Progress` |
 
 ### Layout & structure
@@ -102,8 +102,6 @@ When you feel the urge to create a custom element, use this table instead.
 | What you want | Use instead |
 |---------------|-------------|
 | A data table | `DataTable` |
-| A detail / edit grid for a single record | `DataGrid` |
-| A selectable list of entities | `EntityList` |
 | A paginator | `Pagination` |
 | A "show N of many" collapsed list | `CollapsedList` |
 
@@ -351,14 +349,14 @@ if (confirmed) deleteItem();
 
 ---
 
-## Empty state rules
+## Empty state / feedback rules
 
 ```tsx
 // Wrong
 {items.length === 0 && <div className="empty">No items found.</div>}
 
 // Correct
-{items.length === 0 && <Empty title="No items found" />}
+{items.length === 0 && <Result title="No items found" />}
 ```
 
 ---

@@ -1,6 +1,6 @@
 # Scrollable
 
-A container with styled overlay scrollbars. Built on `overlayscrollbars-react`. The scrollbar auto-hides when the pointer is not moving and reappears on scroll/hover.
+A container with styled overlay scrollbars. Built on `overlayscrollbars-react`. The bar auto-hides when the pointer is not moving and reappears on scroll/hover, and follows the app theme.
 
 ## Import
 
@@ -15,23 +15,28 @@ import { Scrollable } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | Scrollable content |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref. Resolves to the **viewport** element (the inner scrollable div), not the outer wrapper — use it for programmatic scrolling. |
+| `overflowX` | `'scroll' \| 'hidden' \| 'visible' \| 'visible-hidden' \| 'visible-scroll'` | `'scroll'` | Horizontal overflow behavior, forwarded to OverlayScrollbars. `'hidden'` fully disables the axis (no bar, no pan). |
+| `overflowY` | same as `overflowX` | `'scroll'` | Vertical overflow behavior. |
+| `maxHeight` | `number \| string` | — | Caps the box height — it grows with content up to this value, then scrolls. Without it the box fills its parent's height. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the wrapper element (the visible box). |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted and applied to the outer wrapper.
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted and applied to the wrapper.
 
 ---
 
 ## Behavior
 
 - Scrollbar auto-hides when the pointer stops moving (300 ms delay).
-- The `ref` exposes the OverlayScrollbars **viewport** element — the same `HTMLDivElement` you would scroll programmatically.
-- The outer wrapper fills its container (`height: 100%`) by default; size the wrapper via `className` or `style`.
+- `ref`, `className` and `style` all resolve to the same wrapper element.
+- Sizing: by default the wrapper fills its parent (`height: 100%`), so the parent must be sized. Pass `maxHeight` to size by content instead, up to a cap.
+- Inside a flex column the wrapper carries `min-height: 0`, so it shrinks and scrolls next to a fixed header/footer instead of growing the column.
+- The actual scroll viewport is an inner element managed by OverlayScrollbars; reach it with `ref.current?.querySelector('[data-overlayscrollbars-viewport]')` if you need to script `scrollTo`.
 
 ---
 
 ## Examples
 
-### Basic
+### Filling a sized parent
 
 ```tsx
 <div style={{ height: 400 }}>
@@ -41,32 +46,34 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted and applied to t
 </div>
 ```
 
-### Programmatic scroll via ref
+### Cap the height, then scroll (dropdown menus)
 
 ```tsx
-const viewportRef = useRef<HTMLDivElement>(null);
-
-const scrollToTop = () => {
-  viewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-<Scrollable ref={viewportRef}>
-  <LongContent />
+<Scrollable maxHeight={240}>
+  <Menu>{options.map(renderOption)}</Menu>
 </Scrollable>
 ```
 
-### Inside a modal or drawer
-
-`Scrollable` is used internally by `Drawer` to wrap its content. Use it directly when you need a scrollable region within a fixed-height container.
+### Inside a flex column
 
 ```tsx
 <div style={{ height: 600, display: 'flex', flexDirection: 'column' }}>
   <Header />
-  <Scrollable style={{ flex: 1 }}>
-    <ArticleContent />
-  </Scrollable>
+  <div style={{ flex: 1, minHeight: 0 }}>
+    <Scrollable>
+      <ArticleContent />
+    </Scrollable>
+  </div>
   <Footer />
 </div>
+```
+
+### Horizontal only
+
+```tsx
+<Scrollable overflowX="scroll" overflowY="hidden">
+  <Row style={{ width: 'max-content' }}>{chips}</Row>
+</Scrollable>
 ```
 
 ### Full-height sidebar
@@ -74,9 +81,7 @@ const scrollToTop = () => {
 ```tsx
 <aside style={{ height: '100vh' }}>
   <Scrollable>
-    <NavigationList id="nav">
-      {navItems.map(…)}
-    </NavigationList>
+    <NavigationList id="nav">{navItems.map(renderItem)}</NavigationList>
   </Scrollable>
 </aside>
 ```

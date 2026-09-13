@@ -1,25 +1,25 @@
-# AltroneApplication
+# Application
 
 The root wrapper component for every Altrone UI app. It sets up the theme, accent color, localization, dialog system, and toast notifications. Must be placed at the top of the component tree — all other Altrone components must be rendered inside it.
 
 ## Import
 
 ```tsx
-import { AltroneApplication } from 'altrone-ui';
+import { Application } from 'altrone-ui';
 ```
 
 ---
 
 ## What it provides
 
-Rendering `AltroneApplication` sets up the following globally:
+Rendering `Application` sets up the following globally:
 
-- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Applies `AltroneDark` class to both `<html>` and the root element so portals inherit CSS variables correctly.
+- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Sets the `data-altrone-theme` attribute on both `<html>` and the root element so portals inherit the right CSS variables.
+- **Document background** — mirrors the resolved app background color onto `<body>` and `<html>` (inline style, restored on unmount), re-applied when the theme changes. Keeps the browser overscroll / rubber-band area from flashing white on scroll (notably in Safari), since the color tokens are scoped to the root element and not to `<html>`.
 - **Accent color** — applied via `data-altrone-accent` attribute; controls the primary color token across all components.
 - **Localization** — passes `language` and `customLabels` to all components that have built-in text strings.
 - **Dialog system** — mounts `DialogProvider` so `useDialog` / `Dialog` work anywhere in the tree.
 - **Toast** — mounts the toast container so `useToast` works anywhere in the tree.
-- **Locale warning** — logs a console warning in development if `config.locale.locale` is not set.
 
 ---
 
@@ -31,10 +31,11 @@ Rendering `AltroneApplication` sets up the following globally:
 | `accent` | `'red' \| 'pink' \| 'purple' \| 'indigo' \| 'blue' \| 'teal' \| 'amber' \| 'brown'` | `'blue'` | Accent color for the design system |
 | `language` | `'en' \| 'ru' \| 'fr' \| 'ge' \| 'sp'` | `'en'` | Language for built-in component labels (e.g. empty state text, validation messages) |
 | `customLabels` | `Partial<Localization>` | `{}` | Override individual localization strings without replacing the full locale |
-| `config` | `Partial<ConsumerConfigurationContext>` | — | Low-level per-component configuration (e.g. `locale.locale` for date/number formatting) |
-| `sidebar` | `ScreenProps['sidebar']` | — | Sidebar layout config passed to the inner `Screen` component |
-| `header` | `ScreenProps['header']` | — | Header layout config passed to the inner `Screen` component |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the root `<div>` |
+| `toastPlacement` | `'start' \| 'end'` | `'end'` | Vertical placement of the toast stack: `start` = top, `end` = bottom (always centred horizontally). See `Toasts`. |
+| `notificationSide` | `'start' \| 'end'` | `'end'` | Horizontal side of the notification stack: `start` = left, `end` = right. See `Toasts`. |
+| `notificationPlacement` | `'start' \| 'end'` | `'end'` | Vertical placement of the notification stack: `start` = top, `end` = bottom. See `Toasts`. |
+| `asChild` | `boolean` | `false` | Merge the root's attributes/classes onto the single child element instead of rendering a wrapping `<div>` (e.g. your own `<body>`). The child's own children become the provider tree's content. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the root element |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
@@ -45,13 +46,13 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 ### Minimal setup
 
 ```tsx
-import { AltroneApplication } from 'altrone-ui';
+import { Application } from 'altrone-ui';
 
 export default function App() {
   return (
-    <AltroneApplication>
+    <Application>
       {/* your app */}
-    </AltroneApplication>
+    </Application>
   );
 }
 ```
@@ -59,43 +60,38 @@ export default function App() {
 ### With theme and accent
 
 ```tsx
-<AltroneApplication theme="dark" accent="purple">
+<Application theme="dark" accent="purple">
   <App />
-</AltroneApplication>
+</Application>
 ```
 
-### With locale config
-
-The `config.locale.locale` string is a standard BCP 47 locale tag used for date and number formatting. Without it a console warning is shown in development.
+### asChild — render as your own root element
 
 ```tsx
-<AltroneApplication
-  theme="auto"
-  accent="blue"
-  language="en"
-  config={{ locale: { locale: 'en-US' } }}
->
-  <App />
-</AltroneApplication>
+<Application asChild>
+  <body>
+    <App />
+  </body>
+</Application>
 ```
 
 ### Forced light/dark theme
 
 ```tsx
-<AltroneApplication theme="light">
+<Application theme="light">
   <App />
-</AltroneApplication>
+</Application>
 ```
 
 ### Overriding individual labels
 
 ```tsx
-<AltroneApplication
+<Application
   language="en"
   customLabels={{ 'autocompleteInput.loadError': 'Failed to load suggestions' }}
 >
   <App />
-</AltroneApplication>
+</Application>
 ```
 
 ---
@@ -103,5 +99,4 @@ The `config.locale.locale` string is a standard BCP 47 locale tag used for date 
 ## Behavior details
 
 - When `theme="auto"`, the component listens to `window.matchMedia('(prefers-color-scheme: dark)')` and updates the theme in real time if the system setting changes.
-- `AltroneDark` CSS class is applied to both `<html>` (for scrollbar and selection styles) and the root element (so portals rendered inside `data-altrone-root` also inherit dark-mode CSS variables).
-- The component renders the inner layout via `Screen`, which means `sidebar` and `header` props can be used to define the top-level application layout.
+- `Application` is a pure provider root — theme, locale, dialogs, toasts. It does not render a layout itself; compose your screen with the `Screen` component (`Screen.Header`/`Screen.Sidebar`/`Screen.Content`/`Screen.Footer`) inside `Application`'s `children`.

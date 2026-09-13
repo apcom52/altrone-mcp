@@ -1,6 +1,6 @@
 # Breadcrumbs
 
-A navigation landmark for showing the current page's location in the hierarchy. Renders a `<nav>` with an `<ol>` inside. Separators (`ChevronRight`) are inserted automatically between items — the last item never gets a separator.
+A navigation landmark for showing the current page's location in the hierarchy. Renders a labelled `<nav>` (localized `aria-label`) with an `<ol>` inside. A `ChevronRight` separator is drawn after every item except the last (hidden via CSS `:last-child`).
 
 ## Import
 
@@ -26,18 +26,18 @@ All standard `HTMLAttributes<HTMLElement>` are also accepted.
 
 ### Breadcrumbs.Item
 
-A single breadcrumb. Renders as a plain `<div>` by default. Use `asChild` to make it a link or any other element.
+A single breadcrumb. Renders `<li>` as the root; inside it, a plain `<div>` by default, or the `asChild` child. The separator is rendered inside every `<li>` and hidden on the last via CSS.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | `string` | — | Text label of the breadcrumb |
 | `icon` | `ReactElement` | — | Icon displayed to the left of the label |
-| `current` | `boolean` | `false` | Marks this item as the current page. Applies distinct styling. Use on the last item. |
-| `asChild` | `boolean` | `false` | Merges Breadcrumbs.Item styles onto the single child element (Slot pattern). Use to render an `<a>` or a router `<Link>`. |
+| `current` | `boolean` | `false` | The current page (the last item). Renders bold and sets `aria-current="page"` automatically. Should not be combined with `asChild`. |
+| `asChild` | `boolean` | `false` | Merge the item's styling/ref/props onto the single child element (Slot pattern). Use for an `<a>` or router `<Link>`. `label`/`icon` become its content. |
 | `children` | `ReactElement` | — | Only used with `asChild`. Must be a single valid React element. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the item element (the `<div>`, or the `asChild` child) |
 
-> **Internal prop:** `isLast` is injected automatically by `Breadcrumbs` via `cloneElement` and controls whether the separator is shown. Never pass it manually.
+`className`/`style` and other passthrough props (`onClick`, `data-*`, …) go on the item element (`<div>` or the `asChild` child), not the `<li>`. This works with `asChild` too.
 
 ---
 
@@ -126,6 +126,7 @@ import { Ellipsis } from 'lucide-react';
 
 ## Notes
 
-- The separator `ChevronRight` is rendered after every item except the last one. This is determined automatically by `Breadcrumbs` — no manual handling needed.
+- The separator `ChevronRight` is rendered inside every `<li>` (as an `aria-hidden` node) and hidden on the last item via CSS `:last-child` — this stays correct even when an item is wrapped (e.g. by `Dropdown`).
+- `current` already sets `aria-current="page"` on the item element — no need to add it yourself.
 - When `asChild={true}` and `children` is not a valid React element, the component logs an error and returns `null`.
-- The `current` prop is purely visual; for full accessibility consider also setting `aria-current="page"` on the item or its child link element.
+- The `<nav>` gets a localized `aria-label` ("Breadcrumb"), so multiple nav landmarks on a page stay distinguishable.

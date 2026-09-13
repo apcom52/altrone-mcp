@@ -1,66 +1,56 @@
 # Message
 
-An inline alert or banner for status messages. Supports severity levels, a close button, action buttons, and a compact layout.
+An inline alert or banner for status messages that belong in the flow of the page (not a floating `Toast`). Supports severity levels, an icon, a header, action buttons, a close button, and a compact layout.
+
+The container is a `Box` (`material="glass"`, `shape="rounded"`), so a message renders as a soft frosted panel consistent with the rest of the library. `severity` maps onto the Box `tone`. With no `icon`, the container widens its horizontal padding so the text keeps a comfortable inset.
+
+The root `role` is derived from `severity`: `severity="danger"` renders an assertive `role="alert"` (the screen reader interrupts), every other severity renders a polite `role="status"`. Pass `ariaRole` to override.
 
 ## Import
 
 ```tsx
-import { Message } from 'altrone-ui';
+import { Message } from "altrone-ui";
 ```
 
 ---
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | — | **Required.** Primary message text |
-| `severity` | `'info' \| 'success' \| 'warning' \| 'danger'` | `'info'` | Controls color and icon. Use `severity` — the `role` prop is deprecated and logs a console warning. |
-| `description` | `string` | — | Secondary body text below the title |
-| `actions` | `MessageAction[]` | — | Array of action buttons rendered below the description |
-| `onClose` | `() => void` | — | When provided, a `CloseButton` appears in the top-right corner |
-| `compact` | `boolean` | `false` | Reduces padding and font size |
-| `ariaRole` | `string` | `'alert'` | ARIA role for the root element |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| Prop       | Type                                              | Default                                        | Description                                                                                   |
+| ---------- | ------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `header`   | `ReactNode`                                       | —                                              | Primary message text, shown above the body                                                    |
+| `children` | `ReactNode`                                       | —                                              | Body content, shown below the header                                                          |
+| `icon`     | `ReactElement`                                    | —                                              | Icon shown to the left of the content (e.g. a `lucide-react` icon)                            |
+| `severity` | `'primary' \| 'success' \| 'warning' \| 'danger'` | —                                              | Colour and implied urgency. Omit for a neutral message. `primary` follows the current accent. |
+| `actions`  | `ReactElement[]`                                  | —                                              | Elements (usually `Button`s) rendered in a row under the body                                 |
+| `onClose`  | `() => void`                                      | —                                              | When provided, a `CloseButton` is rendered; the message does not track its own visibility     |
+| `compact`  | `boolean`                                         | `false`                                        | Lays the header and body on one wrapping line, vertically centred on the icon                 |
+| `ariaRole` | `AriaRole`                                        | `alert` for `severity="danger"`, else `status` | Overrides the severity-derived ARIA role of the root element                                  |
+| `ref`      | `Ref<HTMLDivElement>`                             | —                                              | Forwarded to the root element                                                                 |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
-
-### MessageAction
-
-```ts
-interface MessageAction {
-  label: string;
-  onClick: () => void;
-}
-```
+All standard `HTMLAttributes<HTMLDivElement>` (except `role`, replaced by `ariaRole`) are also accepted.
 
 ---
 
 ## Examples
 
-### Basic info message
+### Basic message
 
 ```tsx
-<Message title="Your session will expire in 5 minutes." />
+<Message header="Custom code is not validated">
+  Incorrect code may impact your website's performance.
+</Message>
 ```
 
 ### Severity levels
 
 ```tsx
-<Message severity="info"    title="A new version is available." />
-<Message severity="success" title="Your changes were saved." />
-<Message severity="warning" title="Storage is almost full." />
-<Message severity="danger"  title="Failed to connect to the server." />
-```
+import { Info, Check, TriangleAlert, CircleAlert } from 'lucide-react';
 
-### With description
-
-```tsx
-<Message
-  severity="warning"
-  title="Unsaved changes"
-  description="You have unsaved changes that will be lost if you navigate away."
-/>
+<Message icon={<Info />} header="A new version is available." severity="primary" />
+<Message icon={<Check />} header="Your changes were saved." severity="success" />
+<Message icon={<TriangleAlert />} header="Storage is almost full." severity="warning" />
+<Message icon={<CircleAlert />} header="Failed to connect to the server." severity="danger" />
 ```
 
 ### Dismissible
@@ -68,41 +58,54 @@ interface MessageAction {
 ```tsx
 const [visible, setVisible] = useState(true);
 
-{visible && (
-  <Message
-    severity="info"
-    title="New features are available."
-    onClose={() => setVisible(false)}
-  />
-)}
+{
+  visible && (
+    <Message
+      header="New features are available."
+      severity="primary"
+      onClose={() => setVisible(false)}
+    />
+  );
+}
 ```
 
 ### With actions
 
 ```tsx
 <Message
-  severity="warning"
-  title="Your plan is about to expire."
-  description="Renew now to avoid service interruption."
+  icon={<Info />}
+  header="The data export you requested is ready!"
+  severity="primary"
   actions={[
-    { label: 'Renew plan', onClick: openBilling },
-    { label: 'Dismiss',    onClick: dismiss },
+    <Button key="view" label="View the data" />,
+    <Button key="later" label="Maybe later" />,
   ]}
+  onClose={dismiss}
 />
+```
+
+### Without an icon
+
+```tsx
+<Message header="Draft saved">
+  Your changes are stored locally and will sync when you reconnect.
+</Message>
 ```
 
 ### Compact
 
 ```tsx
-<Message severity="success" title="Copied to clipboard." compact />
+<Message
+  icon={<Check />}
+  header="Successfully uploaded"
+  severity="success"
+  compact
+  onClose={dismiss}
+/>
 ```
 
 ### Custom ARIA role
 
 ```tsx
-<Message
-  severity="info"
-  title="Loading data…"
-  ariaRole="status"
-/>
+<Message header="Loading data…" ariaRole="status" />
 ```

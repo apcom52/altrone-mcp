@@ -52,6 +52,7 @@ A clickable menu item.
 | `danger` | `boolean` | `false` | Danger (red) color treatment |
 | `disabled` | `boolean` | `false` | Disables the item |
 | `asChild` | `boolean` | `false` | Merges action styles onto the single child element (Slot pattern) |
+| `ref` | `Ref<HTMLButtonElement>` | — | Forwarded ref (or the child element's ref when `asChild` is used) |
 | `onClick` | `(event: MouseEvent) => void` | — | Click handler |
 
 ---
@@ -66,6 +67,7 @@ A toggleable checkbox item inside the menu.
 | `checked` | `boolean` | **Required.** Checked state |
 | `onChange` | `(state: boolean) => void` | **Required.** Called with the next state |
 | `disabled` | `boolean` | — |
+| `ref` | `Ref<HTMLButtonElement>` | Forwarded ref |
 
 ---
 
@@ -79,6 +81,7 @@ A group of mutually exclusive options.
 | `value` | `T` | **Required.** Currently selected value |
 | `onChange` | `(value: T) => void` | **Required.** Called when selection changes |
 | `children` | `ReactElement<DropdownRadioListItem>[]` | **Required.** `Dropdown.RadioItem` elements |
+| `ref` | `Ref<HTMLDivElement>` | Forwarded ref |
 
 ---
 
@@ -91,6 +94,7 @@ An individual option inside `Dropdown.RadioList`.
 | `value` | `T` | **Required.** This item's value |
 | `label` | `string` | **Required.** Display label |
 | `disabled` | `boolean` | — |
+| `ref` | `Ref<HTMLButtonElement>` | Forwarded ref |
 
 ---
 
@@ -103,6 +107,7 @@ A menu item that opens a nested sub-menu on hover/click.
 | `label` | `string` | **Required.** Item label |
 | `icon` | `ReactElement` | — |
 | `disabled` | `boolean` | — |
+| `ref` | `Ref<HTMLElement>` | Forwarded ref |
 | `children` | `Dropdown.Action` elements | Content of the sub-menu |
 
 ---

@@ -1,6 +1,6 @@
 # Splitter
 
-A resizable panel layout. Panels are separated by draggable dividers. Supports horizontal and vertical splitting, collapsible panels, min/max constraints, and an imperative control API.
+A resizable panel layout. Panels are separated by draggable dividers. Supports horizontal and vertical splitting, collapsible panels, min/max constraints, keyboard resizing (arrow keys on a focused divider, `Home`/`End`), and an imperative control API. Divider collapse buttons and panel `aria-label`s are localized via `useLocalization()`.
 
 ## Import
 
@@ -18,6 +18,7 @@ import { Splitter } from 'altrone-ui';
 |------|------|---------|-------------|
 | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Direction panels are split |
 | `showControls` | `boolean` | `true` | Show collapse/expand toggle buttons on dividers |
+| `collapsedControlsVisibility` | `'always' \| 'hover' \| 'never'` | `'always'` | How a collapsed panel's expand button is shown. `'always'` — persistently visible while collapsed. `'hover'` — only on divider hover / button focus. `'never'` — not rendered; expand via `controlRef`. |
 | `onResize` | `(sizes: number[], event: PointerEvent) => void` | — | Fired on every pointer-move during drag. `sizes` is an array of panel percentages (0–100). |
 | `onResizeStart` | `(sizes: number[], event: PointerEvent) => void` | — | Fired when drag begins |
 | `onResizeEnd` | `(sizes: number[], event: PointerEvent) => void` | — | Fired when drag ends |
@@ -36,8 +37,7 @@ A descriptor component — carries configuration. Splitter reads its props and r
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | Panel content |
-| `defaultSize` | `number` | auto | Initial size in percent (0–100). Uncontrolled. If omitted, panels share equal space. |
-| `size` | `number` | — | Also treated as initial size (uncontrolled semantics). |
+| `defaultSize` | `number` | auto | Initial size in percent (0–100). Uncontrolled. Panels without one share the remaining space equally. |
 | `min` | `number` | `0` | Minimum size in percent |
 | `max` | `number` | `100` | Maximum size in percent |
 | `collapsible` | `boolean` | `false` | Allow this panel to be fully collapsed via the divider toggle button |

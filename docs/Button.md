@@ -1,6 +1,10 @@
 # Button
 
-A clickable element that triggers an action. Built on `motion/react` — every press animates with a subtle scale. Supports icons, badges, loading/success/failed states, toggle selection, and the `asChild` Slot pattern.
+A clickable element that triggers an action. Rendered as a `Box` primitive (pill shape; `material`/`tone` derived from `variant`) with a `motion/react` press animation. Supports icons, badges, loading/success/failed states, toggle selection, and the `asChild` Slot pattern.
+
+Press feedback is `:active`-only (from `Box`) — there is no hover background change.
+
+Content changes (`label`, `icon`, `badge`) animate: the button eases to its new width via `motion`'s layout animation, respecting `prefers-reduced-motion`.
 
 ## Import
 
@@ -30,7 +34,8 @@ import { Button } from 'altrone-ui';
 | `additionalIcon` | `ReactElement` | — | Icon displayed to the right of the label (e.g. a chevron) |
 | `showLabel` | `boolean` | `true` | When `false`, hides the label and renders icon only. Automatically wraps the button in a `Tooltip` showing `tooltip ?? label`. |
 | `tooltip` | `string \| ReactElement` | — | Custom tooltip content. Only used when `showLabel={false}`; overrides the default `label` tooltip. |
-| `badge` | `number \| string \| ReactElement` | — | Small badge rendered inside the button (e.g. a counter or status tag) |
+| `kbd` | `string` | — | Shortcut badge shown in the auto-tooltip (e.g. `"⌘S"`). Only used when `showLabel={false}`. |
+| `badge` | `number \| string \| ReactElement` | — | Small badge (counter or status). Inline at the end of the content on a labelled button; a `plate` chip floating over the top-right corner on an icon-only button. |
 | `state` | `'idle' \| 'loading' \| 'succeeded' \| 'failed'` | `'idle'` | Async feedback state. Any non-idle value disables the button and replaces content with a spinner, checkmark, or X icon. |
 | `selected` | `boolean` | `false` | Toggle state. Sets `aria-pressed` and applies a selected visual style. |
 | `disabled` | `boolean` | `false` | Disables the button. Also set implicitly when `state !== 'idle'`. |
@@ -100,6 +105,9 @@ When `showLabel={false}`, the label is hidden visually but used as the accessibl
   icon={<AArrowUp />}
   tooltip="Sort A → Z"
 />
+
+{/* Tooltip with a shortcut badge — no need to wrap in <Tooltip> */}
+<Button label="Save" showLabel={false} icon={<Save />} kbd="⌘S" />
 ```
 
 ### Badge

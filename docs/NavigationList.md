@@ -1,6 +1,6 @@
 # NavigationList
 
-A vertical navigation sidebar component. Renders a `<nav>` element. Supports nested links, groups, header, footer, and keyboard navigation. Uses `framer-motion` for the active-item highlight animation.
+A vertical navigation sidebar. Renders a semantic `<nav>` element. Supports an optional header and footer, titled groups, links with icons/badges/nested sub-navigation, and inline row/group action buttons. Uses `framer-motion` for the sliding highlight that animates between items.
 
 ## Import
 
@@ -14,86 +14,96 @@ import { NavigationList } from 'altrone-ui';
 
 ### NavigationList
 
+The `<nav>` container. Lays its children out top-to-bottom; a `Header` sticks to the top and a `Footer` to the bottom while groups scroll between them.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string` | — | **Required.** Unique ID for the `layoutId` of the framer-motion backdrop animation. Each independent navigation list needs its own `id`. |
-| `children` | `ReactNode` | — | `NavigationList.Group`, `NavigationList.Link`, `NavigationList.Header`, `NavigationList.Footer` elements |
-| `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
+| `children` | `ReactNode` | — | `NavigationList.Header`, `NavigationList.Group`, `NavigationList.Link`, `NavigationList.Footer` elements |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<nav>` |
+
+Also accepts the standard `HTMLElement` attributes (`className`, `style`, `aria-label`, …). No `id` prop is required — the `layoutId` for the highlight animation is generated internally.
 
 ---
 
 ### NavigationList.Group
 
-A labeled section that groups related links. Collapsible via expand/collapse button.
+A section of links. With a `title` it is exposed as `role="group"` labelled by that title; without one it just visually separates a cluster of links.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | **Required.** Group heading text |
-| `children` | `ReactNode` | — | `NavigationList.Link` elements |
-| `icon` | `ReactElement` | — | Icon next to the group label |
-| `defaultExpanded` | `boolean` | `true` | Whether the group starts expanded |
+| `title` | `string` | — | Group heading text (optional) |
+| `children` | `ReactNode` | — | `NavigationList.Link` elements, plus optional `NavigationList.GroupAction` / `Dropdown`-wrapped actions rendered in the header |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 ---
 
 ### NavigationList.GroupAction
 
-An icon button rendered in the group header (e.g. an "Add" button).
+An icon button for the group header (e.g. an "Add" button, or a menu trigger when wrapped in `Dropdown`). Renders a `size="s"` `Button`.
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `label` | `string` | **Required.** Tooltip/aria label |
+| `label` | `string` | **Required.** Accessible name / tooltip |
 | `icon` | `ReactElement` | **Required.** Icon |
-| `onClick` | `() => void` | Click handler |
+| `onClick` | `(e: MouseEvent) => void` | Click handler |
 
 ---
 
 ### NavigationList.Link
 
-A navigation item. Can contain nested `NavigationList.Link` elements and `NavigationList.LinkAction` buttons. Nested links are shown when `selected={true}`.
+A navigation item. Renders a real `<a>`.
+
+- Pass `href` for a normal link.
+- Omit `href` and pass `onClick` to use it as a button — it becomes focusable (`tabindex="0"`) and activates on `Enter` / `Space`.
+- `selected` marks the active item: sets `aria-current="page"` and moves the animated backdrop to it.
+- Nested `NavigationList.Link` children form sub-navigation that is shown **only while the parent is `selected`**.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | `string` | — | **Required.** Item label |
-| `selected` | `boolean` | `false` | Whether this item is currently active. When true, reveals nested children and shows the animated backdrop. |
+| `href` | `string` | — | Navigation target. Omit to use the item as a button. |
+| `selected` | `boolean` | `false` | Active item. Sets `aria-current="page"`, reveals nested children, shows the backdrop. |
 | `icon` | `ReactElement` | — | Icon to the left of the label |
-| `badge` | `string \| number \| ReactElement` | — | Badge on the right |
-| `disabled` | `boolean` | `false` | Disables the item |
-| `asChild` | `boolean` | `false` | Merges link styles onto a single child element (Slot pattern). Use to wrap a router `<Link>`. |
-| `onClick` | `() => void` | — | Click handler |
-| `children` | `ReactNode` | — | Nested `NavigationList.Link` elements (sub-navigation shown when selected) |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `badge` | `string \| number \| ReactElement` | — | Badge on the right. Any element also works as trailing content (e.g. a `Label`). |
+| `disabled` | `boolean` | `false` | Drops `href`, sets `tabindex="-1"` + `aria-disabled`, ignores clicks |
+| `asChild` | `boolean` | `false` | Merge styling / ref / interaction props onto a single child element instead of rendering an `<a>`. Use to wrap a router `<Link>`. |
+| `onClick` | `(e: MouseEvent) => void` | — | Click handler |
+| `children` | `ReactNode` | — | Nested `NavigationList.Link` elements and/or `NavigationList.LinkAction` buttons |
+| `ref` | `Ref<HTMLAnchorElement>` | — | Forwarded ref |
 
 ---
 
 ### NavigationList.LinkAction
 
-An icon button rendered inline at the right side of a `NavigationList.Link` on hover.
+An icon button rendered inline at the right edge of a `NavigationList.Link`. It stops the event from reaching the parent link, so triggering the action never navigates. Renders a `size="s"` `variant="text"` `Button`.
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `label` | `string` | **Required.** Tooltip/aria label |
+| `label` | `string` | **Required.** Accessible name / tooltip |
 | `icon` | `ReactElement` | **Required.** Icon |
-| `onClick` | `(e: MouseEvent) => void` | Click handler (should call `e.stopPropagation()` to avoid triggering the parent link) |
+| `onClick` | `(e: MouseEvent) => void` | Click handler (the parent link is already shielded) |
 
 ---
 
 ### NavigationList.Header
 
-Content rendered above all groups/links (e.g. a workspace switcher).
+Content pinned above all groups (e.g. a workspace switcher).
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `children` | `ReactNode` | Header content |
+| `ref` | `Ref<HTMLDivElement>` | Forwarded ref |
 
 ---
 
 ### NavigationList.Footer
 
-Content rendered below all groups/links (e.g. account info or settings).
+Content pinned below all groups (e.g. account info).
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `children` | `ReactNode` | Footer content |
+| `ref` | `Ref<HTMLDivElement>` | Forwarded ref |
 
 ---
 
@@ -102,24 +112,34 @@ Content rendered below all groups/links (e.g. account info or settings).
 ### Basic
 
 ```tsx
-<NavigationList id="main-nav">
-  <NavigationList.Link label="Dashboard" icon={<Home />} selected={current === 'dashboard'} onClick={() => setCurrent('dashboard')} />
-  <NavigationList.Link label="Projects"  icon={<Folder />} selected={current === 'projects'} onClick={() => setCurrent('projects')} />
-  <NavigationList.Link label="Settings"  icon={<Settings />} selected={current === 'settings'} onClick={() => setCurrent('settings')} />
+<NavigationList>
+  <NavigationList.Link label="Dashboard" icon={<Home />} href="/" selected={pathname === '/'} />
+  <NavigationList.Link label="Projects" icon={<Folder />} href="/projects" selected={pathname === '/projects'} />
+  <NavigationList.Link label="Settings" icon={<Settings />} href="/settings" selected={pathname === '/settings'} />
 </NavigationList>
+```
+
+### As buttons (no href)
+
+```tsx
+<NavigationList.Link
+  label="Toggle sidebar"
+  icon={<PanelLeft />}
+  onClick={() => setCollapsed((c) => !c)}
+/>
 ```
 
 ### With groups
 
 ```tsx
-<NavigationList id="sidebar">
-  <NavigationList.Group label="Workspace" icon={<Building />}>
-    <NavigationList.Link label="Overview" selected={…} onClick={…} />
-    <NavigationList.Link label="Members"  selected={…} onClick={…} />
+<NavigationList>
+  <NavigationList.Group title="Workspace">
+    <NavigationList.Link label="Overview" href="/overview" selected={…} />
+    <NavigationList.Link label="Members"  href="/members"  selected={…} />
   </NavigationList.Group>
-  <NavigationList.Group label="Settings">
-    <NavigationList.Link label="Profile"  selected={…} onClick={…} />
-    <NavigationList.Link label="Billing"  selected={…} onClick={…} />
+  <NavigationList.Group title="Settings">
+    <NavigationList.Link label="Profile" href="/profile" selected={…} />
+    <NavigationList.Link label="Billing" href="/billing" selected={…} />
   </NavigationList.Group>
 </NavigationList>
 ```
@@ -129,16 +149,16 @@ Content rendered below all groups/links (e.g. account info or settings).
 Nested links appear when the parent has `selected={true}`.
 
 ```tsx
-<NavigationList.Link label="Projects" selected={section === 'projects'} icon={<Folder />}>
-  <NavigationList.Link label="Active"   selected={project === 'active'}   onClick={…} />
-  <NavigationList.Link label="Archived" selected={project === 'archived'} onClick={…} />
+<NavigationList.Link label="Engineering" icon={<Users />} selected={section === 'engineering'} onClick={() => setSection('engineering')}>
+  <NavigationList.Link label="Frontend" selected={team === 'frontend'} onClick={() => setTeam('frontend')} />
+  <NavigationList.Link label="Backend"  selected={team === 'backend'}  onClick={() => setTeam('backend')} />
 </NavigationList.Link>
 ```
 
-### With router links (asChild)
+### Router links (asChild)
 
 ```tsx
-<NavigationList.Link label="Dashboard" selected={pathname === '/'} asChild>
+<NavigationList.Link label="Dashboard" icon={<Home />} asChild selected={pathname === '/'}>
   <Link to="/" />
 </NavigationList.Link>
 ```
@@ -146,27 +166,22 @@ Nested links appear when the parent has `selected={true}`.
 ### Link with hover action buttons
 
 ```tsx
-<NavigationList.Link label="My Project" selected={…} onClick={…}>
-  <NavigationList.LinkAction
-    label="Add page"
-    icon={<Plus />}
-    onClick={(e) => { e.stopPropagation(); openAddPage(); }}
-  />
-  <NavigationList.LinkAction
-    label="More options"
-    icon={<MoreHorizontal />}
-    onClick={(e) => { e.stopPropagation(); openMenu(); }}
-  />
+<NavigationList.Link label="My Project" href="/p/1" selected={…}>
+  <NavigationList.LinkAction label="Add page" icon={<Plus />} onClick={openAddPage} />
+  <NavigationList.LinkAction label="More options" icon={<MoreHorizontal />} onClick={openMenu} />
 </NavigationList.Link>
 ```
 
-### Group with action button
+### Group with action button and menu
 
 ```tsx
-<NavigationList.Group label="Pages" icon={<FileText />}>
-  <NavigationList.GroupAction label="New page" icon={<Plus />} onClick={createPage} />
-  {pages.map(page => (
-    <NavigationList.Link key={page.id} label={page.name} selected={…} onClick={…} />
+<NavigationList.Group title="Projects">
+  <NavigationList.GroupAction label="New project" icon={<Plus />} onClick={createProject} />
+  <Dropdown content={<Dropdown.Menu><Dropdown.Action label="Sort by name" /></Dropdown.Menu>}>
+    <NavigationList.GroupAction label="Options" icon={<MoreHorizontal />} />
+  </Dropdown>
+  {projects.map((p) => (
+    <NavigationList.Link key={p.id} label={p.name} href={`/p/${p.id}`} selected={…} />
   ))}
 </NavigationList.Group>
 ```
@@ -174,16 +189,22 @@ Nested links appear when the parent has `selected={true}`.
 ### With header and footer
 
 ```tsx
-<NavigationList id="app-nav">
+<NavigationList>
   <NavigationList.Header>
     <WorkspaceSwitcher />
   </NavigationList.Header>
 
-  <NavigationList.Link label="Home" icon={<Home />} selected={…} />
-  <NavigationList.Link label="Inbox" icon={<Inbox />} badge={3} selected={…} />
+  <NavigationList.Link label="Home" icon={<Home />} href="/" selected={…} />
+  <NavigationList.Link label="Inbox" icon={<Inbox />} href="/inbox" badge={3} selected={…} />
 
   <NavigationList.Footer>
     <UserProfile />
   </NavigationList.Footer>
 </NavigationList>
+```
+
+### Disabled item
+
+```tsx
+<NavigationList.Link label="Reports" icon={<BarChart2 />} disabled />
 ```

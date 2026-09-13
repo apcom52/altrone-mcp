@@ -1,6 +1,6 @@
 # NumberInput
 
-A numeric text input with optional increment/decrement spinner buttons. Built on `react-number-format` (`NumericFormat`). Reads `name`, `disabled`, `invalid`, and `size` from `FormFieldContext` when used inside a `Form`.
+A numeric text input with locale-aware formatting (grouping and decimal separators) and silent `min`/`max` clamping. Built on `react-number-format` (`NumericFormat`). Reads `name`, `disabled`, `invalid`, and `size` from `FormFieldContext` when used inside a `Form`.
 
 ## Import
 
@@ -16,20 +16,23 @@ import { NumberInput } from 'altrone-ui';
 |------|------|---------|-------------|
 | `value` | `number \| null` | — | Controlled value. `null` renders an empty input. |
 | `onChange` | `(value: number, event: SyntheticEvent) => void` | — | Called with the parsed float value. If the parsed value is `NaN`, `0` is passed instead. |
-| `min` | `number` | `0` | Minimum allowed value (enforced by the spinner buttons) |
-| `max` | `number` | — | Maximum allowed value (enforced by the spinner buttons) |
+| `min` | `number` | `0` | Minimum allowed value — values below it are refused as you type |
+| `max` | `number` | — | Maximum allowed value — values above it are refused as you type |
 | `digitsAfterPoint` | `number` | `2` | Number of decimal places |
+| `fixedDecimalScale` | `boolean` | `false` | Pad the decimals to `digitsAfterPoint` (e.g. `5` → `5.00`) |
 | `groupingDelimiter` | `string` | `' '` | Thousands separator character |
-| `showControls` | `boolean` | `true` | Whether to show the +/− spinner buttons |
+| `decimalDelimiter` | `string` | `'.'` | Decimal separator character |
+| `allowNegative` | `boolean` | `false` | Allow a leading minus sign |
 | `disabled` | `boolean` | `false` | Disables the input. Also inherited from `FormFieldContext`. |
 | `invalid` | `boolean` | `false` | Error state styling. Also inherited from `FormFieldContext`. |
 | `size` | `Size` | `'m'` | Input size. Also inherited from `FormFieldContext`. |
 | `name` | `string` | — | Input name. Also inherited from `FormFieldContext`. |
 | `placeholder` | `string` | — | Placeholder text |
 | `readOnly` | `boolean` | — | Makes the input read-only |
-| `ref` | `Ref<HTMLInputElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the visual wrapper |
+| `inputRef` | `Ref<HTMLInputElement>` | — | Forwarded to the underlying `<input>` |
 
-All other `TextInputProps` are also accepted.
+All other `TextInputProps` are also accepted. There are no spinner buttons — stepping a value up and down by one is a niche interaction with a tiny hit target; type the value, or compose an explicit `[−]/[+]` stepper with `TextInput.ActionIsland` where it genuinely helps.
 
 > **Note:** The `min` prop defaults to `0`. Set `min` to `undefined` or a negative number if you need to accept values below zero.
 
@@ -80,13 +83,15 @@ const [qty, setQty] = useState(1);
 />
 ```
 
-### Without spinner controls
+### Fixed decimal scale
 
 ```tsx
 <NumberInput
-  value={value}
-  onChange={(v) => setValue(v)}
-  showControls={false}
+  value={amount}
+  onChange={(v) => setAmount(v)}
+  digitsAfterPoint={2}
+  fixedDecimalScale
+  groupingDelimiter=","
 />
 ```
 

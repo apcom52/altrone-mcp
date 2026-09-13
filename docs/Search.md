@@ -2,6 +2,8 @@
 
 A search input with an optional suggestion dropdown, a search icon, and a clear button. Extends `AutocompleteInput` with search-specific styling: a full-width placeholder with a search icon when empty, and a clear (×) button when the field has a value.
 
+Generic over the suggestion type — `Search<T>` — like `AutocompleteInput`. `T` defaults to `string`; pass an object type together with `getSuggestionValue` and `renderSuggestion` for rich results (see the docs-sidebar story).
+
 ## Import
 
 ```tsx
@@ -15,8 +17,8 @@ import { Search } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `string` | — | **Required.** Controlled value |
-| `onChange` | `(e: ChangeEvent<HTMLInputElement>) => void` | — | **Required.** Change handler |
-| `getSuggestions` | `(query: string) => Promise<Suggestion[]> \| Suggestion[]` | `() => []` | Async or sync function that returns autocomplete suggestions. Optional — omit it for a plain search field with no dropdown. |
+| `onChange` | `(value: string, event: ChangeEvent) => void` | — | **Required.** Change handler — receives the string value first. |
+| `getSuggestions` | `(ctx: { value: string }) => Promise<T[]> \| T[]` | `() => []` | Async or sync function that returns suggestions. Optional — omit it for a plain search field with no dropdown (see the list-filter story). |
 | `showControls` | `boolean` | `true` | Whether to show the clear button when value is non-empty. Set to `false` to hide it. |
 | `placeholder` | `string` | localized default | Placeholder text shown inside the styled placeholder overlay when the field is empty. |
 | `disabled` | `boolean` | `false` | Disables the input |

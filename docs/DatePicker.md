@@ -1,6 +1,6 @@
 # DatePicker
 
-A family of date/time input components built on a shared `generatePicker` factory. All variants render a read-only `TextInput` that opens a calendar popover.
+A family of date/time input components built on a shared `generatePicker` factory. All variants render a read-only `TextInput` (or a custom trigger — see `renderFunc` / `asChild`) that opens a calendar popover.
 
 ## Import
 
@@ -35,9 +35,22 @@ Extends `TextInput` props (except `value`, `onChange`, `ref`).
 | `maxDate` | `Dayjs` | — | Maximum selectable date. Dates after this are disabled. |
 | `autoClose` | `boolean` | `true` | Automatically close the popover after a date is selected |
 | `readOnly` | `boolean` | `false` | Disables the popover. Renders the value in a read-only style. |
+| `renderFunc` | `(ctx: DatePickerRenderContext) => ReactElement` | — | Replaces the default `TextInput` trigger with the returned element. `ctx` is `{ value, displayValue, expanded, disabled, clear, className, style }`. |
+| `asChild` | `boolean` | `false` | Use `children` as the trigger, merging `className` / `style` / click + ref onto it. |
+| `children` | `ReactElement` | — | The trigger element when `asChild` is set. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the wrapper div |
 
 Also accepts `TextInput` props: `placeholder`, `invalid`, `size`, `disabled`, `wrapperClassName`, etc.
+
+### `useDatePickerTrigger()`
+
+Any component rendered inside a `renderFunc` trigger can read the live trigger state instead of receiving it as props:
+
+```tsx
+const { value, displayValue, expanded, disabled, clear } = useDatePickerTrigger();
+```
+
+Throws outside a `DatePicker` / `RangePicker`.
 
 > **Warning:** If `minDate` is after `maxDate`, a console warning is emitted and the values are swapped internally.
 
@@ -140,10 +153,32 @@ const [range, setRange] = useState<(Dayjs | undefined)[]>([]);
 />
 ```
 
+### Custom trigger
+
+```tsx
+// renderFunc — receives live state
+<DatePicker
+  value={date}
+  onChange={setDate}
+  renderFunc={({ displayValue, expanded }) => (
+    <Button
+      label={displayValue || 'Pick a date'}
+      additionalIcon={expanded ? <ChevronUp /> : <ChevronDown />}
+    />
+  )}
+/>
+
+// asChild — bring your own element
+<DatePicker value={date} onChange={setDate} asChild>
+  <Button label={date ? date.format('D MMM') : 'Pick a date'} />
+</DatePicker>
+```
+
 ---
 
 ## Behavior details
 
-- The displayed value in the input is formatted using `dayjs(value).locale(locale).format(format)` where `locale` comes from the `Configuration` component (or `AltroneApplication`'s `config.locale.locale`).
+- The day grid inside the popover is the library's `Calendar` component (`mode="single"` for `DatePicker`, `mode="range"` for `RangePicker`) — weekday names, first-day-of-week, range highlighting and the selected-day animation all come from it. The popover's header (with month/year drill-down) and footer are `DatePicker`-specific.
+- The displayed value in the input is formatted using `dayjs(value).locale(locale).format(format)` where `locale` comes from the internal `useLocale()` hook, which currently defaults to `en-US` — there is no app-wide locale prop yet.
 - When the popover closes, the view resets to the picker's native level (e.g. reopening a `DatePicker` always starts at the day view, not the month/year navigation view left from the previous session).
 - The `readOnly` prop prevents the popover from opening but does not change the `TextInput` to `disabled` — the field remains focusable for screen readers.

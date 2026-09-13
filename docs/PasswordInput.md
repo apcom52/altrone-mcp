@@ -22,7 +22,8 @@ import { PasswordInput } from 'altrone-ui';
 | `size` | `Size` | `'m'` | Input size. Also inherited from `FormFieldContext`. |
 | `name` | `string` | — | Input name. Also inherited from `FormFieldContext`. |
 | `placeholder` | `string` | — | Placeholder text |
-| `ref` | `Ref<HTMLInputElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the visual wrapper |
+| `inputRef` | `Ref<HTMLInputElement>` | — | Forwarded to the underlying `<input>` |
 
 All other `TextInputProps` are also accepted (except `type`, which is managed internally).
 

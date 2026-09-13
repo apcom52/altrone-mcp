@@ -18,9 +18,9 @@ import { SideNavigation } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | `string` | — | Optional heading above the links (e.g. `"On this page"`) |
+| `title` | `string` | — | Optional heading above the links (e.g. `"On this page"`). The `<nav>` is `aria-labelledby` it. |
 | `children` | `ReactNode` | — | `SideNavigation.Item` elements |
-| `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<nav>` |
 
 All standard `HTMLAttributes<HTMLElement>` are also accepted.
 
@@ -33,8 +33,9 @@ All standard `HTMLAttributes<HTMLElement>` are also accepted.
 | `href` | `string` | **Required.** CSS selector for the target section (e.g. `"#introduction"`). Must match the `id` of a heading or section on the page. |
 | `label` | `string` | **Required.** Link text |
 | `children` | `ReactNode` | Nested `SideNavigation.Item` elements for sub-sections |
+| `ref` | `Ref<HTMLLIElement>` | Forwarded to the root `<li>` |
 
-All standard `HTMLAttributes<HTMLAnchorElement>` are also accepted.
+All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread onto the inner `<a>`); `className`/`style` apply to the root `<li>`.
 
 ---
 

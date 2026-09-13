@@ -1,6 +1,6 @@
 # Switcher
 
-A toggle switch control. Semantically equivalent to a checkbox but rendered as a sliding pill. Has `role="switch"` and `aria-checked`.
+A toggle switch. Same controlled contract as `Checkbox`, but rendered as a sliding pill and reported to assistive tech as `role="switch"`. Renders a `<label>` wrapping a visually-hidden (but focusable, screen-reader-visible) `<input type="checkbox" role="switch">`.
 
 ## Import
 
@@ -15,24 +15,26 @@ import { Switcher } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `checked` | `boolean` | `false` | Whether the switch is on |
-| `onChange` | `(nextChecked: boolean, event: ChangeEvent) => void` | — | Called with the **next** value (`!checked`), not `event.target.checked`. |
+| `onChange` | `(nextChecked: boolean, event: ChangeEvent<HTMLInputElement>) => void` | — | Called with the **next** value (`!checked`), not `event.target.checked`. |
 | `children` | `ReactNode` | — | Optional label rendered next to the switch |
-| `disabled` | `boolean` | `false` | Disables the switch |
-| `danger` | `boolean` | `false` | Applies danger (red) color to the active state |
-| `name` | `string` | — | HTML name attribute for the hidden `<input type="checkbox">` |
-| `ref` | `Ref<HTMLLabelElement>` | — | Forwarded ref |
+| `disabled` | `boolean` | `false` | Disables the switch (applied to the native `<input>`) |
+| `danger` | `boolean` | `false` | Applies danger (red) color to the label |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the track, handle and label type; the row stays ≥24px tall |
+| `name` | `string` | — | HTML `name` attribute on the `<input>`, for form submission |
+| `ref` | `Ref<HTMLLabelElement>` | — | Forwarded ref to the root `<label>` |
 
 All standard `LabelHTMLAttributes<HTMLLabelElement>` are also accepted.
 
-> **Note:** `Switcher` does not have an `indeterminate` state. For a three-state control, use `Checkbox`.
+> **Note:** `Switcher` has no `indeterminate` state. For a three-state control, use `Checkbox`.
 
 ---
 
 ## Behavior
 
-- `onChange` receives `!checked` as the first argument — the value has already been flipped. There is no need to negate `event.target.checked`.
-- Keyboard: `Enter` and `Space` toggle the switch.
-- The underlying `<input type="checkbox">` is visually hidden but participates in form submission via `name`.
+- `onChange` receives `!checked` as the first argument — already flipped, no need to read `event.target.checked`.
+- **Keyboard**: focus lands on the real `<input>`; `Space` toggles it natively (`Enter` does not, matching native form controls).
+- **Accessible name** comes from `children` (the `<label>` wraps the input). With no `children`, pass `aria-label` / `aria-labelledby` — they are forwarded to the `<input>`, not the wrapper.
+- The `<input>` is visually hidden but stays in the accessibility tree and participates in form submission via `name`.
 
 ---
 
@@ -42,35 +44,36 @@ All standard `LabelHTMLAttributes<HTMLLabelElement>` are also accepted.
 
 ```tsx
 const [enabled, setEnabled] = useState(false);
-<Switcher checked={enabled} onChange={(v) => setEnabled(v)} />
+<Switcher aria-label="Wi-Fi" checked={enabled} onChange={setEnabled} />
 ```
 
 ### With label
 
 ```tsx
-<Switcher checked={notifications} onChange={(v) => setNotifications(v)}>
+<Switcher checked={notifications} onChange={setNotifications}>
   Email notifications
 </Switcher>
+```
+
+### Sizes
+
+```tsx
+<Switcher size="s" checked={on} onChange={setOn}>Compact row</Switcher>
+<Switcher size="l" checked={on} onChange={setOn}>Large</Switcher>
 ```
 
 ### Disabled
 
 ```tsx
-<Switcher checked={true} onChange={() => {}} disabled>
-  Auto-save (locked)
-</Switcher>
+<Switcher checked disabled>Always on for this workspace</Switcher>
 ```
 
-### Danger variant
+### Danger
 
 Use `danger` for switches that enable a destructive or high-risk mode.
 
 ```tsx
-<Switcher
-  checked={deleteMode}
-  onChange={(v) => setDeleteMode(v)}
-  danger
->
+<Switcher checked={deleteMode} onChange={setDeleteMode} danger>
   Enable bulk delete mode
 </Switcher>
 ```
@@ -79,17 +82,12 @@ Use `danger` for switches that enable a destructive or high-risk mode.
 
 ```tsx
 <Flex direction="vertical" gap="m">
-  <Flex justify="space-between" align="center">
-    <span>Dark mode</span>
-    <Switcher checked={darkMode} onChange={(v) => setDarkMode(v)} />
-  </Flex>
-  <Flex justify="space-between" align="center">
-    <span>Compact layout</span>
-    <Switcher checked={compact} onChange={(v) => setCompact(v)} />
-  </Flex>
-  <Flex justify="space-between" align="center">
-    <span>Notifications</span>
-    <Switcher checked={notifications} onChange={(v) => setNotifications(v)} />
-  </Flex>
+  {settings.map(({ key, label }) => (
+    <Flex key={key} justify="between" align="center">
+      <Switcher checked={values[key]} onChange={(v) => set(key, v)}>
+        {label}
+      </Switcher>
+    </Flex>
+  ))}
 </Flex>
 ```

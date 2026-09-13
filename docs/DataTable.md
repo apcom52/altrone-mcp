@@ -1,8 +1,7 @@
 # DataTable
 
-A full-featured data table for displaying **multiple rows**. Built on `@tanstack/react-table`. Supports sorting, filtering, pagination, row selection, custom row actions, and loading/select modes.
+A full-featured data table for displaying **multiple rows**. A thin wrapper around `@tanstack/react-table` (v9) — sorting, filtering, pagination, row selection and column resizing are all owned by the underlying table instance. Also supports custom row actions and loading/select modes.
 
-> For editing a single record, use `DataGrid` instead.
 
 ## Import
 
@@ -20,16 +19,17 @@ import { DataTable } from 'altrone-ui';
 | `columns` | `DataTableColumn<T>[]` | — | **Required.** Column definitions |
 | `mode` | `'loading' \| 'read' \| 'select'` | `'read'` | Table mode. `loading` shows skeleton cells. `select` enables row checkboxes. |
 | `rowsPerPage` | `number` | `20` | Rows per page |
-| `selectable` | `boolean` | — | Enables row selection checkboxes |
+| `selectable` | `boolean` | — | Enables row selection and the "select rows" toggle in the header |
 | `showFooter` | `boolean` | `true` | Show/hide the pagination footer |
-| `showEmptyBanner` | `boolean` | `true` | Show an empty state banner when `data` is empty |
-| `renderRowActions` | `(ctx: DataTableRenderRowActionsContext) => ReactElement<DataTableRowActionsProps>` | — | Per-row action buttons. Return a `<DataTable.RowActions>` element. |
+| `showEmptyBanner` | `boolean` | `true` | Show an empty state banner when there are no rows to display |
+| `resizableColumns` | `boolean` | `false` | Let columns be resized by dragging their header edge (per-column opt-out via `resizable: false`) |
+| `renderRowActions` | `(ctx: DataTableRenderRowActionsContext<T>) => ReactElement<DataTableRowActionsProps>` | — | Per-row action buttons. Return a `<DataTable.RowActions>` element. |
 | `defaultPage` | `number` | `0` | Initial page index (zero-based) |
 | `defaultSort` | `{ field: string; direction: 'asc' \| 'desc' }` | — | Initial sort state |
-| `defaultFilters` | `Filter[]` | — | Initial filter state |
+| `defaultFilters` | `DataTableFilter[]` | — | Initial filter state |
 | `onPageChange` | `(currentPage: number) => void` | — | Called on page change. Page is 1-based. |
-| `onSortChange` | `(sort?: Sorting) => void` | — | Called on sort change |
-| `onFilterChange` | `(filters?: Filter[]) => void` | — | Called on filter change |
+| `onSortChange` | `(sort?: Sorting) => void` | — | Called on sort change. `undefined` when sorting is cleared. |
+| `onFilterChange` | `(filters: DataTableFilter[]) => void` | — | Called on filter change. Always an array (empty when no filters). |
 | `onModeChange` | `(mode: DataTableMode) => void` | — | Called when mode changes (e.g. entering select mode) |
 | `children` | `ReactElement \| ReactElement[] \| ((ctx: DataTableRenderContext<T>) => ReactElement \| ReactElement[])` | — | Toolbar content rendered in the table header. Receives `{ selectableMode, selectedItems }` when used as a function. |
 
@@ -45,6 +45,7 @@ type DataTableColumnBase<T> = {
   visible?: boolean;
   filterable?: boolean | DataTableColumnType;  // true = auto type, or explicit type
   sortable?: boolean;
+  resizable?: boolean;     // opt this column out of resizing when `resizableColumns` is on
 };
 ```
 
@@ -112,9 +113,40 @@ type User = { id: number; name: string; email: string; active: boolean };
   data={data}
   columns={columns}
   defaultSort={{ field: 'name', direction: 'asc' }}
-  defaultFilters={[]}
+  defaultFilters={[
+    { id: 'active', value: { rule: 'positive' } },
+    { id: 'age', value: { rule: 'gte', value: 18 } },
+  ]}
   onSortChange={(sort) => console.log(sort)}
   onFilterChange={(filters) => console.log(filters)}
+/>
+```
+
+### Filter state shape
+
+```ts
+interface DataTableFilter {
+  id: string;                    // column id (equal to its accessor)
+  value: {
+    rule: string;                // one of the *FilterRules enums for the column type
+    value?: unknown;             // compared value; a [from, to] tuple for `between` rules; absent for `empty`/`notEmpty`
+    level?: 'day' | 'month' | 'year';  // date columns only
+  };
+}
+```
+
+Rule enums are exported: `StringFilterRules`, `NumberFilterRules`, `DateFilterRules`, `BooleanFilterRules`, `SelectFilterRules`, `ColorFilterRules`, `PasswordFilterRules`, `ArrayFilterRules`.
+
+### Resizable columns
+
+```tsx
+<DataTable
+  data={data}
+  resizableColumns
+  columns={[
+    { accessor: 'name', label: 'Name', width: 200 },
+    { accessor: 'id', label: 'ID', width: 80, resizable: false },
+  ]}
 />
 ```
 
@@ -181,7 +213,7 @@ type User = { id: number; name: string; email: string; active: boolean };
         renderReadMode: ({ value }) => (
           <img src={String(value)} style={{ width: 48, height: 48, objectFit: 'cover' }} />
         ),
-        renderLoadingMode: () => <DummyBox width="48px" height="48px" />,
+        renderLoadingMode: () => <Skeleton width={48} height={48} />,
       },
     },
   ]}

@@ -20,6 +20,7 @@ import { FilePicker } from 'altrone-ui';
 | `multiple` | `boolean` | `false` | Allow selecting multiple files at once. |
 | `accept` | `string` | — | Accepted file types. Passed directly to `<input accept>` (e.g. `"image/*"`, `".pdf,.docx"`). |
 | `placeholder` | `string` | localized default | Label on the upload button. |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the pick button and the file chips (height, text, inline retry/delete buttons). |
 | `autoUpload` | `boolean` | `true` | Automatically upload files after selection using `url`/`method`/`name` or `autoUploadFn`. |
 | `url` | `string` | — | Upload endpoint URL. Required when `autoUpload=true` and no `autoUploadFn` is provided. |
 | `method` | `HTMLFormElement['method']` | — | HTTP method for upload (`'post'`, `'put'`, etc.). |

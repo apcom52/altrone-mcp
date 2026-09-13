@@ -2,6 +2,8 @@
 
 A multi-line text input. Extends `TextInput` — supports the same island sub-components (`TextInput.ActionIsland`, `TextInput.IconIsland`, etc.) and reads from `FormFieldContext` when inside a `Form`.
 
+Unlike `TextInput`, the wrapper defaults to `shape="rounded"` at a 16px radius (the corner a `pill` `TextInput` of the default size resolves to) rather than `pill` itself — a capsule end makes no sense on a box that grows vertically. Pass a different `shape` to override.
+
 ## Import
 
 ```tsx
@@ -23,6 +25,7 @@ All `TextInputProps` are accepted, **except** `type` (managed internally) and `r
 | `name` | `string` | — | Input name. Also read from `FormFieldContext`. |
 | `disabled` | `boolean` | `false` | Disables the textarea. Also read from `FormFieldContext`. |
 | `readOnly` | `boolean` | — | Makes the textarea read-only |
+| `shape` | `BoxShape` | `'rounded'` | Corner shape of the wrapper. Defaults to `rounded` at 16px (not `pill` like `TextInput`). |
 | `placeholder` | `string` | — | Placeholder text |
 | `rows` | `number` | — | Number of visible rows (native `rows` attribute) |
 | `maxLength` | `number` | — | Maximum character count (use with `TextInput.CharCounterIsland`) |
@@ -50,7 +53,12 @@ const [bio, setBio] = useState('');
 />
 ```
 
-### With character counter
+### Islands render as a footer
+
+Island children (`TextInput.CharCounterIsland`, `TextInput.CustomIsland`, …) don't
+share the text's line the way they do on a single-line `TextInput` — on a
+`Textarea` they lay out as a footer *below* the text: full-width textarea on top,
+islands on a row under it (`placement="start"` left, `placement="end"` right).
 
 ```tsx
 <Textarea
@@ -59,9 +67,15 @@ const [bio, setBio] = useState('');
   maxLength={500}
   placeholder="Write your message…"
 >
-  <TextInput.CharCounterIsland placement="right" />
+  <TextInput.CustomIsland placement="start" style={{ pointerEvents: 'none' }}>
+    <Text size={1} color="muted">⌘↵ to send</Text>
+  </TextInput.CustomIsland>
+  <TextInput.CharCounterIsland placement="end" />
 </Textarea>
 ```
+
+`CharCounterIsland` reads `value` / `maxLength` from context and shows
+`length/max`, turning red past the limit on its own.
 
 ### Invalid state
 

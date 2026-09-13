@@ -1,6 +1,6 @@
 # Pagination
 
-A fully controlled page navigation component. Always shows page 1 and the last page; automatically inserts ellipsis between ranges. Supports first/last jump buttons and keyboard accessibility.
+A fully controlled page switcher. Renders a `<nav>` landmark (localized `aria-label`) with previous/next arrows, numbered page buttons, and — by default — first/last jump buttons. Always shows page 1 and the last page; gaps collapse into an ellipsis.
 
 ## Import
 
@@ -14,14 +14,14 @@ import { Pagination } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `currentPage` | `number` | — | **Required.** The currently active page (1-based). |
+| `currentPage` | `number` | — | **Required.** The active page (1-based). Controlled — clamp it yourself in `onChange`. Out-of-range values log a dev warning. |
 | `totalPages` | `number` | — | **Required.** Total number of pages. |
-| `onChange` | `(page: number) => void` | — | **Required.** Called when the user selects a page. |
-| `siblings` | `number` | `1` | Number of page buttons to show on each side of the current page. |
-| `showEdgeButtons` | `boolean` | `false` | Show "go to first page" and "go to last page" buttons. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `onChange` | `(page: number, event: React.MouseEvent<HTMLButtonElement>) => void` | — | **Required.** Called with the target page when the user picks one. |
+| `siblings` | `number` | `1` | Page buttons to show on each side of the current page. |
+| `showEdgeButtons` | `boolean` | `true` | Show the "first page" / "last page" jump buttons. |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<nav>` |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
+All standard `HTMLAttributes<HTMLElement>` (except `onChange`) are also accepted.
 
 ---
 
@@ -30,8 +30,9 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 - Always renders page `1` and page `totalPages` (unless `totalPages` is 1).
 - Pages adjacent to `currentPage` within `siblings` distance are always shown as numbered buttons.
 - Gaps between the anchor pages and sibling range are replaced with an ellipsis (`…`).
-- The active page button has `aria-current="page"`.
-- Previous/Next buttons are disabled on the first/last page respectively.
+- The active page button is `selected` and has `aria-current="page"` (it stays focusable, not disabled).
+- Previous/First are disabled on page 1; Next/Last are disabled on the last page.
+- `Pagination` never hides itself. With `totalPages` of `1` it renders a lone disabled page button with disabled arrows — gate rendering on `totalPages > 1` yourself if you want it gone.
 
 ---
 
@@ -79,10 +80,12 @@ const [page, setPage] = useState(1);
 </Flex>
 ```
 
-### Single page (no pagination rendered)
+### Hide it when there's nothing to paginate
 
-When `totalPages` is `1`, the component renders without navigation — there is nothing to paginate.
+`Pagination` always renders something. Gate it yourself:
 
 ```tsx
-<Pagination currentPage={1} totalPages={1} onChange={() => {}} />
+{totalPages > 1 && (
+  <Pagination currentPage={page} totalPages={totalPages} onChange={setPage} />
+)}
 ```

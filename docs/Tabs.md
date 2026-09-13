@@ -1,6 +1,8 @@
 # Tabs
 
-A horizontal tab bar. `Tabs` is the container with `role="tablist"`; `Tabs.Item` is each tab. The active tab's backdrop animates between items using a shared `layoutId` from `motion/react`.
+A compact segmented tab bar. `Tabs` is the container with `role="tablist"`; `Tabs.Item` is each tab (`role="tab"`). The active tab's backdrop slides between items via a shared `layoutId` (`motion/react`), with a small scale pulse on each hop. `Tabs` renders only the strip — swap the panel below yourself, keyed off `selected`.
+
+**Keyboard:** `Tab` reaches the selected item (it's the only tab stop); `ArrowLeft`/`ArrowRight`/`ArrowUp`/`ArrowDown` and `Home`/`End` move focus between items (skipping disabled ones); `Enter`/`Space` activates.
 
 ## Import
 
@@ -27,17 +29,19 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | **Required.** Tab label text. Always used for `title` attribute (tooltip on truncation) and `aria-*`. |
-| `selected` | `boolean` | `false` | Whether this tab is currently active. Shows the animated backdrop. |
+| `label` | `string` | — | **Required.** Tab label text. Also the `title` (tooltip) and, when `showLabel={false}`, the `aria-label`. |
+| `selected` | `boolean` | `false` | Whether this tab is active. Shows the sliding backdrop; sets `aria-selected` and makes this the tab stop (`tabindex={0}`). |
 | `icon` | `ReactElement` | — | Icon before the label |
-| `showLabel` | `boolean` | `true` | Set to `false` to hide the text label (icon-only tabs) |
-| `badge` | `string \| number \| ReactElement` | — | Badge rendered after the label |
-| `asChild` | `boolean` | `false` | Merge tab styles onto the single child element (Slot pattern). Use for router links. |
+| `showLabel` | `boolean` | `true` | Set to `false` for an icon-only tab (label becomes the `aria-label`) |
+| `disabled` | `boolean` | `false` | Not focusable, ignores activation, skipped by arrow-key navigation |
+| `badge` | `string \| number \| ReactElement` | — | Corner pill, styled like a `Button`'s badge |
+| `href` | `string` | — | Render an `<a href>` instead of a `<button>` |
+| `asChild` | `boolean` | `false` | Merge the tab's role/styles/props onto the single child element (Slot pattern). Use for router links. |
 | `children` | `ReactElement` | — | Child element when `asChild={true}` |
-| `renderFunc` | `(ref, props) => ReactElement` | — | Fully custom render function. Receives the forwarded ref and all resolved props. |
-| `ref` | `Ref<HTMLAnchorElement>` | — | Forwarded ref |
+| `renderFunc` | `(ref, props) => ReactElement` | — | **Deprecated** (prefer `asChild`). Fully custom render function. |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<button>` / `<a>` |
 
-All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (except `children`).
+Default element is `<button type="button">`; `<a>` when `href` is set. All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (except `children`).
 
 ---
 

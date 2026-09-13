@@ -2,6 +2,8 @@
 
 A styled text input with a composable island system for icons, action buttons, text prefixes/suffixes, loading indicators, and character counters. Reads `name`, `disabled`, `invalid`, and `size` from `FormFieldContext` when inside a `Form`.
 
+The visual frame (fill, border, corner radius, elevation, and the focus ring while typing) is a `Box` primitive, so `TextInput` shares one material system with `Button` and other chip-like controls. `variant="default"` maps to Box's `plate` material (frosted fill + hairline), `variant="transparent"` to Box's `transparent` material.
+
 ## Import
 
 ```tsx
@@ -15,18 +17,20 @@ import { TextInput } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `string` | — | Controlled value |
-| `onChange` | `(value: string, event: ChangeEvent) => void` | — | Change handler. Receives the **string value** directly, not the event. |
-| `variant` | `'default' \| 'transparent'` | `'default'` | Visual style. `transparent` removes border and background. |
-| `invalid` | `boolean` | `false` | Error state styling. Also read from `FormFieldContext`. |
-| `size` | `Size` | `'m'` | Input size: `'mini' \| 's' \| 'm' \| 'l' \| 'xl'`. Also read from `FormFieldContext`. |
+| `onChange` | `(value: string, event: ChangeEvent) => void` | — | Change handler. Receives the **string value** first, then the event. |
+| `variant` | `'default' \| 'transparent'` | `'default'` | Visual style. `default` is a frosted `plate` surface; `transparent` has no fill or border at rest and washes in the same tint on hover and focus. |
+| `shape` | `BoxShape` (`'rect' \| 'rounded' \| 'squircle' \| 'circle' \| 'pill'`) | `'pill'` | Corner shape of the visual wrapper. `pill` (the default) is right for a single-line field; `Textarea` overrides it with `'rounded'`. |
+| `invalid` | `boolean` | `false` | Error state (`aria-invalid` + danger tone). Also read from `FormFieldContext`. |
+| `size` | `Size` | `'m'` | Field size: `'mini' \| 's' \| 'm' \| 'l' \| 'xl'`. Also read from `FormFieldContext`. |
 | `name` | `string` | — | Input name. Also read from `FormFieldContext`. |
 | `disabled` | `boolean` | `false` | Disables the input. Also read from `FormFieldContext`. |
 | `readOnly` | `boolean` | — | Makes the input read-only |
-| `readonlyStyles` | `boolean` | `true` | Whether to apply visual readonly styles when `readOnly` is true |
-| `asChild` | `boolean` | `false` | Replace the `<input>` with a custom element. The first non-island child is used as the input element. |
-| `wrapperClassName` | `string` | — | Extra class for the outer wrapper `<div>` |
-| `wrapperStyle` | `CSSProperties` | — | Inline styles for the outer wrapper |
-| `ref` | `Ref<HTMLInputElement>` | — | Forwarded ref |
+| `readonlyStyles` | `boolean` | `true` | When `readOnly`, drop the material so the value reads as plain text (still focusable for copy) |
+| `asChild` | `boolean` | `false` | Replace the `<input>` with a custom element. The first non-island child is used as the field element. |
+| `wrapperClassName` | `string` | — | Extra class for the visual wrapper (the `Box`). `className` targets the `<input>`. |
+| `wrapperStyle` | `CSSProperties` | — | Inline styles for the visual wrapper. `style` targets the `<input>`. |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the visual wrapper element |
+| `inputRef` | `Ref<HTMLInputElement>` | — | Forwarded to the underlying `<input>` (or the `asChild` element) |
 
 All standard `InputHTMLAttributes<HTMLInputElement>` are accepted (except `onChange`, `size`, `children`).
 
@@ -34,7 +38,7 @@ All standard `InputHTMLAttributes<HTMLInputElement>` are accepted (except `onCha
 
 ## Island sub-components
 
-Islands are placed inside the input as children. They automatically appear inside the input field — to the left or right — and the input's padding is dynamically adjusted via `ResizeObserver` so text never overlaps them.
+Islands are passed inside the input as children. Each is pulled out of the content and laid into a flex row beside the input — `placement="start"` (the default) or `placement="end"`. The passive islands (`TextIsland`, `IconIsland`, `CustomIsland`, `LoadingIsland`, `CharCounterIsland`) are plain inline chips; `ActionIsland` is a `Button`.
 
 ### TextInput.IconIsland
 
@@ -43,22 +47,25 @@ A non-interactive icon.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `icon` | `ReactElement` | — | **Required.** Icon element |
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
 
 ---
 
 ### TextInput.ActionIsland
 
-A clickable button inside the input (e.g. a clear or show/hide button).
+A clickable button inside the input (e.g. a clear or show/hide button). It **is** a `<Button variant="default">` — it accepts the whole `Button` prop set (`state`, `badge`, `tooltip`, `selected`, `additionalIcon`, …) except `variant`, which is locked to the in-field `plate` chip. `size` defaults to one tier below the field. When `showLabel` is `false` it is a circular icon-only button with an automatic tooltip from `label`. A disabled field disables its `ActionIsland`s (its own `disabled` prop is OR-ed with the field's).
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | **Required.** Accessible label (used as `title` tooltip) |
+| `label` | `string` | — | **Required.** Label text; also the `aria-label` and tooltip when `showLabel` is false |
 | `icon` | `ReactElement` | — | Icon |
 | `showLabel` | `boolean` | `true` | Whether to show the label text alongside the icon |
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
-| `danger` | `boolean` | `false` | Red color for destructive actions |
-| `ref` | `Ref<HTMLButtonElement>` | — | Forwarded ref |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
+| `danger` | `boolean` | `false` | Danger tone for destructive actions |
+| `state` | `'idle' \| 'loading' \| 'succeeded' \| 'failed'` | `'idle'` | Async state (from `Button`) |
+| `ref` | `Ref<HTMLButtonElement>` | — | Forwarded to the button |
+
+Plus every other `Button` prop except `variant`.
 
 ---
 
@@ -69,27 +76,27 @@ A static text prefix or suffix (e.g. units, currency symbols).
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | `string` | — | **Required.** Text to display |
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
 
 ---
 
 ### TextInput.LoadingIsland
 
-A spinner island shown during async operations.
+A spinner island shown during async operations. Carries `role="status"` and a localized `aria-label`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
 
 ---
 
 ### TextInput.CustomIsland
 
-A free-form island for arbitrary content (e.g. the number spinner in `NumberInput`).
+A free-form island for arbitrary content (e.g. the number spinner in `NumberInput`). Keeps pointer events so its content stays interactive.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
 
 ---
 
@@ -99,7 +106,7 @@ Shows the current character count. Shows `valueLength/maxLength` when `maxLength
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `placement` | `'left' \| 'right'` | `'left'` | Position inside the input |
+| `placement` | `'start' \| 'end'` | `'start'` | Position inside the input |
 
 Requires `maxLength` (or just `value`) on the parent `TextInput` to read the current character count.
 
@@ -117,7 +124,7 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 
 ```tsx
 <TextInput value={email} onChange={(v) => setEmail(v)}>
-  <TextInput.IconIsland icon={<Mail />} placement="left" />
+  <TextInput.IconIsland icon={<Mail />} placement="start" />
 </TextInput>
 ```
 
@@ -125,13 +132,13 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 
 ```tsx
 <TextInput value={search} onChange={(v) => setSearch(v)}>
-  <TextInput.IconIsland icon={<Search />} placement="left" />
+  <TextInput.IconIsland icon={<Search />} placement="start" />
   {search && (
     <TextInput.ActionIsland
       label="Clear"
       icon={<X />}
       showLabel={false}
-      placement="right"
+      placement="end"
       onClick={() => setSearch('')}
     />
   )}
@@ -142,7 +149,7 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 
 ```tsx
 <TextInput value={amount} onChange={(v) => setAmount(v)} placeholder="0.00">
-  <TextInput.TextIsland label="$" placement="left" />
+  <TextInput.TextIsland label="$" placement="start" />
 </TextInput>
 ```
 
@@ -150,7 +157,7 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 
 ```tsx
 <TextInput value={query} onChange={(v) => setQuery(v)}>
-  {isLoading && <TextInput.LoadingIsland placement="right" />}
+  {isLoading && <TextInput.LoadingIsland placement="end" />}
 </TextInput>
 ```
 
@@ -163,7 +170,7 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
   maxLength={160}
   placeholder="Write a short bio…"
 >
-  <TextInput.CharCounterIsland placement="right" />
+  <TextInput.CharCounterIsland placement="end" />
 </TextInput>
 ```
 
@@ -181,6 +188,15 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 <TextInput value={v} onChange={setV} size="m" />
 <TextInput value={v} onChange={setV} size="l" />
 <TextInput value={v} onChange={setV} size="xl" />
+```
+
+### Accessing the input node
+
+```tsx
+const inputRef = useRef<HTMLInputElement>(null);
+
+<TextInput value={v} onChange={setV} inputRef={inputRef} />;
+// `ref` points at the visual wrapper; `inputRef` points at the <input>.
 ```
 
 ### Inside a Form

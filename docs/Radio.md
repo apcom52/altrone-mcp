@@ -22,6 +22,7 @@ import { Radio } from 'altrone-ui';
 | `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the items |
 | `name` | `string` | auto-generated | HTML `name` attribute for the group. Auto-generated with `useId()` if not provided. |
 | `disabled` | `boolean` | `false` | Disables all items in the group |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales every item (dot and label type); the row stays ≥24px tall. A single `Radio.Item` can override it. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -33,8 +34,9 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `string \| number` | — | **Required.** This item's value |
-| `children` | `ReactNode` | — | Label text or element. If omitted, renders a radio button with no label. |
+| `children` | `ReactNode` | — | Label text or element. If omitted, pass `aria-label` — it is forwarded to the `<input>`. |
 | `disabled` | `boolean` | `false` | Disables this specific item. Combined with group-level `disabled`. |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | group's `size` | Overrides the group's `size` for this item only |
 | `ref` | `Ref<HTMLLabelElement>` | — | Forwarded ref |
 
 All standard `LabelHTMLAttributes<HTMLLabelElement>` are also accepted.
@@ -43,9 +45,8 @@ All standard `LabelHTMLAttributes<HTMLLabelElement>` are also accepted.
 
 ## Behavior
 
-- `onChange` always receives a **string** value (HTML input constraint) even when the item's `value` prop is a number. Parse with `Number()` if needed.
-- The item is keyboard-accessible: `Enter` and `Space` trigger selection.
-- Each item renders a visually hidden `<input type="radio">` under the hood.
+- `onChange` receives `(value: string, event: ChangeEvent<HTMLInputElement>)`. The value is always a **string** (HTML input constraint) even when the item's `value` prop is a number — parse with `Number()` if needed.
+- Each item renders a real `<input type="radio">` that is visually hidden but stays in the accessibility tree. Focus lands on it; **arrow keys move between options** natively (Up/Down/Left/Right), and `Space` selects.
 
 ---
 
@@ -112,5 +113,23 @@ const [qty, setQty] = useState(1);
   <Radio.Item value="m">Medium</Radio.Item>
   {isPremium && <Radio.Item value="l">Large</Radio.Item>}
   {isPremium && <Radio.Item value="xl">Extra Large</Radio.Item>}
+</Radio>
+```
+
+### Sizes
+
+```tsx
+<Radio size="s" value={value} onChange={setValue}>
+  <Radio.Item value="a">Compact</Radio.Item>
+  <Radio.Item value="b">row</Radio.Item>
+</Radio>
+```
+
+### Without a visible label
+
+```tsx
+<Radio value={value} onChange={setValue}>
+  <Radio.Item value="a" aria-label="Option A" />
+  <Radio.Item value="b" aria-label="Option B" />
 </Radio>
 ```

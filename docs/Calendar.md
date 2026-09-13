@@ -1,6 +1,15 @@
 # Calendar
 
-A headless-style calendar grid displaying one month at a time. Handles date rendering, multi-selection, range highlighting, and a configurable week start day. The component only renders the day grid — month navigation must be implemented by the parent.
+A single-month calendar grid. Renders one month on a fixed six-row (42-cell)
+grid so its height never shifts between months. It exposes two API levels:
+
+- **High-level** — pass `mode` and `Calendar` owns the selection state
+  (`value` / `defaultValue` / `onSelect`), renders its own navigation header and
+  weekday row, and handles range hover-preview highlighting.
+- **Low-level** — omit `mode` and drive the grid with `selectedDates` +
+  `DateComponent`. The header and weekday row are hidden by default; navigation
+  and selection are the caller's responsibility. This is the shape `DatePicker`
+  builds on.
 
 ## Import
 
@@ -8,22 +17,67 @@ A headless-style calendar grid displaying one month at a time. Handles date rend
 import { Calendar } from 'altrone-ui';
 ```
 
-Requires `dayjs` as a peer dependency. The component uses an internal `dayjsInstance` with any plugins pre-registered.
+Requires `dayjs` as a peer dependency.
 
 ---
 
 ## Props
 
+### Selection (high-level)
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `month` | `Dayjs` | `dayjs()` | The month to display. Only the year and month portions are used; the day is ignored. |
-| `selectedDates` | `Dayjs[]` | `[dayjs()]` | Array of selected dates. Each matching day is rendered in a selected state. |
-| `cursorDate` | `Dayjs` | — | Hover/cursor date for range previews. When set, all dates between `selectedDates[0]` and `cursorDate` are highlighted (in both directions). |
-| `onDateChange` | `(date: Dayjs, event: React.MouseEvent<HTMLButtonElement>) => void` | — | Called when the user clicks a date cell. |
-| `DateComponent` | `React.FC<CalendarRenderDateProps>` | `CalendarDate` | Custom day cell component. Replace the default renderer to add custom styling or content. |
-| `disabled` | `boolean` | `false` | Disables all date cells. |
-| `firstDayOfWeek` | `'monday' \| 'sunday'` | `'sunday'` | Controls which day starts each week row. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `mode` | `'single' \| 'multiple' \| 'range'` | — | Enables the high-level API. When set, `Calendar` owns selection state and shows its header/weekday row. |
+| `value` | `Dayjs \| Dayjs[] \| { from?: Dayjs; to?: Dayjs }` | — | Controlled value. Shape depends on `mode`: `Dayjs` for `single`, `Dayjs[]` for `multiple`, `{ from, to }` for `range`. |
+| `defaultValue` | same as `value` | — | Uncontrolled initial value. |
+| `onSelect` | `(value, event: React.MouseEvent<HTMLButtonElement>) => void` | — | Fires on every day click with the next value (same shape as `value`). |
+
+Range clicks: the first click opens `{ from }`; the second closes the range,
+auto-ordering so `from` never comes after `to`; a click on a completed range
+starts a new one. While a range is half-open, hovering a day previews the band.
+
+### Display month
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `month` | `Dayjs` | — | Controlled displayed month (year + month only). |
+| `defaultMonth` | `Dayjs` | `dayjs()` | Uncontrolled initial month. |
+| `onMonthChange` | `(month: Dayjs) => void` | — | Fires when the header navigation changes the month. |
+
+### Locale & week
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `locale` | `string` | active app language | BCP-47 locale for the month caption and weekday names. |
+| `firstDayOfWeek` | `'monday' \| 'sunday' \| 'auto'` | `'auto'` | `'auto'` resolves the first weekday from the locale (Sunday for `en-US`, Monday for `ru-RU`, …). |
+
+### Constraints
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `minDate` | `Dayjs` | — | Days before this are disabled. |
+| `maxDate` | `Dayjs` | — | Days after this are disabled. |
+| `isDateDisabled` | `(date: Dayjs) => boolean` | — | Predicate to disable individual days. |
+| `disabled` | `boolean` | `false` | Disables every day cell. |
+
+### Chrome & layout
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `showHeader` | `boolean` | `true` if `mode` is set, else `false` | Month caption + navigation row. |
+| `showNavigation` | `boolean` | `true` | The `‹` / `›` buttons inside the header. |
+| `showWeekdays` | `boolean` | `true` if `mode` is set, else `false` | The weekday-name row. |
+| `showOutsideDays` | `boolean` | `true` | Render leading/trailing days from adjacent months (muted) instead of blank cells. |
+
+### Low-level
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `selectedDates` | `Dayjs[]` | — | Days rendered in the selected state (used when `mode` is omitted). |
+| `cursorDate` | `Dayjs` | — | Hover date for a range preview between `selectedDates[0]` and `cursorDate` (both directions). |
+| `onDateChange` | `(date: Dayjs, event: React.MouseEvent<HTMLButtonElement>) => void` | — | Fires on a day click; `Calendar` keeps no state. |
+| `DateComponent` | `React.FC<CalendarRenderDateProps>` | `Calendar.Date` | Custom day-cell renderer. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the root element. |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
@@ -36,147 +90,63 @@ Props passed to each `DateComponent` instance:
 | Prop | Type | Description |
 |------|------|-------------|
 | `currentDate` | `Dayjs` | The date this cell represents |
-| `weekDay` | `number` | Day of the week (0 = Sunday … 6 = Saturday) |
+| `weekDay` | `number` | Day of week (0 = Sunday … 6 = Saturday) |
 | `fromAnotherMonth` | `boolean` | `true` for padding days from the previous/next month |
 | `today` | `boolean` | `true` if this date is today |
-| `selected` | `boolean` | `true` if this date is in `selectedDates` |
-| `disabled` | `boolean` | `true` if the whole calendar is disabled |
-| `cursorHighlighted` | `boolean` | `true` if this date falls within the range between `selectedDates[0]` and `cursorDate` |
-| `onSelect` | `(date: Dayjs, event) => void` | Call this in your custom component to trigger `onDateChange` |
+| `selected` | `boolean` | `true` if this date is selected |
+| `disabled` | `boolean` | `true` if this specific day is disabled |
+| `cursorHighlighted` | `boolean` | `true` for the legacy `cursorDate` range preview |
+| `inRange` | `boolean` | `true` if the day lies within the (possibly hover-previewed) range |
+| `rangeStart` / `rangeEnd` | `boolean` | `true` at the range bounds |
+| `startOfWeek` / `endOfWeek` | `boolean` | First / last rendered column of the week row |
+| `inRangeAbove` / `inRangeBelow` | `boolean` | `true` if the band also covers the cell directly above / below — used to round only the band's outer corners |
+| `onSelect` | `(date: Dayjs, event) => void` | Call to report a selection |
+| `onHover` | `(date?: Dayjs) => void` | Call to drive the range hover-preview |
 
 ---
 
 ## Examples
 
-### Basic single-month display
+### Single date
 
 ```tsx
-import dayjs from 'dayjs';
+const [value, setValue] = useState<Dayjs>();
 
-const [month, setMonth] = useState(dayjs());
-
-<Calendar
-  month={month}
-  selectedDates={[]}
-  onDateChange={(date) => console.log(date.format('YYYY-MM-DD'))}
-/>
+<Calendar mode="single" value={value} onSelect={setValue} />
 ```
 
-### Single date selection
+### Multiple dates
 
 ```tsx
-const [month, setMonth] = useState(dayjs());
-const [selected, setSelected] = useState<Dayjs | null>(null);
+const [value, setValue] = useState<Dayjs[]>([]);
+
+<Calendar mode="multiple" value={value} onSelect={setValue} />
+```
+
+### Date range with highlighting
+
+```tsx
+const [range, setRange] = useState<{ from?: Dayjs; to?: Dayjs }>({});
+
+<Calendar mode="range" value={range} onSelect={setRange} />
+```
+
+### Localized week start
+
+```tsx
+<Calendar mode="single" locale="ru-RU" />          {/* auto → Monday */}
+<Calendar mode="single" firstDayOfWeek="monday" /> {/* pinned */}
+```
+
+### Low-level grid (no chrome)
+
+```tsx
+const [selected, setSelected] = useState<Dayjs>();
 
 <Calendar
   month={month}
   selectedDates={selected ? [selected] : []}
   onDateChange={(date) => setSelected(date)}
+  DateComponent={MyDayCell}
 />
 ```
-
-### Multi-date selection
-
-```tsx
-const [month, setMonth] = useState(dayjs());
-const [selected, setSelected] = useState<Dayjs[]>([]);
-
-const toggle = (date: Dayjs) => {
-  setSelected((prev) =>
-    prev.some((d) => d.isSame(date, 'day'))
-      ? prev.filter((d) => !d.isSame(date, 'day'))
-      : [...prev, date],
-  );
-};
-
-<Calendar month={month} selectedDates={selected} onDateChange={toggle} />
-```
-
-### Date range with cursor highlight
-
-```tsx
-const [month, setMonth] = useState(dayjs());
-const [range, setRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
-const [cursor, setCursor] = useState<Dayjs | undefined>();
-
-const handleSelect = (date: Dayjs) => {
-  const [start, end] = range;
-  if (!start || (start && end)) {
-    setRange([date, null]);
-  } else {
-    setRange([start, date]);
-  }
-};
-
-<div
-  onMouseLeave={() => setCursor(undefined)}
->
-  <Calendar
-    month={month}
-    selectedDates={range.filter(Boolean) as Dayjs[]}
-    cursorDate={cursor}
-    onDateChange={handleSelect}
-  />
-</div>
-```
-
-### Monday as first day of week
-
-```tsx
-<Calendar month={dayjs()} firstDayOfWeek="monday" />
-```
-
-### Month navigation
-
-The Calendar does not include navigation controls. Implement them yourself:
-
-```tsx
-const [month, setMonth] = useState(dayjs());
-
-<div>
-  <button onClick={() => setMonth((m) => m.subtract(1, 'month'))}>←</button>
-  <span>{month.format('MMMM YYYY')}</span>
-  <button onClick={() => setMonth((m) => m.add(1, 'month'))}>→</button>
-  <Calendar month={month} selectedDates={[]} onDateChange={handleSelect} />
-</div>
-```
-
-### Custom day cell
-
-Replace the default cell renderer to add event dots, tooltips, or any custom content.
-
-```tsx
-const CustomDay: React.FC<CalendarRenderDateProps> = ({
-  currentDate,
-  selected,
-  today,
-  fromAnotherMonth,
-  disabled,
-  onSelect,
-}) => (
-  <button
-    onClick={(e) => onSelect?.(currentDate, e)}
-    disabled={disabled}
-    style={{
-      opacity: fromAnotherMonth ? 0.3 : 1,
-      fontWeight: today ? 'bold' : 'normal',
-      background: selected ? 'var(--primary-500)' : 'transparent',
-    }}
-  >
-    {currentDate.date()}
-  </button>
-);
-
-<Calendar month={dayjs()} DateComponent={CustomDay} onDateChange={handleSelect} />
-```
-
----
-
-## Grid layout
-
-The calendar computes the full grid by:
-1. Prepending padding days from the previous month to fill the first week row.
-2. Including all days of `month`.
-3. Appending padding days from the next month to fill the last week row.
-
-Padding days have `fromAnotherMonth={true}` in their props.

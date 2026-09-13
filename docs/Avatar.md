@@ -1,6 +1,6 @@
 # Avatar
 
-Displays a user's avatar. Shows a photo when `imageSrc` is provided and the image loads successfully; falls back to initials automatically on load error. Initials are derived from `firstName` and `lastName`.
+Displays a user's avatar. Shows a photo when `imageSrc` is provided and the image loads successfully; falls back to initials automatically on load error. Initials are derived from `firstName` and `lastName`. The element is `role="img"` labelled by the full name (the inner `<img>` is decorative, `alt=""`).
 
 ## Import
 
@@ -18,7 +18,7 @@ import { Avatar } from 'altrone-ui';
 | `lastName` | `string` | — | Optional last name. Adds a second initial when provided. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Avatar size |
 | `imageSrc` | `string` | — | URL of the user's photo. Falls back to initials if the image fails to load. When `imageSrc` changes, the error state resets and the new image is attempted. |
-| `backgroundColor` | `string` | — | Background color of the initials circle. Any valid CSS color value. When omitted, a theme default is used. |
+| `backgroundColor` | `string` | — | Background color of the initials circle. Any valid CSS color value. When omitted, a categorical hue is picked deterministically from the name (the same person always gets the same colour). |
 | `textColor` | `string` | — | Color of the initials text. Overrides automatic contrast calculation. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
@@ -30,7 +30,8 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 - Initials = `firstName[0]` + `lastName[0]` (if `lastName` is provided).
 - Leading whitespace in either name is trimmed before taking the first character.
-- `aria-label` is set to the full name (`firstName + ' ' + lastName`).
+- The container is `role="img"` with `aria-label` = the full name (`firstName + ' ' + lastName`). The initials `<span>` is `aria-hidden`, and the photo `<img>` uses `alt=""` — the container already provides the accessible name.
+- Text colour auto-contrasts against the fill (an `oklch` relative-colour calc); `textColor` overrides it.
 
 ---
 

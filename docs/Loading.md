@@ -1,6 +1,6 @@
 # Loading
 
-An SVG circular spinner. Use to indicate an in-progress operation.
+An SVG circular spinner for an in-progress operation. Renders a `<div role="status">` wrapper with a localized `aria-label` ("Loading") around the SVG (which is `aria-hidden`). Keeps spinning under `prefers-reduced-motion` — it's a functional state indicator, not decorative motion.
 
 ## Import
 
@@ -14,14 +14,15 @@ import { Loading } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `size` | `string` | `'24px'` | Diameter of the spinner. Must include a CSS unit (e.g. `'24px'`, `'2rem'`). |
-| `strokeWidth` | `string` | `'2'` | Width of the circular stroke. Unitless number as string. |
-| `color` | `string` | `var(--loadingColor)` | Stroke color. Any valid CSS color value. |
-| `ref` | `Ref<SVGSVGElement>` | — | Forwarded ref |
+| `size` | `number \| string` | `'24px'` | Diameter — a number of px or a px string. |
+| `strokeWidth` | `number \| string` | `'2'` | Ring thickness, in the same units as `size`. Fractions (`1.5`) are fine. |
+| `color` | `string` | `var(--loading-color)` | Stroke colour. Any CSS colour, or `currentColor`. |
+| `aria-label` | `string` | localized `"Loading"` | Override to say what's loading. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the `<div>` wrapper |
 
-All standard `SVGAttributes<SVGSVGElement>` are also accepted.
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
-> **Note:** The SVG radius is calculated automatically as `size / 2 − strokeWidth / 2`, so the stroke stays fully inside the bounding box regardless of stroke width.
+> **Note:** The SVG radius is `size / 2 − strokeWidth / 2`, so the stroke stays inside the bounding box regardless of thickness. A faint full-circle track sits behind the animated sweep.
 
 ---
 
@@ -38,13 +39,13 @@ All standard `SVGAttributes<SVGSVGElement>` are also accepted.
 ```tsx
 <Loading size="48px" />
 <Loading size="16px" />
-<Loading size="2rem" />
+<Loading size={32} />
 ```
 
 ### Custom color
 
 ```tsx
-<Loading color="var(--blue-500)" />
+<Loading color="var(--blue-9)" />
 <Loading color="#ff4d4f" />
 <Loading color="currentColor" />
 ```

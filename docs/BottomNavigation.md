@@ -1,6 +1,6 @@
 # BottomNavigation
 
-A mobile-style bottom navigation bar. Consists of `BottomNavigation` as the container and `BottomNavigation.Item` for each navigation tab. The selected item is highlighted with an animated backdrop that smoothly slides between items using `framer-motion` layout animations.
+A mobile-style bottom navigation bar. Consists of `BottomNavigation` as the container and `BottomNavigation.Item` for each navigation tab. The selected item sets `aria-current="page"` and is highlighted with a raised backdrop that smoothly slides between items using `motion` layout animations (plus a small scale pulse on each hop). Sizing is compact — a 24px icon over 12px text.
 
 ## Import
 
@@ -27,15 +27,16 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 ### BottomNavigation.Item
 
-Each navigation tab. Renders as an `<a>` element by default. The `renderFunc` prop can override the element entirely.
+Each navigation tab. Renders as an `<a>` element by default.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `icon` | `ReactElement` | — | **Required.** Icon displayed above the label. |
 | `label` | `string` | — | **Required.** Tab label shown below the icon. |
-| `selected` | `boolean` | `false` | Marks this item as the active tab. Triggers the backdrop animation. |
-| `badge` | `string \| number \| ReactElement` | — | Badge shown in the top-right corner of the item (e.g. notification count). |
-| `renderFunc` | `RenderFuncProp<HTMLAnchorElement, BottomNavigationItemProps>` | — | Custom render function. Receives `(ref, props)` and must return a React element. Use this to render a router `<Link>` or any other element instead of `<a>`. |
+| `selected` | `boolean` | `false` | Marks this item as the active tab. Sets `aria-current="page"` and triggers the backdrop animation. |
+| `badge` | `string \| number \| ReactElement` | — | Badge chip in the item's top-right corner — styled like a single-icon `Button`'s badge (`plate` pill, corner offset). |
+| `asChild` | `boolean` | `false` | Merge styling, ref and interaction props onto a single child element (e.g. a router `<Link>`) instead of rendering an `<a>`. Icon, label, badge and backdrop still come from props. |
+| `renderFunc` | `RenderFuncProp<HTMLAnchorElement, BottomNavigationItemProps>` | — | **Deprecated** (prefer `asChild`). Custom render function `(ref, props) => ReactElement`. |
 | `ref` | `Ref<HTMLAnchorElement>` | — | Forwarded ref |
 
 All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (e.g. `href`, `onClick`).
@@ -97,30 +98,22 @@ const [active, setActive] = useState('home');
 </BottomNavigation>
 ```
 
-### With a router Link (renderFunc)
+### With a router Link (asChild)
 
-Use `renderFunc` to replace the `<a>` element with a router component while keeping all Button.Item styles and the backdrop animation.
+Set `asChild` and pass the router component as the only child — the item merges its styles/ref/props onto it and still supplies icon, label, badge and backdrop.
 
 ```tsx
 import { Link, useLocation } from 'react-router-dom';
 
-const renderLink = (ref, props) => <Link ref={ref} {...props} />;
+const { pathname } = useLocation();
 
 <BottomNavigation>
-  <BottomNavigation.Item
-    icon={<Home />}
-    label="Home"
-    href="/home"
-    selected={location.pathname === '/home'}
-    renderFunc={renderLink}
-  />
-  <BottomNavigation.Item
-    icon={<User />}
-    label="Profile"
-    href="/profile"
-    selected={location.pathname === '/profile'}
-    renderFunc={renderLink}
-  />
+  <BottomNavigation.Item icon={<Home />} label="Home" asChild selected={pathname === '/home'}>
+    <Link to="/home" />
+  </BottomNavigation.Item>
+  <BottomNavigation.Item icon={<User />} label="Profile" asChild selected={pathname === '/profile'}>
+    <Link to="/profile" />
+  </BottomNavigation.Item>
 </BottomNavigation>
 ```
 
@@ -128,4 +121,4 @@ const renderLink = (ref, props) => <Link ref={ref} {...props} />;
 
 ## Animation details
 
-The selected backdrop is a single `motion.div` with a shared `layoutId` scoped to the parent `BottomNavigation` instance. When `selected` moves from one item to another, Framer Motion automatically animates the backdrop between positions. An extra scale pulse (`[1, 0.85, 1]`) plays on every backdrop move.
+The container renders a single backdrop element and springs it over whichever item is `selected` (the item reports itself; the container measures its rect and re-measures on resize). An extra scale pulse (`[1, 0.85, 1]`) plays on every move, but not on the initial placement.

@@ -16,14 +16,14 @@ import { Flex } from 'altrone-ui';
 |------|------|---------|-------------|
 | `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | Flex direction |
 | `gap` | `Gap` | `'none'` | Space between children. Uses design-system gap tokens. |
-| `align` | `'start' \| 'center' \| 'end' \| 'between'` | — | `align-items` value |
+| `align` | `'start' \| 'center' \| 'end'` | — | `align-items` value. For space distribution use `justify`. |
 | `justify` | `'start' \| 'center' \| 'end' \| 'between'` | — | `justify-content` value |
 | `wrap` | `boolean` | `false` | `flex-wrap: wrap` |
 | `disableInnerMargins` | `boolean` | `true` | Strips margins from direct children to avoid double-spacing with `gap`. |
 | `tagName` | `keyof JSX.IntrinsicElements` | `'div'` | HTML element to render (e.g. `'ul'`, `'section'`, `'nav'`) |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
+All standard `HTMLAttributes<HTMLElement>` are also accepted.
 
 ### Gap scale
 

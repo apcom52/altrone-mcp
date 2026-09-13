@@ -1,6 +1,6 @@
 # Spoiler
 
-A collapsible disclosure section with an animated height transition. The header is always visible; clicking it toggles the content area. Uses `motion/react` for the expand/collapse animation.
+A collapsible disclosure section with an animated height transition. The header is always visible; clicking it (or focusing it and pressing `Enter` / `Space`) toggles the content area. Uses `motion/react` for the expand/collapse animation.
 
 ## Import
 
@@ -14,11 +14,11 @@ import { Spoiler } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | `string` | — | **Required.** Always-visible heading text |
+| `title` | `ReactNode` | — | **Required.** Always-visible heading content (rendered inside a `<button>`) |
 | `children` | `ReactNode` | — | Content revealed when expanded |
 | `openedByDefault` | `boolean` | `false` | Whether the spoiler starts expanded |
-| `onToggle` | `(opened: boolean, event: MouseEvent) => void` | — | Called after each toggle. `opened` is the **new** state after the click. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `onToggle` | `(opened: boolean, event: MouseEvent<HTMLButtonElement>) => void` | — | Called after each toggle. `opened` is the **new** state. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref (root `<div>`) |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
@@ -27,9 +27,9 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 ## Behavior
 
 - **Uncontrolled** — open/close state is managed internally.
-- The header shows a `Plus` icon when collapsed and a `Minus` icon when expanded.
-- The content area animates from `height: 0` to `height: auto` (and back) over 200 ms.
-- The header is keyboard-accessible (`tabIndex={0}`).
+- The header is a native `<button>` with `aria-expanded` and `aria-controls` pointing at the content region; it toggles on click and on `Enter` / `Space`.
+- The header shows a `Plus` icon when collapsed and a `Minus` icon when expanded (`aria-hidden`).
+- The content area animates open with a spring on `height` (plus a short fade) and closes with a quick tween. Padding sits on an inner wrapper so it doesn't jump while the height animates. Respects `prefers-reduced-motion` via the app-level `MotionConfig`.
 
 ---
 
@@ -72,7 +72,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 ))}
 ```
 
-### Inside a Form (DataGrid uses this pattern)
+### Inside a Form
 
 ```tsx
 <Spoiler title="Additional fields">

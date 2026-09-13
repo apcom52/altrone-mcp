@@ -12,20 +12,24 @@ import { Label } from 'altrone-ui';
 
 ## Props
 
+Renders a `<div>`. The text is passed as `children`, not a prop.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | **Required.** Text content of the label |
-| `color` | `LabelColor` | `'default'` | Color variant (see below) |
-| `variant` | `'solid' \| 'soft' \| 'outline'` | `'solid'` | Visual style of the label |
+| `children` | `ReactNode` | — | Text content of the label |
+| `color` | `LabelColor` | `'default'` | Colour (see below) |
+| `variant` | `'solid' \| 'soft' \| 'outline'` | `'solid'` | Visual style |
 | `rounding` | `'rounded' \| 'pill'` | `'rounded'` | Border-radius style |
-| `size` | `Size` | `'m'` | Size: `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` |
-| `ref` | `Ref<HTMLSpanElement>` | — | Forwarded ref |
+| `size` | `Size` | `'m'` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
-All standard `HTMLAttributes<HTMLSpanElement>` are also accepted.
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 ### LabelColor values
 
 `'default' | 'primary' | 'success' | 'danger' | 'warning' | 'amber' | 'blue' | 'brown' | 'indigo' | 'pink' | 'purple' | 'red' | 'teal'`
+
+The four semantic colours (`primary` → accent, `success` → green, `warning` → amber, `danger` → red) come from the design-system status role tokens. The rest are the categorical hues.
 
 ---
 
@@ -34,41 +38,41 @@ All standard `HTMLAttributes<HTMLSpanElement>` are also accepted.
 ### Basic
 
 ```tsx
-<Label label="New" />
+<Label>New</Label>
 ```
 
 ### Color variants
 
 ```tsx
-<Label label="Active"   color="success" />
-<Label label="Archived" color="default" />
-<Label label="Deleted"  color="danger" />
-<Label label="Draft"    color="warning" />
-<Label label="Beta"     color="primary" />
+<Label color="success">Active</Label>
+<Label color="default">Archived</Label>
+<Label color="danger">Deleted</Label>
+<Label color="warning">Draft</Label>
+<Label color="primary">Beta</Label>
 ```
 
 ### Visual styles
 
 ```tsx
-<Label label="Solid"   variant="solid"   color="primary" />
-<Label label="Soft"    variant="soft"    color="primary" />
-<Label label="Outline" variant="outline" color="primary" />
+<Label variant="solid"   color="primary">Solid</Label>
+<Label variant="soft"    color="primary">Soft</Label>
+<Label variant="outline" color="primary">Outline</Label>
 ```
 
 ### Pill rounding
 
 ```tsx
-<Label label="v2.0.0" color="indigo" rounding="pill" />
+<Label color="indigo" rounding="pill">v2.0.0</Label>
 ```
 
 ### Sizes
 
 ```tsx
-<Label label="mini" size="mini" />
-<Label label="small" size="s" />
-<Label label="medium" size="m" />
-<Label label="large" size="l" />
-<Label label="xlarge" size="xl" />
+<Label size="mini">mini</Label>
+<Label size="s">small</Label>
+<Label size="m">medium</Label>
+<Label size="l">large</Label>
+<Label size="xl">xlarge</Label>
 ```
 
 ### Status badges in a table row
@@ -78,9 +82,10 @@ All standard `HTMLAttributes<HTMLSpanElement>` are also accepted.
   <td>{task.name}</td>
   <td>
     <Label
-      label={task.status}
       color={task.status === 'done' ? 'success' : task.status === 'blocked' ? 'danger' : 'warning'}
-    />
+    >
+      {task.status}
+    </Label>
   </td>
 </tr>
 ```
@@ -89,8 +94,8 @@ All standard `HTMLAttributes<HTMLSpanElement>` are also accepted.
 
 ```tsx
 <Flex gap="xs">
-  <Label label="React" color="blue" variant="soft" />
-  <Label label="TypeScript" color="indigo" variant="soft" />
-  <Label label="CSS" color="pink" variant="soft" />
+  <Label color="blue" variant="soft">React</Label>
+  <Label color="indigo" variant="soft">TypeScript</Label>
+  <Label color="pink" variant="soft">CSS</Label>
 </Flex>
 ```

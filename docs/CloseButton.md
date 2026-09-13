@@ -12,16 +12,18 @@ import { CloseButton } from 'altrone-ui';
 
 ## Props
 
-`CloseButton` accepts all `Button` props **except** `label` (which is managed internally). The `label` prop is optional and ignored even if provided.
+`CloseButton` exposes a curated subset, not the whole `Button` surface. The identity props (`icon`, `showLabel`, `tooltip`) are locked and cannot be overridden.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | `'default' \| 'submit' \| 'text'` | `'default'` | Inherited from Button |
-| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Inherited from Button |
-| `disabled` | `boolean` | `false` | Inherited from Button |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Control tier, forwarded to `Button` |
+| `label` | `string` | localized `closeButton.ariaLabel` | Overrides the accessible name |
+| `disabled` | `boolean` | `false` | — |
 | `onClick` | `(e: MouseEvent) => void` | — | Click handler |
+| `asChild` | `boolean` | `false` | Render onto a custom child element instead of a `<button>` |
+| `ref` | `Ref<HTMLButtonElement>` | — | Forwarded to the button element |
 
-All other `Button` props are also accepted.
+Plus the native `<button>` attributes (`id`, `type`, `data-*`, `onFocus`, …) except `aria-label` — use `label` for that. `Button`-only props such as `variant`, `badge`, `state` or `additionalIcon` are **not** accepted.
 
 ---
 
@@ -52,6 +54,6 @@ All other `Button` props are also accepted.
 
 ## Notes
 
-- The accessible name comes from the localization system (`closeButton.ariaLabel`). It changes automatically when the app `language` prop is set on `AltroneApplication`.
-- No tooltip is shown — `tooltip=""` suppresses it intentionally (the icon is universally understood and a tooltip would create visual noise).
-- Do not pass a `label` prop — it is stripped internally.
+- The accessible name comes from the localization system (`closeButton.ariaLabel`). It changes automatically when the app `language` prop is set on `Application`.
+- Override the accessible name with `label` when one close button among several needs to be more specific (e.g. `label="Dismiss notification"`).
+- No tooltip is shown — the auto-tooltip is suppressed intentionally (the icon is universally understood and a tooltip would create visual noise).

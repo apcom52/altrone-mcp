@@ -14,14 +14,14 @@ import { Drawer } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `ReactElement<{ onClick: () => void }>` | — | **Required.** Trigger element. Must be a single React element that accepts an `onClick` prop. |
+| `children` | `ReactElement<{ onClick?: React.MouseEventHandler }>` | — | **Required.** Trigger element. Cloned with an `onClick` that opens the drawer, merged with any `onClick` it already has. |
 | `title` | `string` | — | Panel title displayed in the header |
-| `content` | `ReactElement` | — | Main content of the drawer. Rendered inside a `Scrollable`. |
-| `footer` | `ReactElement` | — | Footer content. Rendered at the bottom, outside the scrollable area. |
+| `content` | `ReactElement \| ((ctx: { closeDrawer: () => void }) => ReactElement)` | — | Main content of the drawer. Rendered inside a `Scrollable`. Accepts a render function that receives `closeDrawer`. |
+| `footer` | `ReactElement \| ((ctx: { closeDrawer: () => void }) => ReactElement)` | — | Footer content. Rendered at the bottom, outside the scrollable area. Accepts a render function that receives `closeDrawer`. |
 | `placement` | `'start' \| 'end'` | `'start'` | Side from which the drawer slides in. `start` = left, `end` = right. |
-| `width` | `number` | `400` | Width of the panel in pixels |
-| `showDoneButton` | `boolean` | — | Unused in current implementation — use `onDone` to show the done button |
-| `renderActionButton` | `(ctx: { closeDrawer: () => void }) => ReactElement` | — | Custom action button in the header. Replaces the default Done button. Receives a `closeDrawer` function. |
+| `width` | `number` | `400` | Width of the panel in pixels. Capped at the viewport minus its edge inset. |
+| `startActions` | `ReactNode \| ((ctx: { closeDrawer: () => void }) => ReactNode)` | — | Controls on the start side of the header, after the close button. One element or several. |
+| `endActions` | `ReactNode \| ((ctx: { closeDrawer: () => void }) => ReactNode)` | — | Controls on the end side of the header. One element or several. Replaces the default Done button when provided. |
 | `onClose` | `() => void` | — | Called when the drawer is closed (CloseButton, backdrop click, or after `onDone` resolves) |
 | `onDone` | `() => Promise<boolean \| void>` | — | Async handler for the Done button. If it returns `false`, the drawer stays open. Any other resolved value closes the drawer. While pending, the Done button shows a loading state. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the panel element |
@@ -93,19 +93,25 @@ Return `false` from `onDone` to keep the drawer open (e.g. when validation fails
 </Drawer>
 ```
 
-### Custom action button in header
+### Custom header actions on both sides
 
-Replaces the default Done button entirely. Receives `closeDrawer` in context.
+`startActions` sits after the close button; `endActions` replaces the default
+Done button. Either can be one element, several, or a render function that
+receives `closeDrawer`. The title stays centred on the panel regardless.
 
 ```tsx
 <Drawer
-  title="Share"
-  content={<SharePanel />}
-  renderActionButton={({ closeDrawer }) => (
-    <Button label="Copy link" icon={<Link />} onClick={() => { copyLink(); closeDrawer(); }} />
-  )}
+  title="Document"
+  content={<DocPanel />}
+  startActions={
+    <Button label="History" icon={<History />} showLabel={false} variant="text" />
+  }
+  endActions={({ closeDrawer }) => [
+    <Button key="share" label="Share" icon={<Share />} showLabel={false} variant="text" />,
+    <Button key="save" label="Save" variant="submit" onClick={closeDrawer} />,
+  ]}
 >
-  <Button label="Share" icon={<Share />} />
+  <Button label="Open document" />
 </Drawer>
 ```
 
@@ -115,6 +121,8 @@ Replaces the default Done button entirely. Receives `closeDrawer` in context.
 
 - The drawer is **uncontrolled** — open/close state is managed internally.
 - Opening: the trigger's existing `onClick` is preserved and called alongside the drawer open handler.
-- Animation: uses `motion/react` `AnimatePresence` with a spring transition and a backdrop fade.
-- Portal target: `document.querySelector('[data-altrone-root="true"]')` — the element rendered by `AltroneApplication`. Falls back to `document.body` in environments where no root is found.
+- Closing: a click on the backdrop, the close button, or the `Escape` key. `onClose` fires for all three (and after `onDone` resolves).
+- Focus: trapped inside the panel while open (`focus-trap-react`), returned to the trigger on close. The panel body carries `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` when a `title` is set.
+- Animation: `motion/react` `AnimatePresence` — the panel slides in on an ease-out curve while scaling up from the screen edge it enters from, over a backdrop fade. Under `prefers-reduced-motion` both are dropped — the panel mounts/unmounts with no transition. The resting edge inset lives in CSS, so a reduced-motion drawer is still inset.
+- Portal target: `document.querySelector('[data-altrone-root="true"]')` — the element rendered by `Application`. Falls back to `document.body` in environments where no root is found.
 - SSR-safe: `portalRoot` is `null` on the server and the portal is simply not rendered.

@@ -1,6 +1,6 @@
 # Form
 
-A form container that propagates `size`, `disabled`, and `errorMessages` to all `Form.Field` children via context. Prevents default browser submission.
+A form container that propagates `size`, `disabled`, and `errorMessages` to all `Form.Field` children via context. It prevents the default browser submission unless the `<form>` has a native `action` (e.g. a Server Action), which it leaves to run.
 
 ## Import
 
@@ -21,7 +21,7 @@ The container. Renders a `<form>` element.
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Size passed down to all form controls via context |
 | `disabled` | `boolean` | — | Disables all fields via context |
 | `errorMessages` | `Record<string, string \| null \| undefined>` | `{}` | Map of field `name` → error message. `Form.Field` reads this by `name` to show inline errors. |
-| `onSubmit` | `FormEventHandler` | — | Called on form submission. `preventDefault()` is called automatically. |
+| `onSubmit` | `FormEventHandler` | — | Called on form submission. `preventDefault()` is called automatically **unless** the form has an `action` prop, so `<Form action={serverAction}>` works. |
 | `ref` | `Ref<HTMLFormElement>` | — | Forwarded ref |
 
 ---

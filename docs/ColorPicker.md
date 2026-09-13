@@ -24,6 +24,7 @@ import { ColorPicker } from 'altrone-ui';
 | `readOnly` | `boolean` | `false` | Disables the popover trigger. Input renders in read-only visual style. |
 | `asChild` | `boolean` | `false` | Merges trigger props onto the single child element instead of rendering `TextInput`. |
 | `children` | `ReactNode` | — | Only used with `asChild`. Must be a single valid React element. |
+| `renderFunc` | `(props: ColorPickerRenderProps) => ReactElement` | — | Replaces the default `TextInput` trigger entirely. Receives `{ value, opened, disabled, placeholder, className, style }`. |
 | `ref` | `Ref<HTMLInputElement>` | — | Forwarded ref |
 
 All standard `InputHTMLAttributes<HTMLInputElement>` are also accepted (except `onChange`, `size`, `value`, `children`).
@@ -97,6 +98,18 @@ const BRAND_COLORS: ColorPreset[] = [
 <ColorPicker value="#6366f1" onChange={() => {}} readOnly />
 ```
 
+### renderFunc — custom trigger
+
+```tsx
+<ColorPicker
+  value={color}
+  onChange={setColor}
+  renderFunc={({ value, opened }) => (
+    <Button label={value ?? 'Pick color'} data-opened={opened} />
+  )}
+/>
+```
+
 ### asChild — custom trigger
 
 Use `asChild` when you want a completely custom element to trigger the color picker popover. The component merges `data-value` and `data-opened` attributes onto the child.
@@ -115,6 +128,6 @@ Use `asChild` when you want a completely custom element to trigger the color pic
 ## Behavior details
 
 - The color value is always stored lowercase — `onChange` normalizes the string via `.toLowerCase()`.
-- When no color is selected, the swatch area renders a `DummyBox` (skeleton placeholder) instead of a colored circle.
+- When no color is selected, the swatch area renders a hatched `Box` (`material="hatch"`) instead of a colored circle.
 - The dropdown is disabled (`enabled={false}`) when `readOnly={true}`.
 - The chevron icon in the trigger flips direction based on whether the dropdown is open.

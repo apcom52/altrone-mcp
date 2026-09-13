@@ -5,7 +5,7 @@ A dropdown select input. Supports single and multiple selection, search filterin
 ## Import
 
 ```tsx
-import { Select } from 'altrone-ui';
+import { Select, useSelectContext } from 'altrone-ui';
 ```
 
 ---
@@ -14,21 +14,23 @@ import { Select } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `Value \| Value[]` | — | Controlled selected value. Use `string` for single, `string[]` for multiple. |
-| `onChange` | `(value?: Value, event?: MouseEvent) => void` | — | **Required.** Called when the selection changes. |
-| `options` | `Option[]` | — | **Required.** List of available options. |
+| `value` | `string \| string[]` | — | Controlled selected value. `string` for single, `string[]` for `multiple`. |
+| `onChange` | `(value: string \| string[] \| undefined, event?: MouseEvent \| KeyboardEvent) => void` | — | **Required.** Called when the selection changes. `event` is passed when it originates from a DOM event (e.g. the clear button); option picks currently carry no event. |
+| `options` | `Option[]` | — | **Required.** List of available options. `Option.disabled` greys out and blocks a row. |
 | `multiple` | `boolean` | `false` | Enable multi-select mode. `value` must be an array. |
 | `clearable` | `boolean` | `false` | Show a clear (×) button when a value is selected. |
 | `searchable` | `boolean` | `false` | Allow filtering options by typing. Switches the input to a text field on focus. |
-| `size` | `Size` | `'m'` | Input size: `'s' \| 'm' \| 'l'` |
+| `size` | `Size` | `'m'` | Control size (`mini \| s \| m \| l \| xl`), passed to the underlying `TextInput`. |
 | `transparent` | `boolean` | `false` | Removes the border/background for inline use |
 | `placeholder` | `string` | — | Placeholder shown when no value is selected |
 | `parentWidth` | `boolean` | `true` | Make the dropdown panel match the trigger width |
+| `menuHeight` | `number` | `--select-menu-height` (250) | Max height of the options list, px. The list fits its content and only scrolls past this. |
 | `disabled` | `boolean` | `false` | Disables the input |
 | `name` | `string` | auto-generated | HTML `name` for the hidden `<input>` (form submission). Multiple mode uses `name[]`. |
-| `asChild` | `boolean` | `false` | Render a custom trigger element (see below) |
-| `children` | `ReactElement` | — | Custom trigger when `asChild={true}`. Receives `SelectContext` as props. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `renderFunc` | `(ctx: SelectRenderContext) => ReactElement` | — | Replace the whole trigger. Receives the live select state (see below). |
+| `asChild` | `boolean` | `false` | Use `children` as the trigger element (see below) |
+| `children` | `ReactElement` | — | Custom trigger when `asChild={true}`. Read select state inside it with `useSelectContext()`. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the wrapper element |
 
 ### Option
 
@@ -40,14 +42,37 @@ type Option = {
 };
 ```
 
+### SelectContext / SelectRenderContext
+
+The state exposed to `renderFunc` and, via `useSelectContext()`, to any component
+rendered inside an `asChild` trigger:
+
+```ts
+type SelectContextValue = {
+  expanded: boolean;                       // dropdown open
+  value: string | string[] | undefined;
+  selectedOptions: Option | Option[] | undefined;
+  disabled: boolean;
+  multiple: boolean;
+  clearValue: (event?) => void;
+};
+
+// renderFunc argument also carries the resolved `className` / `style`.
+type SelectRenderContext = SelectContextValue & {
+  className: string;
+  style?: CSSProperties;
+};
+```
+
 ---
 
 ## Behavior
 
 - **Single mode**: selecting an option closes the dropdown immediately.
-- **Multiple mode**: the dropdown stays open after each selection; close by clicking outside.
-- **Searchable**: on focus, the input becomes editable and filters options. The selected value label is shown as placeholder while typing.
-- **Clear button** (`clearable`): calls `onChange(undefined)` for single, `onChange([])` for multiple.
+- **Multiple mode**: the dropdown stays open after each selection, and a search query is kept between picks; close by clicking outside.
+- **Searchable**: on focus, the input becomes editable and filters options by case-insensitive substring. The selected value label is shown as placeholder while typing. When nothing matches, the menu shows the localized `select.notFound` text.
+- **Clear button** (`clearable`): calls `onChange(undefined, event)` for single, `onChange([], event)` for multiple.
+- **Accessibility**: the trigger is `role="combobox"` with `aria-expanded` / `aria-controls`; the menu is `role="listbox"` with `role="option"` rows.
 - `parentWidth={true}` (default) aligns the dropdown panel width to the trigger. Set to `false` for a free-width dropdown.
 
 ---
@@ -128,21 +153,43 @@ const [tags, setTags] = useState<string[]>([]);
 <Select value={v} onChange={setV} options={opts} size="l" />
 ```
 
-### Custom trigger (asChild)
+### Custom trigger — `renderFunc`
 
-Pass `asChild` and a child element. The child receives `SelectContext` props (`expanded`, `value`, `selectedOptions`, `disabled`, `multiple`, `clearValue`).
+Replaces the whole trigger; receives the live `SelectRenderContext`.
 
 ```tsx
 <Select
   value={country}
-  onChange={(v) => setCountry(v)}
+  onChange={(v) => setCountry(v as string | undefined)}
   options={countryOptions}
-  asChild
->
-  <Button
-    label={selectedCountry?.label ?? 'Select country'}
-    additionalIcon={<ChevronDown />}
-  />
+  renderFunc={({ expanded, selectedOptions }) => (
+    <Button
+      label={(selectedOptions as Option | undefined)?.label ?? 'Select country'}
+      additionalIcon={expanded ? <ChevronUp /> : <ChevronDown />}
+    />
+  )}
+/>
+```
+
+### Custom trigger — `asChild` + `useSelectContext()`
+
+Pass `asChild` and one child element. Read the select state from a nested
+component with `useSelectContext()` (throws outside `<Select>`).
+
+```tsx
+const CountryTrigger = ({ ref }: { ref?: Ref<HTMLButtonElement> }) => {
+  const { expanded, selectedOptions } = useSelectContext();
+  return (
+    <Button
+      ref={ref}
+      label={(selectedOptions as Option | undefined)?.label ?? 'Select country'}
+      additionalIcon={expanded ? <ChevronUp /> : <ChevronDown />}
+    />
+  );
+};
+
+<Select value={country} onChange={/* … */} options={countryOptions} asChild>
+  <CountryTrigger />
 </Select>
 ```
 

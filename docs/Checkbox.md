@@ -1,6 +1,6 @@
 # Checkbox
 
-A controlled checkbox with label support, indeterminate state, danger styling, and full keyboard accessibility. Renders a `<label>` wrapping a hidden `<input type="checkbox">` and a custom visual indicator.
+A controlled checkbox with label support, indeterminate state, danger styling, five sizes, and native keyboard accessibility. Renders a `<label>` wrapping a visually-hidden (but focusable, screen-reader-visible) `<input type="checkbox">` and a custom visual indicator.
 
 ## Import
 
@@ -13,9 +13,10 @@ import { Checkbox } from 'altrone-ui';
 ## Key behaviors
 
 - **Controlled only** — always pass `checked` and `onChange` together.
-- **`onChange` signature is inverted** — receives the *next* state (`!checked`), not a DOM event: `onChange(nextChecked: boolean, event: ChangeEvent)`.
-- **Keyboard accessible** — the root `<label>` has `tabIndex={0}`; pressing `Enter` or `Space` triggers the hidden `<input>`.
-- **Indeterminate** — when `indeterminate={true}` the visual indicator shows a dash instead of a checkmark. The underlying `<input>` remains `checked={false}` regardless.
+- **`onChange` signature is inverted** — receives the *next* state (`!checked`), not a DOM event: `onChange(nextChecked: boolean, event: ChangeEvent<HTMLInputElement>)`.
+- **Keyboard accessible** — focus lands on the real `<input>`; `Space` toggles it natively (`Enter` does not, matching native checkboxes).
+- **Indeterminate** — when `indeterminate={true}` the visual indicator shows a dash and the native `<input>.indeterminate` property is set, so assistive tech announces the checkbox as `mixed`. The underlying `checked` value is unchanged.
+- **Accessible name** — comes from `children` (the `<label>` wraps the input). With no `children`, pass `aria-label` / `aria-labelledby` — they are forwarded to the `<input>`, not the wrapper.
 
 ---
 
@@ -27,8 +28,9 @@ import { Checkbox } from 'altrone-ui';
 | `onChange` | `(nextChecked: boolean, event: ChangeEvent) => void` | — | Called with the **next** state when the user toggles. |
 | `indeterminate` | `boolean` | `false` | Shows a dash (−) indicator. Used for "select all" checkboxes when only some children are checked. Does not affect the underlying `checked` value. |
 | `danger` | `boolean` | `false` | Applies danger (red) color treatment |
-| `disabled` | `boolean` | `false` | Disables the checkbox |
-| `name` | `string` | — | `name` attribute on the hidden `<input>`. Required for form submission. |
+| `disabled` | `boolean` | `false` | Disables the checkbox (applied to the native `<input>`) |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the box, indicator and label type; the row stays ≥24px tall at every tier |
+| `name` | `string` | — | `name` attribute on the `<input>`. Required for form submission. |
 | `children` | `ReactNode` | — | Label content rendered to the right of the indicator. Accepts text or any React node. |
 | `ref` | `Ref<HTMLLabelElement>` | — | Forwarded ref to the root `<label>` |
 
@@ -50,8 +52,21 @@ const [checked, setChecked] = useState(false);
 
 ### Without label text
 
+Give it a name from context — `aria-label` lands on the `<input>`.
+
 ```tsx
-<Checkbox checked={checked} onChange={setChecked} />
+<Checkbox
+  aria-label="Select all rows"
+  checked={checked}
+  onChange={setChecked}
+/>
+```
+
+### Sizes
+
+```tsx
+<Checkbox size="s" checked={checked} onChange={setChecked}>Compact row</Checkbox>
+<Checkbox size="l" checked={checked} onChange={setChecked}>Large</Checkbox>
 ```
 
 ### Danger
