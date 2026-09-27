@@ -17,7 +17,7 @@ import { AutocompleteInput } from 'altrone-ui';
 - Keyboard navigation: `↑` / `↓` to move through items, `Enter` to select the highlighted item.
 - After a suggestion is selected the input value is updated via a synthetic React change event, ensuring compatibility with controlled inputs.
 - When `cacheResults={true}`, results for a given input value are stored in a `Map` for the lifetime of the component. Navigating back to a cached prefix skips the network call.
-- If `getSuggestions` throws, the error is passed to `onError` and a `CircleAlert` icon appears inside the input (via `TextInput.CustomIsland`).
+- If `getSuggestions` throws, the error is passed to `onError` and an error icon (`Application.icons.error` by default, override via `errorIcon`) appears inside the input (via `TextInput.CustomIsland`).
 
 ---
 
@@ -37,10 +37,11 @@ import { AutocompleteInput } from 'altrone-ui';
 | `minChars` | `number` | `1` | Minimum input length required before `getSuggestions` is called. |
 | `cacheResults` | `boolean` | `false` | Cache suggestion results per input value for the component's lifetime. |
 | `showControls` | `boolean` | — | Show/hide the loading island. Inherits from context when omitted. |
+| `errorIcon` | `ReactElement` | `Application.icons.error` | Overrides the icon shown when `getSuggestions` throws. |
 
 ### Inherited from TextInput
 
-All `TextInput` props are supported: `value`, `onChange`, `placeholder`, `invalid`, `size`, `variant`, `disabled`, `readOnly`, `wrapperClassName`, `wrapperStyle`, and so on. `ref` points at the visual wrapper; use `inputRef` for the `<input>` node.
+All `TextInput` props are supported: `value`, `onChange`, `placeholder`, `invalid`, `size`, `variant`, `disabled`, `readOnly`, `inputClassName`, `inputStyle`, and so on. `className`/`style`/`ref` target the root (the visual wrapper); use `inputRef`/`inputClassName`/`inputStyle` for the `<input>` node.
 
 ### renderSuggestion context
 

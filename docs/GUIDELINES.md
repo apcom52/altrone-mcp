@@ -35,10 +35,10 @@ When you feel the urge to create a custom element, use this table instead.
 | A button | `Button` |
 | A link that looks like a button | `Button` with `asChild` + `<a>` |
 | A checkbox | `Checkbox` |
-| A toggle/switch | `Switcher` |
+| A toggle/switch | `Switch` |
 | A radio group | `Radio` + `Radio.Item` |
 | A text field | `TextInput` |
-| A multi-line text field | `Textarea` |
+| A multi-line text field | `TextArea` |
 | A number field | `NumberInput` |
 | A password field | `PasswordInput` |
 | A search field | `Search` |
@@ -46,7 +46,7 @@ When you feel the urge to create a custom element, use this table instead.
 | A date picker | `DatePicker` |
 | A color picker | `ColorPicker` |
 | An autocomplete input | `AutocompleteInput` |
-| A range/slider | `Range` |
+| A range/slider | `Slider` |
 | A file upload | `FilePicker` |
 
 ### Feedback & status
@@ -60,7 +60,7 @@ When you feel the urge to create a custom element, use this table instead.
 | A modal dialog (declarative) | `Modal` |
 | A loading spinner | `Loading` |
 | A skeleton loading placeholder | `Skeleton` |
-| An image / content placeholder | `Box` with `material="hatch"` |
+| An image / content placeholder | `Box` with `material="dotted"` |
 | An empty state / feedback (error, success, …) | `Result` |
 | A progress bar | `Progress` |
 
@@ -344,7 +344,7 @@ if (confirmed) deleteItem();
 
 // Correct
 <Divider />
-<Divider direction="vertical" />
+<Divider orientation="vertical" />
 ```
 
 ---
@@ -367,4 +367,4 @@ if (confirmed) deleteItem();
 2. **Read the docs before using a component.** Call `get_component_docs` for the component you need. Pay attention to non-obvious props — many components have context propagation, render functions, or `asChild` patterns.
 3. **Do not recreate what the library already provides.** This includes CSS classes, animation effects, focus management, ARIA attributes, and keyboard handling — the components handle all of that.
 4. **Do not wrap altrone-ui components in unnecessary containers.** `Flex`, `Grid`, and `Screen` are the intended layout primitives. Use them directly.
-5. **Prefer composition over workarounds.** If something feels hard, there is likely a built-in prop for it (`asChild`, `renderFunc`, `content` render function, `ref` imperative API, etc.).
+5. **Prefer composition over workarounds.** If something feels hard, there is likely a built-in prop for it (`asChild`, `content` render function, `ref` imperative API, etc.).

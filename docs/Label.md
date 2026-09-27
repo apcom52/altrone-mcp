@@ -19,11 +19,11 @@ Renders a `<div>`. The text is passed as `children`, not a prop.
 | `children` | `ReactNode` | — | Text content of the label |
 | `color` | `LabelColor` | `'default'` | Colour (see below) |
 | `variant` | `'solid' \| 'soft' \| 'outline'` | `'solid'` | Visual style |
-| `rounding` | `'rounded' \| 'pill'` | `'rounded'` | Border-radius style |
+| `shape` | `'rounded' \| 'pill'` | `'rounded'` | Border-radius style |
 | `size` | `Size` | `'m'` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
+All standard `HTMLAttributes<HTMLElement>` are also accepted.
 
 ### LabelColor values
 
@@ -59,10 +59,10 @@ The four semantic colours (`primary` → accent, `success` → green, `warning` 
 <Label variant="outline" color="primary">Outline</Label>
 ```
 
-### Pill rounding
+### Pill shape
 
 ```tsx
-<Label color="indigo" rounding="pill">v2.0.0</Label>
+<Label color="indigo" shape="pill">v2.0.0</Label>
 ```
 
 ### Sizes

@@ -2,6 +2,8 @@
 
 An SVG circular spinner for an in-progress operation. Renders a `<div role="status">` wrapper with a localized `aria-label` ("Loading") around the SVG (which is `aria-hidden`). Keeps spinning under `prefers-reduced-motion` — it's a functional state indicator, not decorative motion.
 
+Pass `value` (0–100) to switch it into a determinate circular progress indicator: the spin/stretch animations stop, the arc is drawn from 12 o'clock for the given percentage, and the wrapper becomes `role="progressbar"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax`.
+
 ## Import
 
 ```tsx
@@ -17,6 +19,7 @@ import { Loading } from 'altrone-ui';
 | `size` | `number \| string` | `'24px'` | Diameter — a number of px or a px string. |
 | `strokeWidth` | `number \| string` | `'2'` | Ring thickness, in the same units as `size`. Fractions (`1.5`) are fine. |
 | `color` | `string` | `var(--loading-color)` | Stroke colour. Any CSS colour, or `currentColor`. |
+| `value` | `number` | — | Progress percentage (0–100). When set, renders a determinate `role="progressbar"` arc instead of an indeterminate spinner. Values outside 0–100 are clamped. |
 | `aria-label` | `string` | localized `"Loading"` | Override to say what's loading. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the `<div>` wrapper |
 
@@ -71,6 +74,14 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
   <Loading size="16px" />
   <span>Saving…</span>
 </Flex>
+```
+
+### Determinate progress
+
+```tsx
+<Loading value={25} />
+<Loading value={60} strokeWidth="3" />
+<Loading value={progress} size={48} strokeWidth="4" />
 ```
 
 ### Inside a button (manual usage)

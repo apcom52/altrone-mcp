@@ -1,6 +1,6 @@
 # Flex
 
-A flexbox layout primitive. Gap values map to design-system CSS variables. Renders any HTML element via `tagName`. Inner margins are disabled by default to prevent double-spacing with gap.
+A flexbox layout primitive. Gap values map to design-system CSS variables. Renders as `<div>` by default, or merges onto any element you wrap it around via `asChild`. Inner margins are disabled by default to prevent double-spacing with gap.
 
 ## Import
 
@@ -14,13 +14,13 @@ import { Flex } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | Flex direction |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Flex axis |
 | `gap` | `Gap` | `'none'` | Space between children. Uses design-system gap tokens. |
 | `align` | `'start' \| 'center' \| 'end'` | — | `align-items` value. For space distribution use `justify`. |
 | `justify` | `'start' \| 'center' \| 'end' \| 'between'` | — | `justify-content` value |
 | `wrap` | `boolean` | `false` | `flex-wrap: wrap` |
 | `disableInnerMargins` | `boolean` | `true` | Strips margins from direct children to avoid double-spacing with `gap`. |
-| `tagName` | `keyof JSX.IntrinsicElements` | `'div'` | HTML element to render (e.g. `'ul'`, `'section'`, `'nav'`) |
+| `asChild` | `boolean` | `false` | Merge the computed className/style onto the single child element instead of rendering a `<div>` — use to render as `<ul>`, `<section>`, `<nav>`, etc. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLElement>` are also accepted.
@@ -54,7 +54,7 @@ All standard `HTMLAttributes<HTMLElement>` are also accepted.
 ### Vertical stack
 
 ```tsx
-<Flex direction="vertical" gap="l">
+<Flex orientation="vertical" gap="l">
   <TextInput placeholder="Email" />
   <TextInput placeholder="Password" type="password" />
   <Button label="Sign in" variant="submit" />
@@ -81,19 +81,21 @@ All standard `HTMLAttributes<HTMLElement>` are also accepted.
 ### Rendered as a semantic element
 
 ```tsx
-<Flex tagName="ul" direction="vertical" gap="s">
-  <li>Item one</li>
-  <li>Item two</li>
+<Flex asChild orientation="vertical" gap="s">
+  <ul>
+    <li>Item one</li>
+    <li>Item two</li>
+  </ul>
 </Flex>
 ```
 
 ### Nested
 
 ```tsx
-<Flex direction="vertical" gap="l">
+<Flex orientation="vertical" gap="l">
   <Flex gap="m" align="center">
     <Avatar firstName="Alice" />
-    <Flex direction="vertical" gap="xs">
+    <Flex orientation="vertical" gap="xs">
       <Text weight="medium">Alice Morgan</Text>
       <Text size={3} color="muted">Product Designer</Text>
     </Flex>

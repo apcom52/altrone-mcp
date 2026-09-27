@@ -58,7 +58,7 @@ showConfirm(options: ConfirmOptions): Promise<boolean>
 | `title` | `string` | localized "Confirm" | **Required.** Dialog title |
 | `message` | `string` | — | **Required.** Dialog body text |
 | `confirmText` | `string` | localized "Confirm" | Confirm button label |
-| `rejectText` | `string` | localized "Cancel" | Cancel button label |
+| `cancelText` | `string` | localized "Cancel" | Cancel button label |
 | `danger` | `boolean` | — | Applies danger (red) style to the confirm button |
 
 Returns `true` if confirmed, `false` if cancelled or closed.
@@ -109,7 +109,7 @@ async function handleDelete(id: string) {
     title: 'Delete item',
     message: 'This action cannot be undone. Are you sure?',
     confirmText: 'Delete',
-    rejectText: 'Cancel',
+    cancelText: 'Cancel',
     danger: true,
   });
 

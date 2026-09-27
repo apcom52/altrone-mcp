@@ -22,15 +22,17 @@ import { Search } from 'altrone-ui';
 | `showControls` | `boolean` | `true` | Whether to show the clear button when value is non-empty. Set to `false` to hide it. |
 | `placeholder` | `string` | localized default | Placeholder text shown inside the styled placeholder overlay when the field is empty. |
 | `disabled` | `boolean` | `false` | Disables the input |
+| `searchIcon` | `ReactElement` | `Application.icons.search` | Overrides the search glyph (shown in the placeholder overlay and, once there's a value, at the field's start). |
+| `clearIcon` | `ReactElement` | `Application.icons.clear` | Overrides the clear-button icon. |
 
-All other `AutocompleteInputProps` are also accepted (except `type`, which is fixed to `"search"`).
+All other `AutocompleteInputProps` are also accepted (except `type`, which is fixed to `"search"`), including `errorIcon`.
 
 ---
 
 ## Behavior
 
-- **Empty state**: shows a full-width placeholder overlay with a `SearchIcon` and placeholder text. The standard HTML placeholder is not used.
-- **Has value**: shows the `SearchIcon` at the left and a `Delete` icon button at the right (if `showControls` is true).
+- **Empty state**: shows a full-width placeholder overlay with the search icon (`searchIcon` / `Application.icons.search`) and placeholder text. The standard HTML placeholder is not used.
+- **Has value**: shows the search icon at the left and a clear icon button (`clearIcon` / `Application.icons.clear`) at the right (if `showControls` is true).
 - **Clear button**: dispatches a synthetic `change` event on the native input with value `""`, so React controlled state is updated correctly.
 - **Custom children** (e.g. `TextInput.IconIsland`) are only rendered when the field has a value.
 

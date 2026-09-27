@@ -16,6 +16,7 @@ import { DataTable } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `data` | `T[]` | — | **Required.** Array of row objects |
+| `getRowId` | `(row: T, index: number) => string` | — | Stabilizes row identity across renders. Without it, row identity falls back to array position, so a `data` array reordered from outside the table (a refetch, a websocket update) leaves per-row UI state (an open `rowActions` overflow menu) stuck at the old position instead of following the row. |
 | `columns` | `DataTableColumn<T>[]` | — | **Required.** Column definitions |
 | `mode` | `'loading' \| 'read' \| 'select'` | `'read'` | Table mode. `loading` shows skeleton cells. `select` enables row checkboxes. |
 | `rowsPerPage` | `number` | `20` | Rows per page |
@@ -23,15 +24,19 @@ import { DataTable } from 'altrone-ui';
 | `showFooter` | `boolean` | `true` | Show/hide the pagination footer |
 | `showEmptyBanner` | `boolean` | `true` | Show an empty state banner when there are no rows to display |
 | `resizableColumns` | `boolean` | `false` | Let columns be resized by dragging their header edge (per-column opt-out via `resizable: false`) |
-| `renderRowActions` | `(ctx: DataTableRenderRowActionsContext<T>) => ReactElement<DataTableRowActionsProps>` | — | Per-row action buttons. Return a `<DataTable.RowActions>` element. |
-| `defaultPage` | `number` | `0` | Initial page index (zero-based) |
-| `defaultSort` | `{ field: string; direction: 'asc' \| 'desc' }` | — | Initial sort state |
-| `defaultFilters` | `DataTableFilter[]` | — | Initial filter state |
-| `onPageChange` | `(currentPage: number) => void` | — | Called on page change. Page is 1-based. |
-| `onSortChange` | `(sort?: Sorting) => void` | — | Called on sort change. `undefined` when sorting is cleared. |
-| `onFilterChange` | `(filters: DataTableFilter[]) => void` | — | Called on filter change. Always an array (empty when no filters). |
-| `onModeChange` | `(mode: DataTableMode) => void` | — | Called when mode changes (e.g. entering select mode) |
-| `children` | `ReactElement \| ReactElement[] \| ((ctx: DataTableRenderContext<T>) => ReactElement \| ReactElement[])` | — | Toolbar content rendered in the table header. Receives `{ selectableMode, selectedItems }` when used as a function. |
+| `icons` | `Partial<DataTableIconSet>` | — | Overrides for icons unique to `DataTable` (`sortAsc`, `sortDesc`, `filter`, `addFilter`, `deleteFilter`, `enableSelection`, `disableSelection`, `rowActions`, `booleanTrue`, `booleanFalse`), each a `ReactElement` |
+| `rowActions` | `StrictReactElements<DataTableRowActionProps> \| ((ctx: DataTableRenderRowActionsContext<T>) => StrictReactElements<DataTableRowActionProps>)` | — | Adds a trailing actions column: one `DataTable.RowAction`, or several (as an array), per row. A `collapsed` `RowAction` folds into an overflow menu. |
+| `actions` | `ReactNode \| ((ctx: DataTableRenderContext<T>) => ReactNode)` | — | Content added to the header `Toolbar`, alongside the select-mode toggle and filter control (both live in `Toolbar.Leading`). `DataTable.Action` element(s) join them there by default; wrap content in `Toolbar.Leading` / `Toolbar.Center` / `Toolbar.Trailing` to place it in a specific region instead. Receives `{ selectableMode, selectedItems }` when used as a function. |
+| `defaultPage` | `number` | `0` | Initial page index (zero-based), uncontrolled |
+| `defaultSort` | `{ field: string; direction: 'asc' \| 'desc' }` | — | Initial sort state, uncontrolled |
+| `defaultFilters` | `DataTableFilter[]` | — | Initial filter state, uncontrolled |
+| `page` | `number` | — | Controlled current page (1-based). Pairs with `onPageChange`; omit for uncontrolled (`defaultPage`) |
+| `sort` | `Sorting \| null` | — | Controlled sort. `null` means controlled with no sort applied. Omit for uncontrolled (`defaultSort`) |
+| `filters` | `DataTableFilter[]` | — | Controlled active filters. Pairs with `onFilterChange`; omit for uncontrolled (`defaultFilters`) |
+| `onPageChange` | `(currentPage: number, event?: MouseEvent) => void` | — | Called on page change. Page is 1-based. `event` is undefined for a programmatic change (e.g. an auto page-reset triggered by a sort/filter change). |
+| `onSortChange` | `(sort?: Sorting, event?: MouseEvent) => void` | — | Called on sort change. `undefined` when sorting is cleared. |
+| `onFilterChange` | `(filters: DataTableFilter[], event?: MouseEvent) => void` | — | Called on filter change. Always an array (empty when no filters). |
+| `onModeChange` | `(mode: DataTableMode, event: MouseEvent) => void` | — | Called when mode changes (e.g. entering select mode) |
 
 ---
 
@@ -68,23 +73,19 @@ Column types and their extra `options`:
 
 ## Sub-components
 
-### DataTable.RowActions
-
-Container for per-row action buttons. Pass as the return value of `renderRowActions`.
-
 ### DataTable.RowAction
 
-An individual action button inside `RowActions`.
+An individual action button, passed to the table's `rowActions` prop (directly, or as an array for several). `DataTable` renders them in a trailing column, folding any `collapsed` ones into an overflow menu (`Dropdown` behind an ellipsis button) once there's more than one action.
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `label` | `string` | **Required.** Button label |
 | `collapsed` | `boolean` | Hides this action into an overflow menu |
-| `onClick` | `() => void` | Click handler — receives no arguments (use a closure) |
+| `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | Native `Button` click handler |
 
 ### DataTable.Action
 
-A toolbar action button rendered in `children`. Accepts all `Button` props.
+A toolbar action button rendered via `actions`. Wraps `Toolbar.Action`, so it accepts the same props and follows the header toolbar's size/context. Disables itself while the table is loading.
 
 ---
 
@@ -155,23 +156,38 @@ Rule enums are exported: `StringFilterRules`, `NumberFilterRules`, `DateFilterRu
 ```tsx
 <DataTable
   data={users}
+  getRowId={(user) => user.id}
   columns={columns}
-  renderRowActions={({ row, rowIndex }) => (
-    <DataTable.RowActions>
-      <DataTable.RowAction
-        label="Edit"
-        icon={<Pencil />}
-        onClick={() => openEditModal(row)}
-      />
-      <DataTable.RowAction
-        label="Delete"
-        icon={<Trash />}
-        danger
-        collapsed
-        onClick={() => deleteUser(row.id)}
-      />
-    </DataTable.RowActions>
-  )}
+  rowActions={({ row, rowIndex }) => [
+    <DataTable.RowAction
+      key="edit"
+      label="Edit"
+      icon={<Pencil />}
+      onClick={() => openEditModal(row)}
+    />,
+    <DataTable.RowAction
+      key="delete"
+      label="Delete"
+      icon={<Trash />}
+      danger
+      collapsed
+      onClick={() => deleteUser(row.id)}
+    />,
+  ]}
+/>
+```
+
+Pass `getRowId` whenever `users` can be reordered outside the table (a refetch, a
+websocket update) — otherwise an already-open row menu stays attached to the old array
+position instead of following the row.
+
+A single, static action for every row can skip the function form:
+
+```tsx
+<DataTable
+  data={users}
+  columns={columns}
+  rowActions={<DataTable.RowAction label="View" onClick={() => openViewer()} />}
 />
 ```
 
@@ -184,18 +200,35 @@ Rule enums are exported: `StringFilterRules`, `NumberFilterRules`, `DateFilterRu
   selectable
   mode={mode}
   onModeChange={setMode}
->
-  {({ selectedItems }) => (
-    <>
-      <DataTable.Action
-        label={`Delete ${selectedItems.length} selected`}
-        danger
-        disabled={selectedItems.length === 0}
-        onClick={() => deleteMany(selectedItems)}
-      />
-    </>
-  )}
-</DataTable>
+  actions={({ selectedItems }) => [
+    <DataTable.Action
+      key="delete"
+      label={`Delete ${selectedItems.length} selected`}
+      danger
+      disabled={selectedItems.length === 0}
+      onClick={() => deleteMany(selectedItems)}
+    />,
+  ]}
+/>
+```
+
+### Placing actions in specific toolbar regions
+
+By default, elements returned from `actions` join the select-mode toggle and filter control in `Toolbar.Leading`. Wrap content in `Toolbar.Center` / `Toolbar.Trailing` to place it elsewhere in the header:
+
+```tsx
+<DataTable
+  data={users}
+  columns={columns}
+  actions={[
+    <Toolbar.Center key="search">
+      <TextInput placeholder="Search users" />
+    </Toolbar.Center>,
+    <Toolbar.Trailing key="export">
+      <DataTable.Action label="Export" icon={<Download />} showLabel={false} onClick={exportUsers} />
+    </Toolbar.Trailing>,
+  ]}
+/>
 ```
 
 ### Custom cell renderer
@@ -249,6 +282,21 @@ Rule enums are exported: `StringFilterRules`, `NumberFilterRules`, `DateFilterRu
 
 ---
 
-## Callbacks fire only after first render
+## Callbacks fire only on user interaction
 
-`onPageChange`, `onSortChange`, and `onFilterChange` are guarded with a `isFirstRender` ref — they do **not** fire on mount. Use `defaultPage`, `defaultSort`, `defaultFilters` to set the initial state instead.
+`onPageChange`, `onSortChange`, and `onFilterChange` fire only when the table's own pagination/sort/filter UI is used — never on mount. Use `defaultPage`, `defaultSort`, `defaultFilters` to set the initial state instead.
+
+## Controlled state
+
+`page`/`sort`/`filters` mirror the `default*` props but put the consumer in charge of the current value — the table renders whatever it's given and only *asks* to change it via `onPageChange`/`onSortChange`/`onFilterChange`. Useful when that state needs to live outside the table, e.g. synced to a URL query param so a link or the browser back button can jump to a specific page. Each of the three is controlled independently — you can control just `page` while leaving `sort`/`filters` uncontrolled.
+
+```tsx
+const [page, setPage] = useState(1);
+
+<DataTable
+  data={rows}
+  columns={columns}
+  page={page}
+  onPageChange={setPage}
+/>
+```

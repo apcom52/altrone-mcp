@@ -1,12 +1,20 @@
 # Application
 
-The root wrapper component for every Altrone UI app. It sets up the theme, accent color, localization, dialog system, and toast notifications. Must be placed at the top of the component tree — all other Altrone components must be rendered inside it.
+The root provider for every Altrone UI app. It sets up the theme, accent color, localization, shared icons, the dialog host, toasts/notifications and reduced-motion handling. It renders no layout of its own. Must be placed at the top of the component tree — all other Altrone components must be rendered inside it.
 
 ## Import
 
 ```tsx
-import { Application } from 'altrone-ui';
+import {
+  Application,
+  useAltroneTheme,
+  useLocalization,
+  useIcons,
+  getThemeInitScript,
+} from 'altrone-ui';
 ```
+
+Types: `ApplicationProps`, `Theme`, `Accent`, `Language`, `IconSet`.
 
 ---
 
@@ -14,12 +22,17 @@ import { Application } from 'altrone-ui';
 
 Rendering `Application` sets up the following globally:
 
-- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Sets the `data-altrone-theme` attribute on both `<html>` and the root element so portals inherit the right CSS variables.
+- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Sets the `data-altrone-theme` attribute on both the root element and `<html>`. Overlays (`Popover`, `Tooltip`, …) portal into an Altrone root element, so they inherit the theme and accent; the attribute on `<html>` covers global styles and the `<body>` fallback for triggers rendered outside any `Application`. Read/change it with `useAltroneTheme()` → `{ theme, setTheme }`.
+- **Theme persistence** (opt-in via `persistTheme`) — remembers the resolved theme in `localStorage` (key `altrone-theme`) once the user has explicitly switched it, and restores it on the next visit ahead of `theme`/system preference.
+- **FOUC prevention** — renders a blocking inline script that sets `data-altrone-theme` on `<html>` before the tree paints (best-effort). For a hard guarantee under streaming SSR, render `getThemeInitScript(theme, persistTheme)` in the document `<head>` yourself, with the same values you pass to `Application`.
 - **Document background** — mirrors the resolved app background color onto `<body>` and `<html>` (inline style, restored on unmount), re-applied when the theme changes. Keeps the browser overscroll / rubber-band area from flashing white on scroll (notably in Safari), since the color tokens are scoped to the root element and not to `<html>`.
-- **Accent color** — applied via `data-altrone-accent` attribute; controls the primary color token across all components.
-- **Localization** — passes `language` and `customLabels` to all components that have built-in text strings.
-- **Dialog system** — mounts `DialogProvider` so `useDialog` / `Dialog` work anywhere in the tree.
-- **Toast** — mounts the toast container so `useToast` works anywhere in the tree.
+- **Accent color** — applied via `data-altrone-accent` attribute; controls the `--accent-*` tokens and the `info` status color across all components. `danger`/`success`/`warning` keep their own fixed hues.
+- **Localization** — passes `language` and `customLabels` to all components that have built-in text strings. `useLocalization()` returns the translate function `t('component.key')` for your own components.
+- **Icons** — passes `icons` to all components that share a common icon role (navigation chevrons, search/clear, error, help, status icons), letting you swap the built-in `lucide-react` glyphs for your own icon set in one place. `useIcons()` returns the resolved `IconSet`.
+- **Dialog host** — mounts `DialogProvider` so the global `showAlert` / `showConfirm` / `showPrompt` functions work anywhere, including outside React. Without a mounted `Application` they log a warning and resolve immediately (`undefined` / `false` / `null`).
+- **Toasts and notifications** — mounts the stacks so the global `showToast` / `showNotification` / `dismissNotification` functions work anywhere, including outside React.
+- **Reduced motion** — wraps the tree in a motion config that follows `prefers-reduced-motion`, so JS-animated components respect it without per-component code.
+- **Fonts** — loads the bundled Inter and JetBrains Mono variable fonts.
 
 ---
 
@@ -28,16 +41,20 @@ Rendering `Application` sets up the following globally:
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Color theme. `auto` follows the OS `prefers-color-scheme` and updates at runtime when the system theme changes. |
-| `accent` | `'red' \| 'pink' \| 'purple' \| 'indigo' \| 'blue' \| 'teal' \| 'amber' \| 'brown'` | `'blue'` | Accent color for the design system |
-| `language` | `'en' \| 'ru' \| 'fr' \| 'ge' \| 'sp'` | `'en'` | Language for built-in component labels (e.g. empty state text, validation messages) |
+| `persistTheme` | `boolean` | `false` | Remember the resolved theme (`light`/`dark`) in `localStorage` and restore it on the next visit, once the user has explicitly switched it at least once. Takes priority over `theme`/system preference after that point. |
+| `accent` | `'red' \| 'orange' \| 'amber' \| 'green' \| 'teal' \| 'blue' \| 'indigo' \| 'purple' \| 'pink' \| 'brown'` | `'blue'` | Accent color for the design system |
+| `language` | `'en' \| 'ru' \| 'fr' \| 'de' \| 'es' \| 'zh' \| 'pt' \| 'tr'` | `'en'` | Language for built-in component labels (e.g. empty state text, validation messages) |
 | `customLabels` | `Partial<Localization>` | `{}` | Override individual localization strings without replacing the full locale |
-| `toastPlacement` | `'start' \| 'end'` | `'end'` | Vertical placement of the toast stack: `start` = top, `end` = bottom (always centred horizontally). See `Toasts`. |
-| `notificationSide` | `'start' \| 'end'` | `'end'` | Horizontal side of the notification stack: `start` = left, `end` = right. See `Toasts`. |
-| `notificationPlacement` | `'start' \| 'end'` | `'end'` | Vertical placement of the notification stack: `start` = top, `end` = bottom. See `Toasts`. |
+| `icons` | `Partial<IconSet>` | `{}` | Override the icon roles shared across components (see below). Icons unique to a single component are overridden via that component's own props instead. |
+| `toastPlacement` | `'top' \| 'bottom'` | `'bottom'` | Vertical edge of the toast stack (always centred horizontally). See `Notifications`. |
+| `notificationPlacement` | `'top-start' \| 'top-end' \| 'bottom-start' \| 'bottom-end'` | `'bottom-end'` | Corner of the notification stack. See `Notifications`. |
 | `asChild` | `boolean` | `false` | Merge the root's attributes/classes onto the single child element instead of rendering a wrapping `<div>` (e.g. your own `<body>`). The child's own children become the provider tree's content. |
-| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the root element |
+| `className` | `string` | — | Extra class name for the root element |
+| `style` | `CSSProperties` | — | Inline styles for the root element |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the root element (or, with `asChild`, the child element it merges onto) |
+| `children` | `ReactNode` | — | The app to render inside. With `asChild`, must be a single valid React element |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
+All other standard `HTMLAttributes<HTMLDivElement>` (`id`, `data-*`, `aria-*`, event handlers) are passed through to the root element.
 
 ---
 
@@ -83,6 +100,14 @@ export default function App() {
 </Application>
 ```
 
+### Persisting the user's theme choice
+
+```tsx
+<Application persistTheme>
+  <App />
+</Application>
+```
+
 ### Overriding individual labels
 
 ```tsx
@@ -94,9 +119,102 @@ export default function App() {
 </Application>
 ```
 
+### Overriding shared icons
+
+```tsx
+import { Application } from 'altrone-ui';
+import { MyChevronLeft, MyChevronRight } from './my-icons';
+
+<Application icons={{ prev: <MyChevronLeft />, next: <MyChevronRight /> }}>
+  <App />
+</Application>;
+```
+
+### Switching the theme from a component
+
+```tsx
+import { useAltroneTheme } from 'altrone-ui';
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useAltroneTheme();
+  return (
+    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+      Current: {theme}
+    </button>
+  );
+}
+```
+
+### Toast and notification placement
+
+```tsx
+<Application toastPlacement="top" notificationPlacement="top-start">
+  <App />
+</Application>
+```
+
+### Next.js App Router
+
+The library ships no `'use client'` boundary, so wrap `Application` in a client component and use that in the (server) root layout:
+
+```tsx
+// app/AltroneProvider.tsx
+'use client';
+
+import { Application } from 'altrone-ui';
+
+export function AltroneProvider({ children }: { children: React.ReactNode }) {
+  return <Application persistTheme>{children}</Application>;
+}
+```
+
+### Hard FOUC guarantee under streaming SSR
+
+```tsx
+<head>
+  <script
+    dangerouslySetInnerHTML={{ __html: getThemeInitScript('auto', true) }}
+  />
+</head>
+```
+
+The arguments mirror `Application`'s `theme` and `persistTheme` props.
+
+---
+
+## `IconSet`
+
+Roles shared by several components — override one role once via `icons` instead of
+overriding it on every component that uses it. A component that only has a unique
+icon (not shared with any other component) exposes its own local override prop
+instead of joining this set — see that component's own docs.
+
+| Role | Default | Used by |
+|------|---------|---------|
+| `prev` | `ChevronLeft` | Calendar, DatePicker, Pagination |
+| `next` | `ChevronRight` | Calendar, DatePicker, Pagination |
+| `open` | `ChevronDown` | ColorPicker, Select, CollapsedList |
+| `close` | `ChevronUp` | ColorPicker, Select, CollapsedList |
+| `search` | `Search` | Search, Select |
+| `clear` | `Delete` | Search, Select |
+| `error` | `CircleAlert` | AutocompleteInput, FilePicker |
+| `help` | `HelpCircle` | Form, Tooltip |
+| `info` | `Info` | Notifications, Result |
+| `success` | `CheckCircle2` | Notifications, Result |
+| `warning` | `AlertTriangle` | Notifications, Result |
+| `danger` | `XCircle` | Notifications, Result |
+
+Every value is a `ReactElement` (an already-instantiated icon, e.g. `<MyIcon />`),
+matching how icon props work everywhere else in the library.
+
 ---
 
 ## Behavior details
 
 - When `theme="auto"`, the component listens to `window.matchMedia('(prefers-color-scheme: dark)')` and updates the theme in real time if the system setting changes.
-- `Application` is a pure provider root — theme, locale, dialogs, toasts. It does not render a layout itself; compose your screen with the `Screen` component (`Screen.Header`/`Screen.Sidebar`/`Screen.Content`/`Screen.Footer`) inside `Application`'s `children`.
+- `persistTheme` only starts overriding `theme`/system preference **after** the user has explicitly called `setTheme` once (via `useAltroneTheme()`) — it never hijacks the first render based on a stale stored value alone.
+- `Application` is a pure provider root — theme, locale, icons, dialogs, toasts. It does not render a layout itself; compose your screen with the `Screen` component (`Screen.Header`/`Screen.Sidebar`/`Screen.Content`/`Screen.Footer`) inside `Application`'s `children`.
+- Use **one instance per app**: each instance writes the theme to `<html>` and mirrors the background onto `<body>`, so a second instance conflicts with the first.
+- Provider order (outermost first): theme → localization → icons → dialogs → notifications → `children`.
+- Toast/notification placement is app-wide (`toastPlacement`, `notificationPlacement`), not per `showToast`/`showNotification` call.
+- The root element carries `data-altrone-root="true"`, `data-altrone-accent` and `data-altrone-theme`; design tokens and overlays hook into them.

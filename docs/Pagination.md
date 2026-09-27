@@ -1,6 +1,6 @@
 # Pagination
 
-A fully controlled page switcher. Renders a `<nav>` landmark (localized `aria-label`) with previous/next arrows, numbered page buttons, and — by default — first/last jump buttons. Always shows page 1 and the last page; gaps collapse into an ellipsis.
+A page switcher, controlled or uncontrolled. Renders a `<nav>` landmark (localized `aria-label`) with previous/next arrows, numbered page buttons, and — by default — first/last jump buttons. Always shows page 1 and the last page; gaps collapse into an ellipsis.
 
 ## Import
 
@@ -14,11 +14,17 @@ import { Pagination } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `currentPage` | `number` | — | **Required.** The active page (1-based). Controlled — clamp it yourself in `onChange`. Out-of-range values log a dev warning. |
+| `currentPage` | `number` | — | Controlled active page (1-based) — clamp it yourself in `onChange`. Out-of-range values log a dev warning. Omit for uncontrolled (`defaultPage`). |
+| `defaultPage` | `number` | `1` | Initial page for the uncontrolled case. Ignored if `currentPage` is passed. |
 | `totalPages` | `number` | — | **Required.** Total number of pages. |
-| `onChange` | `(page: number, event: React.MouseEvent<HTMLButtonElement>) => void` | — | **Required.** Called with the target page when the user picks one. |
+| `onChange` | `(page: number, event: React.MouseEvent<HTMLButtonElement>) => void` | — | Called with the target page when the user picks one — fires whether controlled or uncontrolled. |
 | `siblings` | `number` | `1` | Page buttons to show on each side of the current page. |
 | `showEdgeButtons` | `boolean` | `true` | Show the "first page" / "last page" jump buttons. |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the arrow/page buttons and the ellipsis together. |
+| `prevIcon` | `ReactElement` | `Application.icons.prev` | Overrides the "previous page" icon. |
+| `nextIcon` | `ReactElement` | `Application.icons.next` | Overrides the "next page" icon. |
+| `firstPageIcon` | `ReactElement` | lucide's `ChevronFirst` | Overrides the "first page" jump icon (only used when `showEdgeButtons` is `true`). Not a shared `Application.icons` role. |
+| `lastPageIcon` | `ReactElement` | lucide's `ChevronLast` | Overrides the "last page" jump icon (only used when `showEdgeButtons` is `true`). Not a shared `Application.icons` role. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<nav>` |
 
 All standard `HTMLAttributes<HTMLElement>` (except `onChange`) are also accepted.
@@ -38,11 +44,19 @@ All standard `HTMLAttributes<HTMLElement>` (except `onChange`) are also accepted
 
 ## Examples
 
-### Basic
+### Basic (controlled)
 
 ```tsx
 const [page, setPage] = useState(1);
 <Pagination currentPage={page} totalPages={20} onChange={setPage} />
+```
+
+### Uncontrolled
+
+Omit `currentPage` and the component tracks its own page, seeded from `defaultPage`. `onChange` still fires if you just want to observe the page.
+
+```tsx
+<Pagination defaultPage={1} totalPages={20} onChange={(page) => console.log(page)} />
 ```
 
 ### More siblings (wider range)

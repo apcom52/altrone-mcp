@@ -2,7 +2,7 @@
 
 A styled text input with a composable island system for icons, action buttons, text prefixes/suffixes, loading indicators, and character counters. Reads `name`, `disabled`, `invalid`, and `size` from `FormFieldContext` when inside a `Form`.
 
-The visual frame (fill, border, corner radius, elevation, and the focus ring while typing) is a `Box` primitive, so `TextInput` shares one material system with `Button` and other chip-like controls. `variant="default"` maps to Box's `plate` material (frosted fill + hairline), `variant="transparent"` to Box's `transparent` material.
+The visual frame (fill, border, corner radius, elevation, and the focus ring while typing) is a `Box` primitive, so `TextInput` shares one material system with `Button` and other chip-like controls. `variant="default"` maps to Box's `plate` material (frosted fill + hairline), `variant="transparent"` to Box's `transparent` material. The wrapper is always a `pill` shape — right for a single-line field; `TextArea` reproduces a `rounded` corner instead, since a capsule end makes no sense on a tall, multi-line box.
 
 ## Import
 
@@ -19,7 +19,6 @@ import { TextInput } from 'altrone-ui';
 | `value` | `string` | — | Controlled value |
 | `onChange` | `(value: string, event: ChangeEvent) => void` | — | Change handler. Receives the **string value** first, then the event. |
 | `variant` | `'default' \| 'transparent'` | `'default'` | Visual style. `default` is a frosted `plate` surface; `transparent` has no fill or border at rest and washes in the same tint on hover and focus. |
-| `shape` | `BoxShape` (`'rect' \| 'rounded' \| 'squircle' \| 'circle' \| 'pill'`) | `'pill'` | Corner shape of the visual wrapper. `pill` (the default) is right for a single-line field; `Textarea` overrides it with `'rounded'`. |
 | `invalid` | `boolean` | `false` | Error state (`aria-invalid` + danger tone). Also read from `FormFieldContext`. |
 | `size` | `Size` | `'m'` | Field size: `'mini' \| 's' \| 'm' \| 'l' \| 'xl'`. Also read from `FormFieldContext`. |
 | `name` | `string` | — | Input name. Also read from `FormFieldContext`. |
@@ -27,9 +26,11 @@ import { TextInput } from 'altrone-ui';
 | `readOnly` | `boolean` | — | Makes the input read-only |
 | `readonlyStyles` | `boolean` | `true` | When `readOnly`, drop the material so the value reads as plain text (still focusable for copy) |
 | `asChild` | `boolean` | `false` | Replace the `<input>` with a custom element. The first non-island child is used as the field element. |
-| `wrapperClassName` | `string` | — | Extra class for the visual wrapper (the `Box`). `className` targets the `<input>`. |
-| `wrapperStyle` | `CSSProperties` | — | Inline styles for the visual wrapper. `style` targets the `<input>`. |
-| `ref` | `Ref<HTMLElement>` | — | Forwarded to the visual wrapper element |
+| `className` | `string` | — | Targets the root DOM element (the visual wrapper `Box`), like every other component in the library. |
+| `style` | `CSSProperties` | — | Targets the root DOM element (the visual wrapper `Box`). |
+| `inputClassName` | `string` | — | Extra class for the underlying `<input>` (or the `asChild` element). |
+| `inputStyle` | `CSSProperties` | — | Inline styles for the underlying `<input>` (or the `asChild` element). |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the root DOM element (the visual wrapper `Box`) |
 | `inputRef` | `Ref<HTMLInputElement>` | — | Forwarded to the underlying `<input>` (or the `asChild` element) |
 
 All standard `InputHTMLAttributes<HTMLInputElement>` are accepted (except `onChange`, `size`, `children`).
@@ -196,7 +197,18 @@ Requires `maxLength` (or just `value`) on the parent `TextInput` to read the cur
 const inputRef = useRef<HTMLInputElement>(null);
 
 <TextInput value={v} onChange={setV} inputRef={inputRef} />;
-// `ref` points at the visual wrapper; `inputRef` points at the <input>.
+// `ref` points at the visual wrapper (root); `inputRef` points at the <input>.
+```
+
+### Styling the wrapper vs. the input
+
+```tsx
+<TextInput
+  value={v}
+  onChange={setV}
+  className="w-full"       // root DOM element (the visual wrapper)
+  inputClassName="tabular" // the <input> itself
+/>
 ```
 
 ### Inside a Form

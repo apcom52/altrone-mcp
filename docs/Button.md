@@ -37,6 +37,8 @@ import { Button } from 'altrone-ui';
 | `kbd` | `string` | — | Shortcut badge shown in the auto-tooltip (e.g. `"⌘S"`). Only used when `showLabel={false}`. |
 | `badge` | `number \| string \| ReactElement` | — | Small badge (counter or status). Inline at the end of the content on a labelled button; a `plate` chip floating over the top-right corner on an icon-only button. |
 | `state` | `'idle' \| 'loading' \| 'succeeded' \| 'failed'` | `'idle'` | Async feedback state. Any non-idle value disables the button and replaces content with a spinner, checkmark, or X icon. |
+| `successIcon` | `ReactElement` | checkmark | Icon shown when `state="succeeded"` |
+| `failedIcon` | `ReactElement` | X | Icon shown when `state="failed"` |
 | `selected` | `boolean` | `false` | Toggle state. Sets `aria-pressed` and applies a selected visual style. |
 | `disabled` | `boolean` | `false` | Disables the button. Also set implicitly when `state !== 'idle'`. |
 | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | HTML button type |

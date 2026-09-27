@@ -15,17 +15,16 @@ import { Result } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `status` | `'empty' \| 'info' \| 'success' \| 'warning' \| 'error'` | `'empty'` | Feedback kind. Sets the default icon and the media-chip tint. `empty` is a neutral "no data" state. |
-| `icon` | `ReactNode` | the `status` icon | Custom glyph for the media chip; overrides the status default. |
+| `icon` | `ReactNode` | the `status` icon | Custom glyph for the media chip; overrides the status default. Status defaults (except `empty`, which stays a fixed `SearchX`) come from `Application.icons`: `info` → `.info`, `success` → `.success`, `warning` → `.warning`, `error` → `.danger`. |
 | `title` | `ReactNode` | for `status="empty"`, the localized `"No data"` | Short heading. |
-| `description` | `ReactNode` | — | Muted supporting line under the title. |
-| `actions` | `ReactNode` | — | Buttons row rendered below the text (usually one or two `<Button>`s). |
+| `actions` | `StrictReactElements \| (() => StrictReactElements)` | — | Buttons row rendered below the text (usually one or two `<Button>`s). |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Density — scales the chip, type and padding. |
-| `children` | `ReactNode` | — | Alias for `description`. |
+| `children` | `ReactNode` | — | Muted supporting line under the title. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` (except `title`) are also accepted.
 
-**Title / description resolution:** with no `title`, a lone `description` (or `children`) becomes the heading — so `<Result>No projects yet</Result>` shows just that line. Pass an explicit `title` to get both a heading and a description. With nothing at all, `status="empty"` still shows the localized `"No data"`; other statuses render just the icon (and any `actions`).
+**Title / description resolution:** with no `title`, a lone `children` line becomes the heading — so `<Result>No projects yet</Result>` shows just that line. Pass an explicit `title` to get both a heading and a description. With nothing at all, `status="empty"` still shows the localized `"No data"`; other statuses render just the icon (and any `actions`).
 
 Only the media chip is tinted by `status` — the title and description stay neutral. Tints use the semantic status role tokens.
 
@@ -55,9 +54,10 @@ import { MailCheck } from 'lucide-react';
   size="l"
   icon={<MailCheck />}
   title="Invitations sent"
-  description="Four teammates will get an email with a link to join the workspace."
   actions={<Button label="Back to team" variant="submit" />}
-/>
+>
+  Four teammates will get an email with a link to join the workspace.
+</Result>
 ```
 
 ### Error with retry
@@ -68,9 +68,10 @@ import { RefreshCw } from 'lucide-react';
 <Result
   status="error"
   title="Couldn't load activity"
-  description="Something went wrong on our side. This usually clears up on its own."
   actions={<Button label="Retry" icon={<RefreshCw />} />}
-/>
+>
+  Something went wrong on our side. This usually clears up on its own.
+</Result>
 ```
 
 ### No access (warning)
@@ -82,9 +83,10 @@ import { ShieldAlert } from 'lucide-react';
   status="warning"
   icon={<ShieldAlert />}
   title="You don't have access to this project"
-  description="Ask an owner to add you, or switch to a workspace where you're a member."
   actions={<Button label="Request access" variant="submit" />}
-/>
+>
+  Ask an owner to add you, or switch to a workspace where you're a member.
+</Result>
 ```
 
 ### Full empty state with actions
@@ -95,14 +97,16 @@ import { FolderPlus, Plus, Upload } from 'lucide-react';
 <Result
   icon={<FolderPlus />}
   title="No projects yet"
-  description="Projects group your work, deploys and members. Create the first one to get going."
   actions={
     <>
       <Button label="New project" icon={<Plus />} variant="submit" />
       <Button label="Import" icon={<Upload />} />
     </>
   }
-/>
+>
+  Projects group your work, deploys and members. Create the first one to get
+  going.
+</Result>
 ```
 
 ### Inside a list

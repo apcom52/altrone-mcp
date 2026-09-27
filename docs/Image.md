@@ -25,6 +25,7 @@ import { Image } from 'altrone-ui';
 | `caption` | `ReactNode` | — | Caption rendered centered below the frame. Accepts any node, not just a string. |
 | `isLoading` | `boolean` | — | Controls the preloader for custom `children` — there's no native element to listen to a load event on, so the consumer drives it explicitly. Ignored in `src` mode, which tracks loaded/error state on its own from the `img`. |
 | `preloader` | `ReactElement` | a `Skeleton` | Overrides the default preloader. |
+| `brokenIcon` | `ReactElement` | `ImageOff` | Overrides the icon shown when the picture fails to load. |
 | `onLoad` | `(event: SyntheticEvent<HTMLImageElement>) => void` | — | Fires when the `src` image finishes loading. `src` mode only. |
 | `onError` | `(event: SyntheticEvent<HTMLImageElement>) => void` | — | Fires when the `src` image fails to load. `src` mode only. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref, to the root `<figure>`. |

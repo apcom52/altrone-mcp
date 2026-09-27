@@ -22,11 +22,12 @@ import { Tags } from 'altrone-ui';
 
 ### Tags
 
-A `Flex` wrapper with `direction="horizontal"`, `gap="m"`, and `wrap` enabled.
+A `Flex` wrapper with `orientation="horizontal"`, `gap="m"`, and `wrap` enabled.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | `Tags.Item` elements |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the text size of every `Tags.Item` inside it. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -99,7 +100,7 @@ All standard `AnchorHTMLAttributes` are also accepted (except `children` in non-
 ### Under an article
 
 ```tsx
-<Flex direction="vertical" gap="m">
+<Flex orientation="vertical" gap="m">
   <h1>{article.title}</h1>
   <p>{article.summary}</p>
   <Tags>

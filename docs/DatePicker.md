@@ -1,6 +1,6 @@
 # DatePicker
 
-A family of date/time input components built on a shared `generatePicker` factory. All variants render a read-only `TextInput` (or a custom trigger — see `renderFunc` / `asChild`) that opens a calendar popover.
+A family of date/time input components built on a shared `generatePicker` factory. All variants render a read-only `TextInput` (or a custom trigger — see `asChild`) that opens a calendar popover.
 
 ## Import
 
@@ -35,16 +35,18 @@ Extends `TextInput` props (except `value`, `onChange`, `ref`).
 | `maxDate` | `Dayjs` | — | Maximum selectable date. Dates after this are disabled. |
 | `autoClose` | `boolean` | `true` | Automatically close the popover after a date is selected |
 | `readOnly` | `boolean` | `false` | Disables the popover. Renders the value in a read-only style. |
-| `renderFunc` | `(ctx: DatePickerRenderContext) => ReactElement` | — | Replaces the default `TextInput` trigger with the returned element. `ctx` is `{ value, displayValue, expanded, disabled, clear, className, style }`. |
 | `asChild` | `boolean` | `false` | Use `children` as the trigger, merging `className` / `style` / click + ref onto it. |
 | `children` | `ReactElement` | — | The trigger element when `asChild` is set. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the wrapper div |
+| `prevIcon` | `ReactElement` | `Application.icons.prev` | Overrides the popover header's previous month/year icon. |
+| `nextIcon` | `ReactElement` | `Application.icons.next` | Overrides the popover header's next month/year icon. |
+| `triggerIcon` | `ReactElement` | lucide's `Calendar` | Overrides the trigger's trailing calendar glyph. Not a shared `Application.icons` role — unique to `DatePicker`. |
 
-Also accepts `TextInput` props: `placeholder`, `invalid`, `size`, `disabled`, `wrapperClassName`, etc.
+Also accepts `TextInput` props: `placeholder`, `invalid`, `size`, `disabled`, `inputClassName`, `inputStyle`, etc.
 
 ### `useDatePickerTrigger()`
 
-Any component rendered inside a `renderFunc` trigger can read the live trigger state instead of receiving it as props:
+Any component rendered inside an `asChild` trigger can read the live trigger state instead of receiving it as props:
 
 ```tsx
 const { value, displayValue, expanded, disabled, clear } = useDatePickerTrigger();
@@ -156,21 +158,24 @@ const [range, setRange] = useState<(Dayjs | undefined)[]>([]);
 ### Custom trigger
 
 ```tsx
-// renderFunc — receives live state
-<DatePicker
-  value={date}
-  onChange={setDate}
-  renderFunc={({ displayValue, expanded }) => (
+// asChild — bring your own element
+<DatePicker value={date} onChange={setDate} asChild>
+  <Button label={date ? date.format('D MMM') : 'Pick a date'} />
+</DatePicker>
+
+// asChild + useDatePickerTrigger() — read the live state from a nested component
+const MyTrigger = () => {
+  const { displayValue, expanded } = useDatePickerTrigger();
+  return (
     <Button
       label={displayValue || 'Pick a date'}
       additionalIcon={expanded ? <ChevronUp /> : <ChevronDown />}
     />
-  )}
-/>
+  );
+};
 
-// asChild — bring your own element
 <DatePicker value={date} onChange={setDate} asChild>
-  <Button label={date ? date.format('D MMM') : 'Pick a date'} />
+  <MyTrigger />
 </DatePicker>
 ```
 

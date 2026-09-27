@@ -25,7 +25,7 @@ import { Checkbox } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `checked` | `boolean` | `false` | Checked state |
-| `onChange` | `(nextChecked: boolean, event: ChangeEvent) => void` | — | Called with the **next** state when the user toggles. |
+| `onChange` | `(nextChecked: boolean, event: ChangeEvent) => void` | — | **Required.** Called with the **next** state when the user toggles. |
 | `indeterminate` | `boolean` | `false` | Shows a dash (−) indicator. Used for "select all" checkboxes when only some children are checked. Does not affect the underlying `checked` value. |
 | `danger` | `boolean` | `false` | Applies danger (red) color treatment |
 | `disabled` | `boolean` | `false` | Disables the checkbox (applied to the native `<input>`) |

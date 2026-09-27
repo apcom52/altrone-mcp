@@ -1,13 +1,13 @@
-# Textarea
+# TextArea
 
 A multi-line text input. Extends `TextInput` — supports the same island sub-components (`TextInput.ActionIsland`, `TextInput.IconIsland`, etc.) and reads from `FormFieldContext` when inside a `Form`.
 
-Unlike `TextInput`, the wrapper defaults to `shape="rounded"` at a 16px radius (the corner a `pill` `TextInput` of the default size resolves to) rather than `pill` itself — a capsule end makes no sense on a box that grows vertically. Pass a different `shape` to override.
+Unlike `TextInput`'s always-`pill` wrapper, `TextArea`'s wrapper is `rounded` at a 16px radius (the corner a `pill` `TextInput` of the default size resolves to) — a capsule end makes no sense on a box that grows vertically. This isn't configurable.
 
 ## Import
 
 ```tsx
-import { Textarea } from 'altrone-ui';
+import { TextArea } from 'altrone-ui';
 ```
 
 ---
@@ -25,7 +25,6 @@ All `TextInputProps` are accepted, **except** `type` (managed internally) and `r
 | `name` | `string` | — | Input name. Also read from `FormFieldContext`. |
 | `disabled` | `boolean` | `false` | Disables the textarea. Also read from `FormFieldContext`. |
 | `readOnly` | `boolean` | — | Makes the textarea read-only |
-| `shape` | `BoxShape` | `'rounded'` | Corner shape of the wrapper. Defaults to `rounded` at 16px (not `pill` like `TextInput`). |
 | `placeholder` | `string` | — | Placeholder text |
 | `rows` | `number` | — | Number of visible rows (native `rows` attribute) |
 | `maxLength` | `number` | — | Maximum character count (use with `TextInput.CharCounterIsland`) |
@@ -39,13 +38,13 @@ All `TextInputProps` are accepted, **except** `type` (managed internally) and `r
 
 ```tsx
 const [bio, setBio] = useState('');
-<Textarea value={bio} onChange={(v) => setBio(v)} placeholder="Tell us about yourself…" />
+<TextArea value={bio} onChange={(v) => setBio(v)} placeholder="Tell us about yourself…" />
 ```
 
 ### With row count
 
 ```tsx
-<Textarea
+<TextArea
   value={description}
   onChange={(v) => setDescription(v)}
   rows={6}
@@ -57,11 +56,11 @@ const [bio, setBio] = useState('');
 
 Island children (`TextInput.CharCounterIsland`, `TextInput.CustomIsland`, …) don't
 share the text's line the way they do on a single-line `TextInput` — on a
-`Textarea` they lay out as a footer *below* the text: full-width textarea on top,
+`TextArea` they lay out as a footer *below* the text: full-width textarea on top,
 islands on a row under it (`placement="start"` left, `placement="end"` right).
 
 ```tsx
-<Textarea
+<TextArea
   value={message}
   onChange={(v) => setMessage(v)}
   maxLength={500}
@@ -71,7 +70,7 @@ islands on a row under it (`placement="start"` left, `placement="end"` right).
     <Text size={1} color="muted">⌘↵ to send</Text>
   </TextInput.CustomIsland>
   <TextInput.CharCounterIsland placement="end" />
-</Textarea>
+</TextArea>
 ```
 
 `CharCounterIsland` reads `value` / `maxLength` from context and shows
@@ -80,7 +79,7 @@ islands on a row under it (`placement="start"` left, `placement="end"` right).
 ### Invalid state
 
 ```tsx
-<Textarea
+<TextArea
   value={notes}
   onChange={(v) => setNotes(v)}
   invalid={notes.length === 0}
@@ -92,7 +91,7 @@ islands on a row under it (`placement="start"` left, `placement="end"` right).
 ```tsx
 <Form errorMessages={{ description: ['Description is required'] }}>
   <Form.Field name="description" label="Description">
-    <Textarea
+    <TextArea
       value={form.description}
       onChange={(v) => setForm({ ...form, description: v })}
       rows={4}
@@ -105,5 +104,5 @@ islands on a row under it (`placement="start"` left, `placement="end"` right).
 ### Read-only
 
 ```tsx
-<Textarea value={readonlyContent} onChange={() => {}} readOnly rows={8} />
+<TextArea value={readonlyContent} onChange={() => {}} readOnly rows={8} />
 ```

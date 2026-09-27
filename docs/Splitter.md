@@ -17,6 +17,8 @@ import { Splitter } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Direction panels are split |
+| `sizes` | `number[]` | — | Controlled panel sizes (percent, aligned to panel order), pairs with `onSizesChange`. Omit for uncontrolled (each panel's own `defaultSize`). |
+| `onSizesChange` | `(sizes: number[]) => void` | — | Fires whenever sizes settle — end of a drag, or a panel collapse/expand. Pairs with `sizes`. |
 | `showControls` | `boolean` | `true` | Show collapse/expand toggle buttons on dividers |
 | `collapsedControlsVisibility` | `'always' \| 'hover' \| 'never'` | `'always'` | How a collapsed panel's expand button is shown. `'always'` — persistently visible while collapsed. `'hover'` — only on divider hover / button focus. `'never'` — not rendered; expand via `controlRef`. |
 | `onResize` | `(sizes: number[], event: PointerEvent) => void` | — | Fired on every pointer-move during drag. `sizes` is an array of panel percentages (0–100). |
@@ -24,6 +26,7 @@ import { Splitter } from 'altrone-ui';
 | `onResizeEnd` | `(sizes: number[], event: PointerEvent) => void` | — | Fired when drag ends |
 | `onCollapse` | `(panelIndex: number, collapsed: boolean, event?: MouseEvent) => void` | — | Fired when a panel is collapsed or expanded |
 | `controlRef` | `Ref<SplitterHandle>` | — | Ref exposing the imperative API (see below) |
+| `icons` | `Partial<SplitterIconSet>` | — | Overrides for the four directional chevrons used by the collapse controls (`chevronLeft`, `chevronRight`, `chevronUp`, `chevronDown`), each a `ReactElement` |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the container |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -32,16 +35,23 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 ### Splitter.Panel
 
-A descriptor component — carries configuration. Splitter reads its props and renders children inside sized containers. `Panel` itself renders nothing.
+A descriptor component — carries configuration, children, and DOM attributes (`ref`/`className`/`style`/…). `Splitter` reads its props and renders each panel as its own sized `<div>`, forwarding those attributes onto it. `Panel` itself renders nothing.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | Panel content |
 | `defaultSize` | `number` | auto | Initial size in percent (0–100). Uncontrolled. Panels without one share the remaining space equally. |
-| `min` | `number` | `0` | Minimum size in percent |
-| `max` | `number` | `100` | Maximum size in percent |
+| `minSize` | `number` | `0` | Minimum size in percent |
+| `maxSize` | `number` | `100` | Maximum size in percent |
 | `collapsible` | `boolean` | `false` | Allow this panel to be fully collapsed via the divider toggle button |
 | `resizable` | `boolean` | `true` | When `false`, the adjacent divider becomes non-draggable |
+| `className` | `string` | — | Merged onto the panel's root `<div>` (alongside the internal sizing class) |
+| `style` | `CSSProperties` | — | Merged onto the panel's root `<div>` — the internal `flex` sizing always wins over a colliding `flex`/`flexGrow`/etc. |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the panel's root `<div>`, alongside the internal drag/collapse ref |
+
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted and forwarded to the panel's root
+element (`id` and `aria-label` are reserved — `Splitter` sets them itself for the divider's
+`aria-controls` wiring and the localized panel name).
 
 ---
 
@@ -66,7 +76,7 @@ interface SplitterHandle {
 ```tsx
 <div style={{ height: 400 }}>
   <Splitter>
-    <Splitter.Panel defaultSize={30} min={20} max={60}>
+    <Splitter.Panel defaultSize={30} minSize={20} maxSize={60}>
       <Sidebar />
     </Splitter.Panel>
     <Splitter.Panel>
@@ -95,7 +105,7 @@ interface SplitterHandle {
 
 ```tsx
 <Splitter>
-  <Splitter.Panel defaultSize={20} min={15} max={30}>
+  <Splitter.Panel defaultSize={20} minSize={15} maxSize={30}>
     <FileTree />
   </Splitter.Panel>
   <Splitter.Panel defaultSize={55}>
@@ -152,14 +162,33 @@ const controlRef = useRef<SplitterHandle>(null);
 </Splitter>
 ```
 
-### Respond to resize
+### Controlled sizes (e.g. persist a layout)
+
+Pass `sizes`/`onSizesChange` to own the layout from outside — useful for persisting it (localStorage, a user preference) and restoring it later. `onSizesChange` fires at the end of a drag and on collapse/expand, not on every pointer-move (that's still `onResize`, unchanged).
 
 ```tsx
-<Splitter onResizeEnd={(sizes) => saveSizes(sizes)}>
-  <Splitter.Panel defaultSize={sizes[0]}>
+const [sizes, setSizes] = useState(() => loadSavedSizes() ?? [30, 70]);
+
+<Splitter sizes={sizes} onSizesChange={(next) => { setSizes(next); saveSizes(next); }}>
+  <Splitter.Panel>
     <Left />
   </Splitter.Panel>
-  <Splitter.Panel defaultSize={sizes[1]}>
+  <Splitter.Panel>
+    <Right />
+  </Splitter.Panel>
+</Splitter>
+```
+
+### Respond to a live drag
+
+`onResize` fires on every pointer-move; `onResizeEnd` once, when the drag ends. Both work the same whether `sizes` is controlled or not.
+
+```tsx
+<Splitter onResize={(sizes) => setLiveSizes(sizes)}>
+  <Splitter.Panel defaultSize={40}>
+    <Left />
+  </Splitter.Panel>
+  <Splitter.Panel>
     <Right />
   </Splitter.Panel>
 </Splitter>

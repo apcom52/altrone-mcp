@@ -1,6 +1,6 @@
 # Box
 
-The shared visual primitive behind "chip-like" components — `Button`, `Badge`, `Tag`, `Avatar`, a card. Not for structurally complex components (`Splitter`, `Tabs`, `Range`) — those use `Box` for individual internal parts, not as their whole implementation.
+The shared visual primitive behind "chip-like" components — `Button`, `Badge`, `Tag`, `Avatar`, a card. Not for structurally complex components (`Splitter`, `Tabs`, `Slider`) — those use `Box` for individual internal parts, not as their whole implementation.
 
 `Box` is SSR-safe and holds no React state: every interaction (`pressable`/`focusable`/`editable`) is implemented purely through CSS pseudo-classes.
 
@@ -17,7 +17,7 @@ import { Box } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `shape` | `'rect' \| 'rounded' \| 'squircle' \| 'circle' \| 'pill'` | `'rounded'` | Corner **algorithm**. The rounding *amount* still comes from the inherited `--radius-outer` (concentric radius system) — `shape` doesn't set a radius value itself, except `rect` (forced `0`), `circle` (forced `50%`, and locks to a square aspect ratio), and `pill` (forced capsule ends — stays a capsule at any `size` or width, without constraining the aspect ratio). `rounded` (the default) floors at `--radius-mini` (`2px`), so a Box is never hard-square unless you ask for `shape="rect"`. `squircle` falls back to a plain `border-radius` (scaled by `--squircle-fallback-ratio`, see `radius`) wherever the CSS `corner-shape` property isn't supported. |
-| `material` | `'solid' \| 'glass' \| 'plate' \| 'translucent' \| 'transparent' \| 'outline' \| 'ghost' \| 'hatch'` | `'solid'` | Fill/blur/border treatment at rest — see table below. `plate` is a fixed neutral "raised glass control" (frosted fill + `--gray-a3` hairline + layered shadow); it reproduces the pre-Box default Button chrome and, unlike the others, does not tint with `tone` (only its text does). |
+| `material` | `'solid' \| 'glass' \| 'plate' \| 'translucent' \| 'pale' \| 'transparent' \| 'outline' \| 'ghost' \| 'dotted'` | `'solid'` | Fill/blur/border treatment at rest — see table below. `plate` is a fixed neutral "raised glass control" (frosted fill + `--gray-a3` hairline + layered shadow); it reproduces the pre-Box default Button chrome and, unlike the others, does not tint with `tone` (only its text does). `pale` is `translucent`'s tint made opaque — use it instead of a dedicated "light" tone for a quiet neutral surface that shouldn't blend with what's behind it. |
 | `tone` | `'neutral' \| 'accent' \| 'danger' \| 'success' \| 'warning' \| 'info'` | `'neutral'` | Semantic color. `danger`/`success`/`warning` are fixed hues; `info` aliases the consumer's chosen `accent` |
 | `color` | `'red' \| 'orange' \| 'amber' \| 'green' \| 'teal' \| 'blue' \| 'indigo' \| 'purple' \| 'pink' \| 'brown' \| (string)` | — | Custom fill color, independent of the accent, taking priority over `tone`. A categorical hue name resolves to that hue's solid step (`--<hue>-9`); any other string is used as a raw CSS color. All materials work on top of it — `solid` fills with it (auto-contrasting text), the rest derive tints via `color-mix()`. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl' \| number \| string` | `'m'` | A named tier controls min-height **and** internal padding. A number (px) or CSS string (`'8em'`, `'50%'`) turns the box into a **square** of that size (width = height). `width`/`height` take priority. Arbitrary sizes don't adjust padding — use `padding`. |
@@ -40,14 +40,15 @@ All standard `HTMLAttributes` are also accepted (minus `className`/`style`, whic
 |---|---|---|---|---|---|
 | `solid` | 100% opaque (`tone`'s solid step) | — | — | `brightness(1.03)` | darkens — `brightness(0.92)` |
 | `translucent` | semi-transparent | none | — | alpha → strong | alpha → strong + `brightness(0.97)` |
+| `pale` | 100% opaque (same tint as `translucent`) | none | — | opaque → strong | opaque → strong + `brightness(0.97)` |
 | `glass` | semi-transparent | yes (`backdrop-filter`) | — | `brightness(1.04)` | alpha → strong + backdrop saturation |
 | `plate` | frosted (`--glass-background-color`, fixed — not tone-driven) | yes (`backdrop-filter`) | 1px `--gray-a3` hairline + layered contact/ambient shadow | `brightness(1.04)` | backdrop blur deepens + `brightness(1.1)` |
 | `transparent` | none | — | none | translucent wash appears | wash → strong |
 | `outline` | none | — | static | translucent wash appears | wash → strong + border strengthens |
 | `ghost` | none | — | appears only on interaction | translucent wash appears | wash → strong + border appears |
-| `hatch` | faint tinted wash + diagonal cross-hatch lines | — | 1px hairline (`tone`'s border) | wash → strong | wash → strong + border strengthens |
+| `dotted` | faint tinted wash + tone-driven dot pattern | — | 1px hairline (`tone`'s border) | wash → strong | wash → strong + border strengthens |
 
-`hatch` is a **placeholder surface** — a "content goes here" stub, an empty drop target, an unset swatch. Tone-driven (the wash, the hairline and the hatch lines all follow `tone`).
+`dotted` is a **placeholder surface** — a "content goes here" stub, an empty drop target, an unset swatch. Tone-driven (the wash, the hairline and the dots all follow `tone`).
 
 ---
 

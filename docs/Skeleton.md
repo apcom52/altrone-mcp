@@ -28,7 +28,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `childre
 
 > **Note:** With `animateLayout` off (the default) `Skeleton` renders a plain `<div>` — no `motion` overhead. Turn it on only when a skeleton's dimensions actually change between renders.
 
-> **Hatched `Box` vs `Skeleton`:** Use `Box` with `material="hatch"` for a static "content goes here" placeholder or an empty drop target. Use `Skeleton` for the animated shimmer loading state of text, cards or repeating content.
+> **Dotted `Box` vs `Skeleton`:** Use `Box` with `material="dotted"` for a static "content goes here" placeholder or an empty drop target. Use `Skeleton` for the animated shimmer loading state of text, cards or repeating content.
 
 ---
 
@@ -43,7 +43,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `childre
 ### Paragraph skeleton (multiple lines)
 
 ```tsx
-<Flex direction="vertical" gap="xs">
+<Flex orientation="vertical" gap="xs">
   <Skeleton width="100%" height="16px" radius="4px" />
   <Skeleton width="100%" height="16px" radius="4px" />
   <Skeleton width="75%"  height="16px" radius="4px" />
@@ -55,7 +55,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `childre
 ```tsx
 <Flex gap="m" align="center">
   <Skeleton width="48px" height="48px" radius="50%" />
-  <Flex direction="vertical" gap="xs" style={{ flex: 1 }}>
+  <Flex orientation="vertical" gap="xs" style={{ flex: 1 }}>
     <Skeleton width="40%" height="16px" radius="4px" />
     <Skeleton width="60%" height="12px" radius="4px" />
   </Flex>
@@ -65,7 +65,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `childre
 ### Card skeleton
 
 ```tsx
-<Flex direction="vertical" gap="m" style={{ padding: 16, border: '1px solid var(--border-1)', borderRadius: 8 }}>
+<Flex orientation="vertical" gap="m" style={{ padding: 16, border: '1px solid var(--border-1)', borderRadius: 8 }}>
   <Skeleton width="100%" height="180px" radius="6px" />
   <Skeleton width="70%"  height="20px"  radius="4px" />
   <Skeleton width="90%"  height="14px"  radius="4px" />

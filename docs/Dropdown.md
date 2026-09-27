@@ -16,14 +16,15 @@ import { Dropdown } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `ReactNode \| ((ctx: { opened: boolean; closePopup: () => void }) => ReactNode)` | — | **Required.** Trigger element. Can be a render function to access `opened` state. |
-| `content` | `ReactNode \| ((ctx: { closePopup: () => void; closeAllSequence: () => void }) => ReactNode)` | — | **Required.** Dropdown content. |
+| `children` | `ReactNode \| ((ctx: { open: boolean; hide: () => void }) => ReactNode)` | — | **Required.** Trigger element. Can be a render function to access `open` state. |
+| `content` | `ReactNode \| ((ctx: { hide: () => void; hideAllSequence: () => void }) => ReactNode)` | — | **Required.** Dropdown content. |
 | `placement` | `Placement \| 'auto'` | `'bottom'` | Floating UI placement (e.g. `'bottom-start'`, `'top-end'`) |
 | `trigger` | `'click' \| 'focus' \| 'hover' \| Array` | `['click']` | What opens the dropdown |
 | `closeParentPopover` | `boolean` | `true` | When inside a nested dropdown, whether clicking an action closes the entire chain or just the innermost popover. |
 | `focusTrap` | `boolean` | `true` | Trap focus inside the dropdown while open |
 
-All `PopoverProps` are also accepted.
+All `PopoverProps` are also accepted — including `ref` (forwarded to the trigger DOM element) and
+`controlRef` (imperative `PopoverRef`: `show`/`hide`/…, see `Popover.md`).
 
 ---
 
@@ -35,6 +36,7 @@ Container for menu items. Wraps items in a styled `<div>`.
 |------|------|-------------|
 | `children` | `ReactElement \| null \| (ReactElement \| null)[]` | Menu items |
 | `defaultFocusItemIndex` | `number` | Initially focused item index |
+| `maxHeight` | `CSSProperties['maxHeight']` | Caps the menu's height and scrolls past it (via `Scrollable`); defaults to `--dropdown-menu-max-height` (320px) |
 | `ref` | `Ref<HTMLDivElement>` | Forwarded ref |
 
 ---
@@ -65,7 +67,7 @@ A toggleable checkbox item inside the menu.
 |------|------|-------------|
 | `label` | `string` | **Required.** Item label |
 | `checked` | `boolean` | **Required.** Checked state |
-| `onChange` | `(state: boolean) => void` | **Required.** Called with the next state |
+| `onChange` | `(state: boolean, event: MouseEvent \| KeyboardEvent) => void` | **Required.** Called with the next state |
 | `disabled` | `boolean` | — |
 | `ref` | `Ref<HTMLButtonElement>` | Forwarded ref |
 
@@ -79,7 +81,7 @@ A group of mutually exclusive options.
 |------|------|-------------|
 | `label` | `string` | Group label |
 | `value` | `T` | **Required.** Currently selected value |
-| `onChange` | `(value: T) => void` | **Required.** Called when selection changes |
+| `onChange` | `(value: T, event: MouseEvent \| KeyboardEvent) => void` | **Required.** Called when selection changes |
 | `children` | `ReactElement<DropdownRadioListItem>[]` | **Required.** `Dropdown.RadioItem` elements |
 | `ref` | `Ref<HTMLDivElement>` | Forwarded ref |
 
@@ -135,10 +137,10 @@ A menu item that opens a nested sub-menu on hover/click.
 
 ```tsx
 <Dropdown content={<Dropdown.Menu>…</Dropdown.Menu>}>
-  {({ opened }) => (
+  {({ open }) => (
     <Button
       label="Options"
-      additionalIcon={opened ? <ChevronUp /> : <ChevronDown />}
+      additionalIcon={open ? <ChevronUp /> : <ChevronDown />}
     />
   )}
 </Dropdown>

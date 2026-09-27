@@ -1,6 +1,6 @@
 # NavigationList
 
-A vertical navigation sidebar. Renders a semantic `<nav>` element. Supports an optional header and footer, titled groups, links with icons/badges/nested sub-navigation, and inline row/group action buttons. Uses `framer-motion` for the sliding highlight that animates between items.
+A vertical navigation sidebar. Renders a semantic `<nav>` element. Supports an optional header and footer, titled groups, links with icons/badges/nested sub-navigation, and inline row/group actions. Uses `framer-motion` for the sliding highlight that animates between items.
 
 ## Import
 
@@ -32,20 +32,9 @@ A section of links. With a `title` it is exposed as `role="group"` labelled by t
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `title` | `string` | — | Group heading text (optional) |
-| `children` | `ReactNode` | — | `NavigationList.Link` elements, plus optional `NavigationList.GroupAction` / `Dropdown`-wrapped actions rendered in the header |
+| `actions` | `StrictReactElements \| (() => StrictReactElements)` | — | Rendered in the group header, next to the title (e.g. an "Add" button, or a `Dropdown`-wrapped menu trigger) |
+| `children` | `ReactNode` | — | `NavigationList.Link` elements |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
-
----
-
-### NavigationList.GroupAction
-
-An icon button for the group header (e.g. an "Add" button, or a menu trigger when wrapped in `Dropdown`). Renders a `size="s"` `Button`.
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `label` | `string` | **Required.** Accessible name / tooltip |
-| `icon` | `ReactElement` | **Required.** Icon |
-| `onClick` | `(e: MouseEvent) => void` | Click handler |
 
 ---
 
@@ -65,23 +54,13 @@ A navigation item. Renders a real `<a>`.
 | `selected` | `boolean` | `false` | Active item. Sets `aria-current="page"`, reveals nested children, shows the backdrop. |
 | `icon` | `ReactElement` | — | Icon to the left of the label |
 | `badge` | `string \| number \| ReactElement` | — | Badge on the right. Any element also works as trailing content (e.g. a `Label`). |
+| `childrenIcon` | `ReactElement` | `ChevronDown` | Icon shown next to the link while its nested links are expanded |
 | `disabled` | `boolean` | `false` | Drops `href`, sets `tabindex="-1"` + `aria-disabled`, ignores clicks |
 | `asChild` | `boolean` | `false` | Merge styling / ref / interaction props onto a single child element instead of rendering an `<a>`. Use to wrap a router `<Link>`. |
 | `onClick` | `(e: MouseEvent) => void` | — | Click handler |
-| `children` | `ReactNode` | — | Nested `NavigationList.Link` elements and/or `NavigationList.LinkAction` buttons |
+| `actions` | `StrictReactElements \| ((context: { selected?: boolean; disabled?: boolean }) => StrictReactElements)` | — | Rendered at the right edge of the row. Clicks/keyboard activation inside `actions` are stopped from reaching the link, so triggering an action never navigates. |
+| `children` | `ReactNode` | — | Nested `NavigationList.Link` elements |
 | `ref` | `Ref<HTMLAnchorElement>` | — | Forwarded ref |
-
----
-
-### NavigationList.LinkAction
-
-An icon button rendered inline at the right edge of a `NavigationList.Link`. It stops the event from reaching the parent link, so triggering the action never navigates. Renders a `size="s"` `variant="text"` `Button`.
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `label` | `string` | **Required.** Accessible name / tooltip |
-| `icon` | `ReactElement` | **Required.** Icon |
-| `onClick` | `(e: MouseEvent) => void` | Click handler (the parent link is already shielded) |
 
 ---
 
@@ -166,20 +145,33 @@ Nested links appear when the parent has `selected={true}`.
 ### Link with hover action buttons
 
 ```tsx
-<NavigationList.Link label="My Project" href="/p/1" selected={…}>
-  <NavigationList.LinkAction label="Add page" icon={<Plus />} onClick={openAddPage} />
-  <NavigationList.LinkAction label="More options" icon={<MoreHorizontal />} onClick={openMenu} />
-</NavigationList.Link>
+<NavigationList.Link
+  label="My Project"
+  href="/p/1"
+  selected={…}
+  actions={
+    <>
+      <Button size="s" title="Add page" label="Add page" icon={<Plus />} showLabel={false} onClick={openAddPage} />
+      <Button size="s" title="More options" label="More options" icon={<MoreHorizontal />} showLabel={false} onClick={openMenu} />
+    </>
+  }
+/>
 ```
 
 ### Group with action button and menu
 
 ```tsx
-<NavigationList.Group title="Projects">
-  <NavigationList.GroupAction label="New project" icon={<Plus />} onClick={createProject} />
-  <Dropdown content={<Dropdown.Menu><Dropdown.Action label="Sort by name" /></Dropdown.Menu>}>
-    <NavigationList.GroupAction label="Options" icon={<MoreHorizontal />} />
-  </Dropdown>
+<NavigationList.Group
+  title="Projects"
+  actions={
+    <>
+      <Button size="s" title="New project" label="New project" icon={<Plus />} showLabel={false} onClick={createProject} />
+      <Dropdown content={<Dropdown.Menu><Dropdown.Action label="Sort by name" /></Dropdown.Menu>}>
+        <Button size="s" title="Options" label="Options" icon={<MoreHorizontal />} showLabel={false} />
+      </Dropdown>
+    </>
+  }
+>
   {projects.map((p) => (
     <NavigationList.Link key={p.id} label={p.name} href={`/p/${p.id}`} selected={…} />
   ))}

@@ -19,6 +19,7 @@ import { Tabs } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | `Tabs.Item` elements |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the tablist pill and every `Tabs.Item` inside it (height, icon size, text size, corner rounding). |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -38,7 +39,6 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 | `href` | `string` | — | Render an `<a href>` instead of a `<button>` |
 | `asChild` | `boolean` | `false` | Merge the tab's role/styles/props onto the single child element (Slot pattern). Use for router links. |
 | `children` | `ReactElement` | — | Child element when `asChild={true}` |
-| `renderFunc` | `(ref, props) => ReactElement` | — | **Deprecated** (prefer `asChild`). Fully custom render function. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<button>` / `<a>` |
 
 Default element is `<button type="button">`; `<a>` when `href` is set. All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (except `children`).
@@ -100,19 +100,14 @@ const [tab, setTab] = useState('overview');
 </Tabs>
 ```
 
-### Custom render function
+### Fully custom tab via asChild
 
 ```tsx
 <Tabs>
   {tabs.map((tab) => (
-    <Tabs.Item
-      key={tab.id}
-      label={tab.name}
-      selected={activeTab === tab.id}
-      renderFunc={(ref, props) => (
-        <MyCustomTab ref={ref} {...props} tabData={tab} />
-      )}
-    />
+    <Tabs.Item key={tab.id} label={tab.name} selected={activeTab === tab.id} asChild>
+      <MyCustomTab tabData={tab} />
+    </Tabs.Item>
   ))}
 </Tabs>
 ```

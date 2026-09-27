@@ -19,20 +19,20 @@ import { SideNavigation } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `title` | `string` | — | Optional heading above the links (e.g. `"On this page"`). The `<nav>` is `aria-labelledby` it. |
-| `children` | `ReactNode` | — | `SideNavigation.Item` elements |
+| `children` | `ReactNode` | — | `SideNavigation.Link` elements |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<nav>` |
 
 All standard `HTMLAttributes<HTMLElement>` are also accepted.
 
 ---
 
-### SideNavigation.Item
+### SideNavigation.Link
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `href` | `string` | **Required.** CSS selector for the target section (e.g. `"#introduction"`). Must match the `id` of a heading or section on the page. |
 | `label` | `string` | **Required.** Link text |
-| `children` | `ReactNode` | Nested `SideNavigation.Item` elements for sub-sections |
+| `children` | `ReactNode` | Nested `SideNavigation.Link` elements for sub-sections |
 | `ref` | `Ref<HTMLLIElement>` | Forwarded to the root `<li>` |
 
 All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread onto the inner `<a>`); `className`/`style` apply to the root `<li>`.
@@ -41,8 +41,8 @@ All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread
 
 ## Behavior
 
-- The active item is determined by `ScrollSpy`, which observes the target elements via `IntersectionObserver`. The item whose target is currently visible in the viewport gets `aria-current="page"` and the active style.
-- Nested items are always visible (not collapsible) and are indented.
+- The active link is determined by `ScrollSpy`, which observes the target elements via `IntersectionObserver`. The link whose target is currently visible in the viewport gets `aria-current="page"` and the active style.
+- Nested links are always visible (not collapsible) and are indented.
 - Clicking a link scrolls the page to the target element via the browser's native anchor scroll.
 
 ---
@@ -54,10 +54,10 @@ All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread
 ```tsx
 <div style={{ position: 'fixed', top: 0, right: 0, width: 260, height: '100vh', overflowY: 'auto' }}>
   <SideNavigation title="On this page">
-    <SideNavigation.Item href="#overview"    label="Overview" />
-    <SideNavigation.Item href="#usage"       label="Usage" />
-    <SideNavigation.Item href="#props"       label="Props" />
-    <SideNavigation.Item href="#examples"    label="Examples" />
+    <SideNavigation.Link href="#overview"    label="Overview" />
+    <SideNavigation.Link href="#usage"       label="Usage" />
+    <SideNavigation.Link href="#props"       label="Props" />
+    <SideNavigation.Link href="#examples"    label="Examples" />
   </SideNavigation>
 </div>
 
@@ -78,15 +78,15 @@ All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread
 
 ```tsx
 <SideNavigation title="On this page">
-  <SideNavigation.Item href="#guide" label="Guide">
-    <SideNavigation.Item href="#installation" label="Installation" />
-    <SideNavigation.Item href="#configuration" label="Configuration" />
-    <SideNavigation.Item href="#deployment"    label="Deployment" />
-  </SideNavigation.Item>
-  <SideNavigation.Item href="#api" label="API Reference">
-    <SideNavigation.Item href="#props"   label="Props" />
-    <SideNavigation.Item href="#methods" label="Methods" />
-  </SideNavigation.Item>
+  <SideNavigation.Link href="#guide" label="Guide">
+    <SideNavigation.Link href="#installation" label="Installation" />
+    <SideNavigation.Link href="#configuration" label="Configuration" />
+    <SideNavigation.Link href="#deployment"    label="Deployment" />
+  </SideNavigation.Link>
+  <SideNavigation.Link href="#api" label="API Reference">
+    <SideNavigation.Link href="#props"   label="Props" />
+    <SideNavigation.Link href="#methods" label="Methods" />
+  </SideNavigation.Link>
 </SideNavigation>
 ```
 
@@ -94,7 +94,7 @@ All standard `AnchorHTMLAttributes<HTMLAnchorElement>` are also accepted (spread
 
 ```tsx
 <SideNavigation>
-  <SideNavigation.Item href="#intro" label="Introduction" />
-  <SideNavigation.Item href="#core"  label="Core concepts" />
+  <SideNavigation.Link href="#intro" label="Introduction" />
+  <SideNavigation.Link href="#core"  label="Core concepts" />
 </SideNavigation>
 ```

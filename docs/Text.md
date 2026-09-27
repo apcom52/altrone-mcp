@@ -215,7 +215,7 @@ Use `asChild` when you need a semantic element (e.g. `<button>`) but want Text's
 ### Real-world: activity feed card
 
 ```tsx
-<Flex direction="horizontal" gap="s" align="center">
+<Flex orientation="horizontal" gap="s" align="center">
   <Text size={2} color="danger" nowrap>[Regression]</Text>
   <Text size={3} weight="medium" truncate style={{ flex: 1, minWidth: 0 }}>
     Avatar upload fails silently on Safari 17

@@ -32,6 +32,7 @@ A single breadcrumb. Renders `<li>` as the root; inside it, a plain `<div>` by d
 |------|------|---------|-------------|
 | `label` | `string` | — | Text label of the breadcrumb |
 | `icon` | `ReactElement` | — | Icon displayed to the left of the label |
+| `separatorIcon` | `ReactElement` | `ChevronRight` | Separator drawn after this item (hidden on the last item via CSS) |
 | `current` | `boolean` | `false` | The current page (the last item). Renders bold and sets `aria-current="page"` automatically. Should not be combined with `asChild`. |
 | `asChild` | `boolean` | `false` | Merge the item's styling/ref/props onto the single child element (Slot pattern). Use for an `<a>` or router `<Link>`. `label`/`icon` become its content. |
 | `children` | `ReactElement` | — | Only used with `asChild`. Must be a single valid React element. |

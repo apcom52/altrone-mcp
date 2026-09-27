@@ -1,6 +1,6 @@
 # CloseButton
 
-A pre-built icon button for closing/dismissing UI surfaces. Wraps `Button` with a fixed `X` icon, `showLabel={false}`, and a localized accessible label from `closeButton.ariaLabel`. The `tooltip` is intentionally set to an empty string so no tooltip is shown on hover.
+A pre-built icon button for closing/dismissing UI surfaces. Wraps `Button` with an `X` icon by default (overridable via `icon`), `showLabel={false}`, and a localized accessible label from `closeButton.ariaLabel`. The `tooltip` is intentionally set to an empty string so no tooltip is shown on hover.
 
 ## Import
 
@@ -12,11 +12,12 @@ import { CloseButton } from 'altrone-ui';
 
 ## Props
 
-`CloseButton` exposes a curated subset, not the whole `Button` surface. The identity props (`icon`, `showLabel`, `tooltip`) are locked and cannot be overridden.
+`CloseButton` exposes a curated subset, not the whole `Button` surface. `showLabel`/`tooltip` are locked and cannot be overridden; `icon` can.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Control tier, forwarded to `Button` |
+| `icon` | `ReactElement` | `X` | Overrides the glyph |
 | `label` | `string` | localized `closeButton.ariaLabel` | Overrides the accessible name |
 | `disabled` | `boolean` | `false` | — |
 | `onClick` | `(e: MouseEvent) => void` | — | Click handler |

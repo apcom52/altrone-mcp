@@ -17,6 +17,8 @@ import { PasswordInput } from 'altrone-ui';
 | `value` | `string` | — | Controlled value |
 | `onChange` | `(e: ChangeEvent<HTMLInputElement>) => void` | — | Change handler |
 | `showControls` | `boolean` | `true` | Whether to show the eye-icon toggle button |
+| `showIcon` | `ReactElement` | `Eye` | Icon for the "show password" toggle state |
+| `hideIcon` | `ReactElement` | `EyeOff` | Icon for the "hide password" toggle state |
 | `disabled` | `boolean` | `false` | Disables the input. Also inherited from `FormFieldContext`. |
 | `invalid` | `boolean` | `false` | Error state styling. Also inherited from `FormFieldContext`. |
 | `size` | `Size` | `'m'` | Input size. Also inherited from `FormFieldContext`. |
@@ -83,7 +85,7 @@ const [password, setPassword] = useState('');
 ### Login form
 
 ```tsx
-<Flex direction="vertical" gap="m">
+<Flex orientation="vertical" gap="m">
   <TextInput
     value={email}
     onChange={(e) => setEmail(e.target.value)}

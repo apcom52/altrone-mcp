@@ -27,7 +27,10 @@ import { Select, useSelectContext } from 'altrone-ui';
 | `menuHeight` | `number` | `--select-menu-height` (250) | Max height of the options list, px. The list fits its content and only scrolls past this. |
 | `disabled` | `boolean` | `false` | Disables the input |
 | `name` | `string` | auto-generated | HTML `name` for the hidden `<input>` (form submission). Multiple mode uses `name[]`. |
-| `renderFunc` | `(ctx: SelectRenderContext) => ReactElement` | — | Replace the whole trigger. Receives the live select state (see below). |
+| `openIcon` | `ReactElement` | shared `icons.open` | Trigger chevron shown while the menu is closed. |
+| `closeIcon` | `ReactElement` | shared `icons.close` | Trigger chevron shown while the menu is open. |
+| `searchIcon` | `ReactElement` | shared `icons.search` | Icon shown in the trigger while `searchable` and actively searching. |
+| `clearIcon` | `ReactElement` | shared `icons.clear` | Icon for the clear button. |
 | `asChild` | `boolean` | `false` | Use `children` as the trigger element (see below) |
 | `children` | `ReactElement` | — | Custom trigger when `asChild={true}`. Read select state inside it with `useSelectContext()`. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded to the wrapper element |
@@ -42,10 +45,10 @@ type Option = {
 };
 ```
 
-### SelectContext / SelectRenderContext
+### SelectContext
 
-The state exposed to `renderFunc` and, via `useSelectContext()`, to any component
-rendered inside an `asChild` trigger:
+The state exposed via `useSelectContext()` to any component rendered inside an
+`asChild` trigger:
 
 ```ts
 type SelectContextValue = {
@@ -54,13 +57,7 @@ type SelectContextValue = {
   selectedOptions: Option | Option[] | undefined;
   disabled: boolean;
   multiple: boolean;
-  clearValue: (event?) => void;
-};
-
-// renderFunc argument also carries the resolved `className` / `style`.
-type SelectRenderContext = SelectContextValue & {
-  className: string;
-  style?: CSSProperties;
+  clear: (event?) => void;
 };
 ```
 
@@ -151,24 +148,6 @@ const [tags, setTags] = useState<string[]>([]);
 <Select value={v} onChange={setV} options={opts} size="s" />
 <Select value={v} onChange={setV} options={opts} size="m" />
 <Select value={v} onChange={setV} options={opts} size="l" />
-```
-
-### Custom trigger — `renderFunc`
-
-Replaces the whole trigger; receives the live `SelectRenderContext`.
-
-```tsx
-<Select
-  value={country}
-  onChange={(v) => setCountry(v as string | undefined)}
-  options={countryOptions}
-  renderFunc={({ expanded, selectedOptions }) => (
-    <Button
-      label={(selectedOptions as Option | undefined)?.label ?? 'Select country'}
-      additionalIcon={expanded ? <ChevronUp /> : <ChevronDown />}
-    />
-  )}
-/>
 ```
 
 ### Custom trigger — `asChild` + `useSelectContext()`

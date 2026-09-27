@@ -22,11 +22,12 @@ import { Progress } from 'altrone-ui';
 | `value` | `number` | `0` | Current progress value |
 | `max` | `number` | `100` | Upper bound of the range. Feeds `aria-valuemax`. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Bar height + label type size |
-| `children` | `ReactNode \| ((ctx: ProgressContext) => ReactNode)` | — | Label content. If omitted, defaults to `"${percentage}%"`. A render function receives `{ value, min, max, percentage }`. A non-string label carries no accessible name — pass `aria-label` alongside it. |
-| `activeSegmentClassName` | `string` | — | Extra class name for the filled (active) segment |
+| `label` | `ReactNode \| ((ctx: ProgressContext) => ReactNode)` | — | Label content. If omitted, defaults to `"${percentage}%"`. A render function receives `{ value, min, max, percentage }`. A non-string label carries no accessible name — pass `aria-label` alongside it. |
+| `activeClassName` | `string` | — | Extra class name for the filled (active) segment |
+| `activeStyle` | `CSSProperties` | — | Inline styles for the filled (active) segment |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted (a plain-string `children` is also copied to `aria-label` unless you pass your own).
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted (a plain-string `label` is also copied to `aria-label` unless you pass your own). `children` is not used by `Progress`.
 
 ### ProgressContext
 
@@ -65,33 +66,42 @@ The empty track background is the `Box`'s neutral `glass` fill and is not expose
 ### Custom text label
 
 ```tsx
-<Progress value={42} max={100}>Uploading files…</Progress>
+<Progress value={42} max={100} label="Uploading files…" />
 ```
 
 ### Render function label
 
 ```tsx
-<Progress value={42} max={200}>
-  {({ value, max, percentage }) => (
+<Progress
+  value={42}
+  max={200}
+  label={({ value, max, percentage }) => (
     <span>{value} of {max} ({percentage}%)</span>
   )}
-</Progress>
+/>
 ```
 
 ### Step counter with custom max
 
 ```tsx
-<Progress value={3} max={8} aria-label="Step 3 of 8">
-  {({ value, max }) => `Step ${value} of ${max}`}
-</Progress>
+<Progress
+  value={3}
+  max={8}
+  aria-label="Step 3 of 8"
+  label={({ value, max }) => `Step ${value} of ${max}`}
+/>
 ```
 
 ### Non-zero min
 
 ```tsx
-<Progress value={140} min={100} max={200} aria-label="Temperature">
-  {({ value }) => `${value}°`}
-</Progress>
+<Progress
+  value={140}
+  min={100}
+  max={200}
+  aria-label="Temperature"
+  label={({ value }) => `${value}°`}
+/>
 ```
 
 ### Sizes

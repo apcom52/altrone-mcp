@@ -58,10 +58,11 @@ Two idioms:
 
 ### Screen.Header
 
-A **fixed, full-width** but **transparent** positioning zone pinned to the top of the screen — it carries no fill of its own. The visible bar is the `Toolbar` you put inside it: use **`<Toolbar variant="solid" size="m">`** for the frosted, accent-tinted header surface (the `solid` variant's fill points at the `--color-header-backdrop` token; `m` matches the 56px zone). The toolbar spans the full viewport width — its fill is edge to edge — and only its *content padding* is inset: the header toolbar, `Screen.Content` and the footer all line their content up on one shared vertical line (`--screen-content-inset-start`, which sits a `2 × --space-content` gutter past the sidebar). Content below is offset by `--screen-header-height` (default `56px`).
+A **full-width** but **transparent** positioning zone pinned to the top of the screen — it carries no fill of its own. The visible bar is the `Toolbar` you put inside it: use **`<Toolbar variant="solid" size="m">`** for the frosted, accent-tinted header surface (the `solid` variant's fill points at the `--color-header-backdrop` token; `m` matches the 56px zone). The toolbar spans the full viewport width — its fill is edge to edge — and only its *content padding* is inset: the header toolbar, `Screen.Content` and the footer all line their content up on one shared vertical line (`--screen-content-inset-start`, which sits a `2 × --space-content` gutter past the sidebar). By default the header is `position: fixed` and content below is offset by `--screen-header-height` (default `56px`) to clear it.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `fixed` | `boolean` | `true` | `true` pins the header to the top of the viewport; `Screen.Content`/`Screen.Aside` reserve clearance for it, and DataTable's sticky column header/footer (which offset by `--top-safe-area`) clear it too. `false` puts the header back in normal document flow — it scrolls away with the page, no clearance is reserved, and `--top-safe-area` stays `0px` so an in-content sticky header sticks flush to the true viewport top once this one scrolls out of view. |
 | `insetStart` | `number \| string` | the shared content line (past the sidebar) | Leading content padding of the header toolbar — overrides `--toolbar-inset-start` (the fill still runs full width, and by default lands on the same vertical line as `Screen.Content` / footer). Number = px, string used verbatim (`'var(--space-section)'`). Pass `0` to start the content at the very edge. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<header>` |
 
@@ -71,7 +72,7 @@ A **fixed, full-width** but **transparent** positioning zone pinned to the top o
     <Toolbar.Logo><AppMark /></Toolbar.Logo>
     <Toolbar.Title label="Mail" />
     <Toolbar.Separator />
-    <Toolbar.SearchAction showLabel={false} />
+    <Toolbar.Action label="Search" icon={<Search />} showLabel={false} />
     <Avatar firstName="Ada" lastName="Lovelace" size="s" />
   </Toolbar>
 </Screen.Header>
@@ -97,8 +98,10 @@ Semantic `<aside>` that floats 8px in from the screen edges (the same gutter as 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `collapsed` | `boolean` | uncontrolled | Controlled, presentational — the panel animates out `Drawer`-style and unmounts; inline, `Screen` reflows its content by animating a start inset (no overflow clipping). Wire it to the same boolean as `Toolbar.SidebarToggleAction`'s `collapsed`. **Left undefined** (uncontrolled) the sidebar is a persistent column inline and simply drops out once the viewport goes overlay — it never covers the screen with no way to close it. To make it summonable on mobile, control it + wire the toggle |
-| `onClose` | `() => void` | — | Called on scrim-click / `Escape` in overlay mode. Set your `collapsed` state to `true` here; focus returns to where it was before the panel opened. Even without it, the scrim / `Escape` still visually dismiss the overlay (never a trap) |
+| `collapsed` | `boolean` | — | Controlled — own the state yourself, wired to `Toolbar.SidebarToggleAction`'s `collapsed` and `onClose`/`onCollapsedChange`. Omit for uncontrolled (see `defaultCollapsed`). |
+| `defaultCollapsed` | `boolean` | `false` | Initial state for an uncontrolled sidebar. Ignored once `collapsed` is passed. Uncontrolled sidebars auto-hide on entering overlay — a persistent column would otherwise cover the whole screen with no way to close it — and a `Toolbar.SidebarToggleAction` elsewhere in the same `Screen` (also uncontrolled) reads and toggles it automatically through `Screen`'s context, no state to wire up yourself. |
+| `onCollapsedChange` | `(collapsed: boolean) => void` | — | Fires whenever the collapsed state is asked to change — the scrim, `Escape`, or a toggle action. Pairs with `collapsed`; in uncontrolled mode it's a notification, the sidebar already updated itself. |
+| `onClose` | `(event: MouseEvent \| KeyboardEvent) => void` | — | Narrower sibling of `onCollapsedChange`, specifically for scrim-click / `Escape` in overlay mode. Controlled, set your `collapsed` state to `true` here; focus returns to where it was before the panel opened. Even without it, the scrim / `Escape` still visually dismiss the overlay (never a trap) |
 | `visibleFrom` | `ScreenBreakpoint` | — | Render the sidebar only at viewport widths `>=` this breakpoint (see *Breakpoint-gated zones*) |
 | `hiddenFrom` | `ScreenBreakpoint` | — | Render the sidebar only at viewport widths `<` this breakpoint |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
@@ -129,7 +132,8 @@ It has **no resize logic of its own**. For a draggable boundary, wrap `Screen.Co
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `collapsed` | `boolean` | `false` | Collapses the bare grid column to zero width; Content reclaims the space. No effect inside a `Splitter` (the panel owns collapse) |
+| `collapsed` | `boolean` | — | Controlled — collapses the bare grid column to zero width; Content reclaims the space. No effect inside a `Splitter` (the panel owns collapse). Omit for uncontrolled (see `defaultCollapsed`) |
+| `defaultCollapsed` | `boolean` | `false` | Initial state for an uncontrolled aside. Ignored once `collapsed` is passed |
 | `visibleFrom` | `ScreenBreakpoint` | — | Render only at viewport widths `>=` this breakpoint (see *Breakpoint-gated zones*) |
 | `hiddenFrom` | `ScreenBreakpoint` | — | Render only at viewport widths `<` this breakpoint |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the `<aside>` |
@@ -143,9 +147,9 @@ Put the navigation itself inside — usually the standalone `BottomNavigation` w
 ```tsx
 <Screen.BottomNavigation hiddenFrom="lg">
   <BottomNavigation floating={false}>
-    <BottomNavigation.Item icon={<Home />} label="Home" selected />
-    <BottomNavigation.Item icon={<Search />} label="Search" />
-    <BottomNavigation.Item icon={<User />} label="Profile" />
+    <BottomNavigation.Link icon={<Home />} label="Home" selected />
+    <BottomNavigation.Link icon={<Search />} label="Search" />
+    <BottomNavigation.Link icon={<User />} label="Profile" />
   </BottomNavigation>
 </Screen.BottomNavigation>
 ```
@@ -164,7 +168,7 @@ Put the navigation itself inside — usually the standalone `BottomNavigation` w
     <Toolbar variant="solid" size="m">
       <Toolbar.Title label="Mail" />
       <Toolbar.Separator />
-      <Toolbar.SearchAction showLabel={false} />
+      <Toolbar.Action label="Search" icon={<Search />} showLabel={false} />
     </Toolbar>
   </Screen.Header>
   <Screen.Sidebar>
@@ -180,6 +184,27 @@ Put the navigation itself inside — usually the standalone `BottomNavigation` w
 ```
 
 ### Collapsible / mobile sidebar
+
+Uncontrolled — `Screen.Sidebar` and `Toolbar.SidebarToggleAction` stay in sync on their own via `Screen`'s context, no state to manage:
+
+```tsx
+<Screen mobileBreakpoint="md">
+  <Screen.Sidebar>
+    <AppNavigation />
+  </Screen.Sidebar>
+  <Screen.Header>
+    <Toolbar variant="solid" size="m">
+      <Toolbar.SidebarToggleAction />
+      <Toolbar.Title label="Overview" />
+    </Toolbar>
+  </Screen.Header>
+  <Screen.Content>
+    <Dashboard />
+  </Screen.Content>
+</Screen>
+```
+
+Controlled — reach for this only when the sidebar's state needs to live outside `Screen` (persisted to `localStorage`, say):
 
 ```tsx
 const [collapsed, setCollapsed] = useState(false);
@@ -223,8 +248,8 @@ const [collapsed, setCollapsed] = useState(false);
   </Screen.Content>
   <Screen.BottomNavigation hiddenFrom="lg">
     <BottomNavigation floating={false}>
-      <BottomNavigation.Item icon={<Home />} label="Listen" selected />
-      <BottomNavigation.Item icon={<Compass />} label="Browse" />
+      <BottomNavigation.Link icon={<Home />} label="Listen" selected />
+      <BottomNavigation.Link icon={<Compass />} label="Browse" />
     </BottomNavigation>
   </Screen.BottomNavigation>
 </Screen>
@@ -283,3 +308,9 @@ const [collapsed, setCollapsed] = useState(false);
   </Screen.Content>
 </Screen>
 ```
+
+---
+
+## Notes
+
+**One `Screen` per active view, always full-viewport.** `Screen` builds a full-viewport layout and is not designed to be nested inside another `Screen` or embedded at less than full width/height (e.g. inside a `Splitter` panel or a card). For a nested scrollable area, use `Scrollable` instead.

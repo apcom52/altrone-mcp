@@ -19,7 +19,7 @@ import { Grid } from 'altrone-ui';
 | `gap` | `Gap` | `'none'` | Column gap |
 | `rowGap` | `Gap` | `'none'` | Row gap (independent from column gap) |
 | `wrap` | `boolean` | `true` | Allow columns to wrap to the next row. Set to `false` for a single non-wrapping row. |
-| `tagName` | `keyof JSX.IntrinsicElements` | `'div'` | Element to render the container as (e.g. `'ul'`, `'section'`) |
+| `asChild` | `boolean` | `false` | Merge the computed className/style onto the single child element instead of rendering a `<div>` — use to render the container as `<ul>`, `<section>`, etc. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
 ---
@@ -30,7 +30,7 @@ import { Grid } from 'altrone-ui';
 |------|------|---------|-------------|
 | `size` | `1–12 \| 'auto'` | — | Number of columns this cell spans out of 12. `'auto'` sizes the column to its content. |
 | `offset` | `0–11` | `0` | Number of columns to skip before this cell |
-| `tagName` | `keyof JSX.IntrinsicElements` | `'div'` | Element to render the column as (e.g. `'li'`) |
+| `asChild` | `boolean` | `false` | Merge the computed className/style onto the single child element instead of rendering a `<div>` — use to render the column as `<li>`, etc. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLElement>` are also accepted.
@@ -109,11 +109,15 @@ All standard `HTMLAttributes<HTMLElement>` are also accepted.
 ### Custom element
 
 ```tsx
-<Grid tagName="ul" gap="m" rowGap="m">
-  {items.map((item) => (
-    <Grid.Column tagName="li" key={item.id} size={4}>
-      <Card {...item} />
-    </Grid.Column>
-  ))}
+<Grid asChild gap="m" rowGap="m">
+  <ul>
+    {items.map((item) => (
+      <Grid.Column asChild key={item.id} size={4}>
+        <li>
+          <Card {...item} />
+        </li>
+      </Grid.Column>
+    ))}
+  </ul>
 </Grid>
 ```

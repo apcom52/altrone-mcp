@@ -1,6 +1,6 @@
 # Divider
 
-A thin visual separator line. Renders a native `<hr>` (implicit `separator` role). Horizontal by default; `direction="vertical"` also sets `aria-orientation="vertical"` and makes it stretch to the flex row's height.
+A thin visual separator line. Renders a native `<hr>` (implicit `separator` role). Horizontal by default; `orientation="vertical"` also sets `aria-orientation="vertical"` and makes it stretch to the flex row's height.
 
 ## Import
 
@@ -14,7 +14,7 @@ import { Divider } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | Orientation of the divider |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Orientation of the divider |
 | `ref` | `Ref<HTMLHRElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLHRElement>` are also accepted (except `children`).
@@ -36,7 +36,7 @@ Use inside a flex row to separate items horizontally. The divider needs a constr
 ```tsx
 <div style={{ display: 'flex', alignItems: 'center', height: 32 }}>
   <span>Item A</span>
-  <Divider direction="vertical" />
+  <Divider orientation="vertical" />
   <span>Item B</span>
 </div>
 ```
@@ -44,7 +44,7 @@ Use inside a flex row to separate items horizontally. The divider needs a constr
 ### Separating sections
 
 ```tsx
-<Flex direction="vertical" gap="m">
+<Flex orientation="vertical" gap="m">
   <ProfileSection />
   <Divider />
   <SecuritySection />

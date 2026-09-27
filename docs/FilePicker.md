@@ -27,6 +27,10 @@ import { FilePicker } from 'altrone-ui';
 | `name` | `string` | — | Form field name used in the upload request. |
 | `autoUploadFn` | `(ctx: FilePickerUploadContext) => Promise<void>` | — | Custom upload handler. Replaces the default `fetch` upload. Receives helpers to track progress. |
 | `removeFileFn` | `(ctx: FilePickerRemoveContext) => Promise<void>` | — | Custom delete handler called when a file chip is removed or replaced (single mode). |
+| `uploadIcon` | `ReactElement` | upload glyph | Icon for the pick/upload button. |
+| `errorIcon` | `ReactElement` | shared `icons.error` | Icon shown on a file chip that failed to upload. |
+| `retryIcon` | `ReactElement` | rotate glyph | Icon for the retry button on a failed file chip. |
+| `deleteIcon` | `ReactElement` | trash glyph | Icon for the delete button on a file chip. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 ---

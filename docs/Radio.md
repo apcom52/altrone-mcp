@@ -16,10 +16,10 @@ import { Radio } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `string \| number` | — | **Required.** Currently selected value |
+| `value` | `string \| number` | — | Currently selected value. Omit to render with no item selected. |
 | `onChange` | `(value: string, e: ChangeEvent) => void` | — | **Required.** Called with the selected item's value as a **string** (from `event.currentTarget.value`), even if the item's `value` prop is a number. |
 | `children` | `ReactElement<RadioItemProps> \| (ReactElement<RadioItemProps> \| null \| false)[]` | — | **Required.** `Radio.Item` elements |
-| `direction` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the items |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout orientation of the items |
 | `name` | `string` | auto-generated | HTML `name` attribute for the group. Auto-generated with `useId()` if not provided. |
 | `disabled` | `boolean` | `false` | Disables all items in the group |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales every item (dot and label type); the row stays ≥24px tall. A single `Radio.Item` can override it. |
@@ -67,7 +67,7 @@ const [gender, setGender] = useState('male');
 ### Vertical layout
 
 ```tsx
-<Radio value={plan} onChange={(v) => setPlan(v)} direction="vertical">
+<Radio value={plan} onChange={(v) => setPlan(v)} orientation="vertical">
   <Radio.Item value="free">Free — $0/month</Radio.Item>
   <Radio.Item value="pro">Pro — $12/month</Radio.Item>
   <Radio.Item value="enterprise">Enterprise — contact us</Radio.Item>

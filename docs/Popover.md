@@ -14,8 +14,8 @@ import { Popover } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `ReactElement \| ((ctx: { opened: boolean; closePopup: () => void }) => ReactNode)` | — | **Required.** Trigger element. A render function gets the open state + a close callback. The trigger's own `ref` is merged (not overwritten). |
-| `content` | `ReactElement \| ((ctx: { closePopup: () => void; closeAllSequence: () => void }) => ReactNode)` | — | **Required.** Panel content. Render function receives `closePopup` and `closeAllSequence` (closes the whole nested chain). |
+| `children` | `ReactElement \| ((ctx: { open: boolean; hide: () => void }) => ReactNode)` | — | **Required.** Trigger element. A render function gets the open state + a close callback. The trigger's own `ref` is merged (not overwritten). |
+| `content` | `ReactElement \| ((ctx: { hide: () => void; hideAllSequence: () => void }) => ReactNode)` | — | **Required.** Panel content. Render function receives `hide` and `hideAllSequence` (closes the whole nested chain). |
 | `placement` | `Placement \| 'auto'` | `'auto'` | floating-ui placement (`'top'`, `'bottom-start'`, …) or `'auto'` for best-fit. |
 | `trigger` | `'click' \| 'focus' \| 'hover' \| Array<…>` | `'click'` | What opens the popover. |
 | `title` | `string` | — | Header title. Makes the panel a labelled `role="dialog"`. |
@@ -24,25 +24,27 @@ import { Popover } from 'altrone-ui';
 | `focusTrapTargets` | `('reference' \| 'floating' \| 'content')[]` | `['reference', 'content']` | Focus-trap tab order. |
 | `parentWidth` | `boolean` | `false` | Match the panel width to the trigger width. |
 | `overlap` | `boolean` | `false` | Panel covers the trigger instead of sitting beside it. |
-| `openedByDefault` | `boolean` | `false` | Uncontrolled initial open state. |
+| `open` | `boolean` | — | Controlled open state. Omit for an uncontrolled popover (see `defaultOpen`). |
+| `defaultOpen` | `boolean` | `false` | Initial open state for an uncontrolled popover. Ignored once `open` is passed. |
 | `enabled` | `boolean` | `true` | When `false`, renders only the trigger (no popover behavior). |
 | `listNavigation` | `boolean` | `false` | Enable arrow-key navigation over list items (used by `Dropdown`/`Select`). |
 | `onOpenChange` | `(open: boolean, event?: Event, reason?: OpenChangeReason) => void` | — | Fires on every open-state change. `reason` is `'escape-key'`, `'outside-press'`, `'reference-press'`, `'hover'`, `'focus'`, … |
-| `ref` | `Ref<PopoverRef>` | — | Imperative API (see below). |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the trigger DOM element (merged with the trigger's own `ref`, if any). |
+| `controlRef` | `Ref<PopoverRef>` | — | Imperative API (see below). |
 
 All other props (`role`, `aria-*`, `data-*`, `id`, …) are forwarded to the floating panel element.
 
 ---
 
-## Ref API (`PopoverRef`)
+## Ref API (`PopoverRef`, via `controlRef`)
 
-When you attach a `ref`, the following are exposed:
+When you attach a `controlRef`, the following are exposed:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `opened` | `boolean` | Whether the popover is currently open |
-| `openPopup` | `() => void` | Programmatically open the popover |
-| `closePopup` | `() => void` | Programmatically close the popover |
+| `open` | `boolean` | Whether the popover is currently open |
+| `show` | `() => void` | Programmatically open the popover |
+| `hide` | `() => void` | Programmatically close the popover |
 | `activeIndex` | `number \| null` | Currently focused list item index (keyboard navigation) |
 | `childrenNode` | `HTMLElement \| null` | The trigger DOM element |
 | `contentNode` | `HTMLDivElement \| null` | The floating root box (`.Popover`), not the inner content wrapper |
@@ -54,9 +56,10 @@ When you attach a `ref`, the following are exposed:
 
 ## Behavior
 
+- **Controlled vs. uncontrolled** — pass `open` to drive visibility from your own state (`onOpenChange` reports every requested change: escape, outside-press, and `controlRef.show()`/`hide()` all route through it instead of updating an internal flag); omit it and the popover tracks its own state internally, starting from `defaultOpen`.
 - **Hover trigger**: opens after 500 ms delay, closes after 250 ms delay. Uses `safePolygon` so the pointer can move from trigger to panel without accidental close.
 - **Keyboard navigation**: `ArrowUp` / `ArrowDown` move through list items when `focusTrap` is active. Navigation loops, allows escape.
-- **Nested close**: content render function receives `closeAllSequence` which closes the entire popover chain (e.g. a sub-menu and its parent).
+- **Nested close**: content render function receives `hideAllSequence` which closes the entire popover chain (e.g. a sub-menu and its parent).
 - **Accessibility**: with `title` / `showCloseButton` the panel is `role="dialog"` + `aria-labelledby` (the header). Otherwise it has no role — set `role` yourself for tooltip/menu semantics. Esc and outside-press dismiss; focus returns to the trigger.
 - **Surface**: the panel is a `Box` (`material="plate"` glass fill + blur, `shape="rounded"` corners from `--popover-radius` (`--radius-xl`, 16px — matches the corner a `size="m"` `Button`'s `pill` shape produces, so the panel reads as rounded in harmony with buttons without itself looking like a pill), `elevation="overlay"` shadow + z-index). Only the header/content layout lives in the component's own stylesheet.
 - **`overlap`**: implemented with native floating-ui middleware — a negative main-axis `offset` (reference size) + `shift`; no `flip` (flipping a covering panel makes no sense).
@@ -81,12 +84,22 @@ When you attach a `ref`, the following are exposed:
 
 ```tsx
 <Popover content={<InfoPanel />}>
-  {({ opened }) => (
+  {({ open }) => (
     <Button
       label="Info"
-      additionalIcon={opened ? <ChevronUp /> : <ChevronDown />}
+      additionalIcon={open ? <ChevronUp /> : <ChevronDown />}
     />
   )}
+</Popover>
+```
+
+### Controlled open
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Popover open={open} onOpenChange={setOpen} content={<Panel />}>
+  <Button label="Open" />
 </Popover>
 ```
 
@@ -106,30 +119,41 @@ When you attach a `ref`, the following are exposed:
 </Popover>
 ```
 
-### Programmatic control via ref
+### Programmatic control via controlRef
 
 ```tsx
 const popoverRef = useRef<PopoverRef>(null);
 
 <>
-  <Popover ref={popoverRef} content={<Panel />}>
+  <Popover controlRef={popoverRef} content={<Panel />}>
     <Button label="Open" />
   </Popover>
   <Button
     label="Close from outside"
-    onClick={() => popoverRef.current?.closePopup()}
+    onClick={() => popoverRef.current?.hide()}
   />
 </>
+```
+
+### Reading the trigger DOM node
+
+```tsx
+const triggerRef = useRef<HTMLElement>(null);
+
+<Popover ref={triggerRef} content={<Panel />}>
+  <Button label="Open" />
+</Popover>
+// triggerRef.current is the trigger's DOM element — same node PopoverRef.childrenNode exposes.
 ```
 
 ### Close from inside content
 
 ```tsx
 <Popover
-  content={({ closePopup }) => (
+  content={({ hide }) => (
     <div>
       <p>Are you sure?</p>
-      <Button label="Confirm" onClick={() => { confirm(); closePopup(); }} />
+      <Button label="Confirm" onClick={() => { confirm(); hide(); }} />
     </div>
   )}
 >
@@ -141,10 +165,10 @@ const popoverRef = useRef<PopoverRef>(null);
 
 ```tsx
 <Popover
-  content={({ closeAllSequence }) => (
+  content={({ hideAllSequence }) => (
     <Popover
-      content={({ closeAllSequence: closeAll }) => (
-        <Button label="Close all" onClick={closeAll} />
+      content={({ hideAllSequence: hideAll }) => (
+        <Button label="Close all" onClick={hideAll} />
       )}
     >
       <Button label="Open nested" />

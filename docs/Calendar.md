@@ -42,7 +42,7 @@ starts a new one. While a range is half-open, hovering a day previews the band.
 |------|------|---------|-------------|
 | `month` | `Dayjs` | — | Controlled displayed month (year + month only). |
 | `defaultMonth` | `Dayjs` | `dayjs()` | Uncontrolled initial month. |
-| `onMonthChange` | `(month: Dayjs) => void` | — | Fires when the header navigation changes the month. |
+| `onMonthChange` | `(month: Dayjs, event: MouseEvent<HTMLButtonElement>) => void` | — | Fires when the header navigation changes the month. |
 
 ### Locale & week
 
@@ -68,6 +68,8 @@ starts a new one. While a range is half-open, hovering a day previews the band.
 | `showNavigation` | `boolean` | `true` | The `‹` / `›` buttons inside the header. |
 | `showWeekdays` | `boolean` | `true` if `mode` is set, else `false` | The weekday-name row. |
 | `showOutsideDays` | `boolean` | `true` | Render leading/trailing days from adjacent months (muted) instead of blank cells. |
+| `prevIcon` | `ReactElement` | `Application.icons.prev` | Overrides the header's previous-month icon. |
+| `nextIcon` | `ReactElement` | `Application.icons.next` | Overrides the header's next-month icon. |
 
 ### Low-level
 
@@ -101,7 +103,7 @@ Props passed to each `DateComponent` instance:
 | `startOfWeek` / `endOfWeek` | `boolean` | First / last rendered column of the week row |
 | `inRangeAbove` / `inRangeBelow` | `boolean` | `true` if the band also covers the cell directly above / below — used to round only the band's outer corners |
 | `onSelect` | `(date: Dayjs, event) => void` | Call to report a selection |
-| `onHover` | `(date?: Dayjs) => void` | Call to drive the range hover-preview |
+| `onHover` | `(date: Dayjs \| undefined, event: MouseEvent<HTMLButtonElement>) => void` | Call to drive the range hover-preview |
 
 ---
 

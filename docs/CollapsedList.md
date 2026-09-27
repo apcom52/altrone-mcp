@@ -18,6 +18,8 @@ import { CollapsedList } from 'altrone-ui';
 | `gap` | `Gap` | — | Gap between list items (not the gap between the list and the toggle button). Uses the design system's gap scale. |
 | `hideExpandButtonAfterUsage` | `boolean` | `false` | When `true`, the expand button disappears after the list is expanded (one-way reveal). When `false`, a collapse button is shown after expanding. |
 | `expandButtonLabel` | `string \| (ctx: CollapsedListContext) => string` | — | Custom label for the expand/collapse button. If a function, receives `CollapsedListContext` with `hiddenItems`, `totalItems`, and `expanded`. When omitted, uses the localized default. |
+| `openIcon` | `ReactElement` | shared `icons.open` | Toggle icon shown while collapsed. |
+| `closeIcon` | `ReactElement` | shared `icons.close` | Toggle icon shown while expanded. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -91,7 +93,7 @@ Passed to `expandButtonLabel` when it is a function:
 ## Behavior details
 
 - The component manages expanded state internally — no external state needed.
-- The expand button is a `Button` with `variant="text"` and a chevron icon that flips direction based on state.
+- The expand button is a `Button` with `variant="text"` and a chevron icon that flips direction based on state. Override it per-instance via `openIcon`/`closeIcon`, or globally via `Application`'s `icons` prop.
 - When all items fit within `limit`, no expand button is rendered at all.
 - `children` is normalized through `ArrayUtils.getSafeArray` so single children, arrays, and `null` entries are all handled safely.
 - `limit` slices the **direct** children. Pass the items as siblings (or a single mapped array); wrapping them in one element makes the list see a single child and `limit` has nothing to slice.

@@ -36,6 +36,7 @@ A labeled wrapper for a form control. Reads `errorMessages[name]` from the paren
 | `label` | `string` | — | Field label text |
 | `required` | `boolean` | — | Shows a required asterisk (`*`) after the label |
 | `hintText` | `string` | — | Help text shown in a `Tooltip` on a `?` icon next to the label |
+| `hintIcon` | `ReactElement` | shared `icons.help` | Icon for the hint tooltip trigger, shown when `hintText` is set. |
 | `description` | `string` | — | Descriptive text shown below the control |
 | `errorMessage` | `string` | — | Inline error message. Overrides any message from `Form`'s `errorMessages` context. |
 | `disabled` | `boolean` | — | Disables this specific field. Overrides `Form`'s `disabled` context. |
