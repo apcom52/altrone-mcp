@@ -29,7 +29,7 @@ import { Box } from 'altrone-ui';
 | `pressable` | `boolean` | `false` | Adds a two-step interaction — a lighter `:hover` preview and a fuller `:active` press (hover yields to press). Which property moves depends on `material` (see table). |
 | `focusable` | `boolean` | `false` | Adds a `:focus-visible` ring, identical across every material |
 | `editable` | `boolean` | `false` | For a `Box` wrapping a real form control: the "engaged" look triggers on `:focus-within` instead of hover/active |
-| `asChild` | `boolean` | `false` | Radix Slot polymorphism — the only way to change the rendered element. `children` must be a single valid element when set. |
+| `asChild` | `boolean` | `false` | Radix Slot polymorphism — the only way to change the rendered element. `children` must be a single valid element when set. UA border, margin, font and underline of the element are reset. |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes` are also accepted (minus `className`/`style`, which come from `BasicComponentStyleConfig`).
