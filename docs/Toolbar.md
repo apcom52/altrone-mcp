@@ -1,12 +1,11 @@
 # Toolbar
 
-One horizontal or vertical strip of actions with `role="toolbar"`, styled after
-Apple's liquid-glass toolbars — `Toolbar.Group` collects controls into blurred
-glass capsules with a bright specular top edge. The same component serves as an
-application header, a frame/panel header, or a row of floating glass pills over
-a canvas — the `variant` prop picks how much surface it carries, not the markup.
-Every variant flows in normal document order; the toolbar never positions
-itself.
+A horizontal or vertical row of actions with `role="toolbar"` — a header for
+an app, a window or a panel, or a set of tools floating over a canvas. Related
+actions go into a `Toolbar.Group`, which wraps them in a soft translucent
+capsule. It is always the same component: the `variant` prop only decides how
+much background the toolbar has. The toolbar sits wherever you put it in the
+layout and never positions itself.
 
 ## Import
 
@@ -22,7 +21,7 @@ import { Toolbar } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | `'plain' \| 'grouped' \| 'solid'` | `'solid'` | How much surface the toolbar carries. `plain` — no toolbar fill, no group material; flat text buttons for a strip on a surface that already has its own background. `grouped` — no toolbar fill, but every `Toolbar.Group` is a raised glass pill; the transparent strip lets the pills read as islands on whatever surface is behind them (canvas/editor overlays, positioned by the caller). `solid` — an accent-tinted, blurred toolbar fill with a hairline on its content-facing edge, plus the glass group pills; a self-sufficient app/frame header. |
+| `variant` | `'plain' \| 'grouped' \| 'solid'` | `'solid'` | How much surface the toolbar carries. `plain` — no toolbar fill, no group capsule; flat text buttons for a strip on a surface that already has its own background. `grouped` — no toolbar fill, but every `Toolbar.Group` is a translucent capsule; the transparent strip lets the capsules read as islands on whatever surface is behind them (canvas/editor overlays, positioned by the caller). `solid` — an accent-tinted, blurred toolbar fill with a hairline on its content-facing edge, plus the glass group pills; a self-sufficient app/frame header. |
 | `edge` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | Which edge the toolbar sits on. `left`/`right` flip `aria-orientation` to `vertical` and stack regions top-to-bottom. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Toolbar height + inset. Scales `Toolbar.Title` and cascades as the default `size` of every `Toolbar.Action` inside it (override per action). |
 | `sticky` | `boolean` | `false` | `position: sticky` to the `edge` of the nearest scroll container. |
@@ -58,15 +57,15 @@ A `Button` with `variant="text"`. Accepts all `ButtonProps` except `variant`. In
 
 ### Toolbar.Group
 
-Collects related actions into a blurred glass capsule — the signature Toolbar look, inherited from the parent toolbar's `variant` (a pill under `grouped` / `solid`, a bare row under `plain`). Override it per group with `variant`.
+Collects related actions into a translucent capsule, inherited from the parent toolbar's `variant` (a capsule under `grouped` / `solid`, a bare row under `plain`). Override it per group with `variant`.
 
-**Wrap `Toolbar.Action`s in a `Toolbar.Group` rather than dropping them straight into the toolbar (or a region).** A bare, group-less cluster of actions still renders and still works, but it's not recommended: it skips the glass-pill treatment that makes related actions read as one unit, and — since `Toolbar.Group` is the atomic collapse unit for [Overflow](#overflow) — an ungrouped action collapses into the overflow menu on its own instead of staying grouped with its neighbors until they all collapse together. Reach for `variant="plain"` on the group (or the whole toolbar) instead of omitting the group, when the flat, pill-less look is what you want.
+**Wrap `Toolbar.Action`s in a `Toolbar.Group` rather than dropping them straight into the toolbar (or a region).** A bare, group-less cluster of actions still renders and still works, but it's not recommended: it skips the capsule that makes related actions read as one unit, and — since `Toolbar.Group` is the atomic collapse unit for [Overflow](#overflow) — an ungrouped action collapses into the overflow menu on its own instead of staying grouped with its neighbors until they all collapse together. Reach for `variant="plain"` on the group (or the whole toolbar) instead of omitting the group, when the flat, pill-less look is what you want.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `justify` | `'start' \| 'center' \| 'end' \| 'between'` | `'start'` | Justification of items inside the group. |
 | `weight` | `number` | — | `flex` value — `weight={1}` makes the group eat the remaining space. |
-| `variant` | `'plain' \| 'grouped' \| 'solid'` | inherited | Overrides the toolbar's `variant` for this group only: `plain` drops the glass pill, `grouped`/`solid` force it on. |
+| `variant` | `'plain' \| 'grouped' \| 'solid'` | inherited | Overrides the toolbar's `variant` for this group only: `plain` removes the capsule, `grouped`/`solid` force it on. |
 | `priority` | `'high' \| 'medium' \| 'low'` | `'medium'` | Collapse priority for the whole group as one unit — see [Overflow](#overflow). |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded. |
 
@@ -255,7 +254,7 @@ The one pre-composed header action — icon-only by default, with a localized `a
 </Toolbar>
 ```
 
-`variant="plain"` on the toolbar already drops the glass pill from every group, so wrapping the actions here doesn't change how it looks — only how "Delete" collapses on its own into overflow instead of bundling with "Undo"/"Redo".
+`variant="plain"` on the toolbar already removes the capsule from every group, so wrapping the actions here doesn't change how it looks — only how "Delete" collapses on its own into overflow instead of bundling with "Undo"/"Redo".
 
 ### As Screen.Header
 

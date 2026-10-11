@@ -20,7 +20,7 @@ import { CollapsedList } from 'altrone-ui';
 | `expandButtonLabel` | `string \| (ctx: CollapsedListContext) => string` | — | Custom label for the expand/collapse button. If a function, receives `CollapsedListContext` with `hiddenItems`, `totalItems`, and `expanded`. When omitted, uses the localized default. |
 | `openIcon` | `ReactElement` | shared `icons.open` | Toggle icon shown while collapsed. |
 | `closeIcon` | `ReactElement` | shared `icons.close` | Toggle icon shown while expanded. |
-| `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
+| `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 

@@ -11,6 +11,8 @@ import {
   useLocalization,
   useIcons,
   getThemeInitScript,
+  setPageTitle,
+  resetPageTitle,
 } from 'altrone-ui';
 ```
 
@@ -31,6 +33,7 @@ Rendering `Application` sets up the following globally:
 - **Icons** — passes `icons` to all components that share a common icon role (navigation chevrons, search/clear, error, help, status icons), letting you swap the built-in `lucide-react` glyphs for your own icon set in one place. `useIcons()` returns the resolved `IconSet`.
 - **Dialog host** — mounts `DialogProvider` so the global `showAlert` / `showConfirm` / `showPrompt` functions work anywhere, including outside React. Without a mounted `Application` they log a warning and resolve immediately (`undefined` / `false` / `null`).
 - **Toasts and notifications** — mounts the stacks so the global `showToast` / `showNotification` / `dismissNotification` functions work anywhere, including outside React.
+- **Document title** (opt-out via `manageTitle`) — keeps `document.title` as "`<Screen.title>` - `<applicationName>`" (either half omitted if unset), updating automatically whenever the mounted `Screen`'s `title` changes. `setPageTitle` / `resetPageTitle` override or revert to the computed value from anywhere, including outside React.
 - **Reduced motion** — wraps the tree in a motion config that follows `prefers-reduced-motion`, so JS-animated components respect it without per-component code.
 - **Fonts** — loads the bundled Inter and JetBrains Mono variable fonts.
 
@@ -43,6 +46,8 @@ Rendering `Application` sets up the following globally:
 | `theme` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Color theme. `auto` follows the OS `prefers-color-scheme` and updates at runtime when the system theme changes. |
 | `persistTheme` | `boolean` | `false` | Remember the resolved theme (`light`/`dark`) in `localStorage` and restore it on the next visit, once the user has explicitly switched it at least once. Takes priority over `theme`/system preference after that point. |
 | `accent` | `'red' \| 'orange' \| 'amber' \| 'green' \| 'teal' \| 'blue' \| 'indigo' \| 'purple' \| 'pink' \| 'brown'` | `'blue'` | Accent color for the design system |
+| `applicationName` | `string` | — | Appended to `document.title` as "`<Screen.title>` - `applicationName`" whenever a `Screen` with a `title` is mounted. With no `Screen.title`, the document title is just `applicationName`. |
+| `manageTitle` | `boolean` | `true` | `false` turns off the automatic `document.title` sync from `Screen.title`/`applicationName` — `setPageTitle` still works, you own `document.title` yourself otherwise. |
 | `language` | `'en' \| 'ru' \| 'fr' \| 'de' \| 'es' \| 'zh' \| 'pt' \| 'tr'` | `'en'` | Language for built-in component labels (e.g. empty state text, validation messages) |
 | `customLabels` | `Partial<Localization>` | `{}` | Override individual localization strings without replacing the full locale |
 | `icons` | `Partial<IconSet>` | `{}` | Override the icon roles shared across components (see below). Icons unique to a single component are overridden via that component's own props instead. |
@@ -145,6 +150,32 @@ function ThemeSwitcher() {
 }
 ```
 
+### Document title
+
+```tsx
+<Application applicationName="Altrone Mail">
+  <Screen title="Inbox">{/* … */}</Screen>
+</Application>
+```
+
+`document.title` becomes `"Inbox - Altrone Mail"`, and updates automatically if the mounted `Screen`'s `title` changes (e.g. navigating to a different screen).
+
+```tsx
+import { setPageTitle, resetPageTitle } from 'altrone-ui';
+
+setPageTitle('3 unread — Inbox');
+// ... later, once the user has read the messages
+resetPageTitle();
+```
+
+`setPageTitle` overrides the computed value from anywhere (a store action, a data-fetch callback) until `resetPageTitle()` reverts to what `Screen.title`/`applicationName` currently compute.
+
+```tsx
+<Application manageTitle={false}>
+  {/* Screen.title no longer touches document.title; setPageTitle still does */}
+</Application>
+```
+
 ### Toast and notification placement
 
 ```tsx
@@ -182,6 +213,16 @@ The arguments mirror `Application`'s `theme` and `persistTheme` props.
 
 ---
 
+### Overriding part of the app
+
+To change the theme, accent, language, labels or icons for one block only, wrap it in `Override` (see `Override.md`). Unset props are inherited from `Application`.
+
+```tsx
+<Override theme="dark" accent="red">
+  <Button label="Delete project" />
+</Override>
+```
+
 ## `IconSet`
 
 Roles shared by several components — override one role once via `icons` instead of
@@ -217,4 +258,5 @@ matching how icon props work everywhere else in the library.
 - Use **one instance per app**: each instance writes the theme to `<html>` and mirrors the background onto `<body>`, so a second instance conflicts with the first.
 - Provider order (outermost first): theme → localization → icons → dialogs → notifications → `children`.
 - Toast/notification placement is app-wide (`toastPlacement`, `notificationPlacement`), not per `showToast`/`showNotification` call.
+- `setPageTitle`/`resetPageTitle`, like `showAlert`/`showToast`, log a warning and no-op without a mounted `Application`. An active override (`setPageTitle`) applies even when `manageTitle={false}`.
 - The root element carries `data-altrone-root="true"`, `data-altrone-accent` and `data-altrone-theme`; design tokens and overlays hook into them.

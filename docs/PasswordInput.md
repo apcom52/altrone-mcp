@@ -15,7 +15,7 @@ import { PasswordInput } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `string` | — | Controlled value |
-| `onChange` | `(e: ChangeEvent<HTMLInputElement>) => void` | — | Change handler |
+| `onChange` | `(value: string, event: ChangeEvent<HTMLInputElement>) => void` | — | Change handler: the string value first, the native event second |
 | `showControls` | `boolean` | `true` | Whether to show the eye-icon toggle button |
 | `showIcon` | `ReactElement` | `Eye` | Icon for the "show password" toggle state |
 | `hideIcon` | `ReactElement` | `EyeOff` | Icon for the "hide password" toggle state |
@@ -24,7 +24,7 @@ import { PasswordInput } from 'altrone-ui';
 | `size` | `Size` | `'m'` | Input size. Also inherited from `FormFieldContext`. |
 | `name` | `string` | — | Input name. Also inherited from `FormFieldContext`. |
 | `placeholder` | `string` | — | Placeholder text |
-| `ref` | `Ref<HTMLElement>` | — | Forwarded to the visual wrapper |
+| `ref` | `Ref<HTMLElement>` | — | Forwarded to the root element (the whole field) |
 | `inputRef` | `Ref<HTMLInputElement>` | — | Forwarded to the underlying `<input>` |
 
 All other `TextInputProps` are also accepted (except `type`, which is managed internally).
@@ -35,7 +35,7 @@ All other `TextInputProps` are also accepted (except `type`, which is managed in
 
 - Input `type` toggles between `"password"` and `"text"` when the user clicks the eye button.
 - The toggle button has `aria-pressed` reflecting the current visibility state.
-- When `showControls={false}`, the eye button is hidden and the input behaves as a plain password field.
+- When `showControls={false}` or the field is `readOnly`, the eye button is hidden and the input behaves as a plain password field.
 - `disabled`, `invalid`, `size`, and `name` are read from `FormFieldContext` when inside a `Form.Field`.
 
 ---
@@ -46,7 +46,7 @@ All other `TextInputProps` are also accepted (except `type`, which is managed in
 
 ```tsx
 const [password, setPassword] = useState('');
-<PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} />
+<PasswordInput value={password} onChange={setPassword} />
 ```
 
 ### Without toggle
@@ -54,7 +54,7 @@ const [password, setPassword] = useState('');
 ```tsx
 <PasswordInput
   value={password}
-  onChange={(e) => setPassword(e.target.value)}
+  onChange={setPassword}
   showControls={false}
 />
 ```
@@ -64,7 +64,7 @@ const [password, setPassword] = useState('');
 ```tsx
 <PasswordInput
   value={password}
-  onChange={(e) => setPassword(e.target.value)}
+  onChange={setPassword}
   placeholder="Enter your password"
 />
 ```
@@ -76,7 +76,7 @@ const [password, setPassword] = useState('');
   <Form.Field name="password" label="Password">
     <PasswordInput
       value={form.password}
-      onChange={(e) => setForm({ ...form, password: e.target.value })}
+      onChange={(password) => setForm({ ...form, password })}
     />
   </Form.Field>
 </Form>
@@ -88,12 +88,12 @@ const [password, setPassword] = useState('');
 <Flex orientation="vertical" gap="m">
   <TextInput
     value={email}
-    onChange={(e) => setEmail(e.target.value)}
+    onChange={setEmail}
     placeholder="Email"
   />
   <PasswordInput
     value={password}
-    onChange={(e) => setPassword(e.target.value)}
+    onChange={setPassword}
     placeholder="Password"
   />
   <Button label="Sign in" variant="submit" fullWidth onClick={handleLogin} />

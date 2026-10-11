@@ -14,8 +14,8 @@ import { NumberInput } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `number \| null` | — | Controlled value. `null` renders an empty input. |
-| `onChange` | `(value: number, event: SyntheticEvent) => void` | — | Called with the parsed float value. If the parsed value is `NaN`, `0` is passed instead. |
+| `value` | `number` | — | Controlled value. `undefined` renders an empty input. |
+| `onChange` | `(value?: number, event?: SyntheticEvent<HTMLInputElement>) => void` | — | Called with the parsed number. If there is nothing to parse (an empty field), `0` is passed instead. |
 | `min` | `number` | `0` | Minimum allowed value — values below it are refused as you type |
 | `max` | `number` | — | Maximum allowed value — values above it are refused as you type |
 | `digitsAfterPoint` | `number` | `2` | Number of decimal places |
@@ -34,7 +34,7 @@ import { NumberInput } from 'altrone-ui';
 
 All other `TextInputProps` are also accepted. There are no spinner buttons — stepping a value up and down by one is a niche interaction with a tiny hit target; type the value, or compose an explicit `[−]/[+]` stepper with `TextInput.ActionIsland` where it genuinely helps.
 
-> **Note:** The `min` prop defaults to `0`. Set `min` to `undefined` or a negative number if you need to accept values below zero.
+> **Note:** `min` defaults to `0` and `allowNegative` to `false`. To accept values below zero, pass `allowNegative` together with a negative `min`.
 
 ---
 
@@ -75,6 +75,7 @@ const [qty, setQty] = useState(1);
 
 ```tsx
 <NumberInput
+  allowNegative
   value={temperature}
   onChange={(v) => setTemperature(v)}
   min={-273}
@@ -116,7 +117,7 @@ When placed inside a `Form.Field`, the `name`, `disabled`, `invalid`, and `size`
 
 ```tsx
 <NumberInput
-  value={null}
+  value={undefined}
   onChange={(v) => setAmount(v)}
   placeholder="Enter amount"
 />

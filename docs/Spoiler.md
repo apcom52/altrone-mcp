@@ -19,6 +19,8 @@ import { Spoiler } from 'altrone-ui';
 | `open` | `boolean` | — | Controlled open state. Omit for an uncontrolled spoiler (see `defaultOpen`). |
 | `defaultOpen` | `boolean` | `false` | Initial open state for an uncontrolled spoiler. Ignored once `open` is passed. |
 | `onToggle` | `(open: boolean, event: MouseEvent<HTMLButtonElement>) => void` | — | Called after each toggle. `open` is the **new** state. |
+| `expandIcon` | `ReactElement` | `<Plus />` | Icon shown while collapsed |
+| `collapseIcon` | `ReactElement` | `<Minus />` | Icon shown while expanded |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref (root `<div>`) |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
@@ -29,7 +31,7 @@ All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 - **Controlled vs. uncontrolled** — pass `open` to drive it from your own state (`onToggle` reports every click, you decide whether to act on it); omit it and the spoiler tracks its own state internally, starting from `defaultOpen`.
 - The header is a native `<button>` with `aria-expanded` and `aria-controls` pointing at the content region; it toggles on click and on `Enter` / `Space`.
-- The header shows a `Plus` icon when collapsed and a `Minus` icon when expanded (`aria-hidden`).
+- The header shows a `Plus` icon when collapsed and a `Minus` icon when expanded (`aria-hidden`); replace them with `expandIcon` / `collapseIcon`.
 - The content area animates open with a spring on `height` (plus a short fade) and closes with a quick tween. Padding sits on an inner wrapper so it doesn't jump while the height animates. Respects `prefers-reduced-motion` via the app-level `MotionConfig`.
 
 ---

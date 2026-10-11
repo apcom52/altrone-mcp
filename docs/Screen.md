@@ -17,7 +17,7 @@ import { Screen } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | — | Constrains `Screen.Content`'s max width only — header/sidebar/footer are unaffected |
-| `title` | `string` | — | Accessible name for the root region (`aria-label` + `role="region"`). Label-only, nothing is rendered |
+| `title` | `string` | — | Accessible name for the root region (`aria-label` + `role="region"`), nothing rendered visibly. Also feeds `Application`'s automatic `document.title` ("`<title>` - `<applicationName>`"), unless `Application`'s `manageTitle` is `false` — see `Application`'s docs |
 | `contentAlign` | `'start' \| 'center'` | `'start'` | `'center'` box-centers `Screen.Content` in both axes (with `size`, a narrow centered column) — for sign-in / onboarding forms and full-page `Result` states |
 | `mobileBreakpoint` | `'sm' \| 'md' \| 'lg'` | `'md'` | Viewport width below which `Screen.Sidebar` stops reserving layout space and floats over the content with a scrim (overlay mode). Independent of the zone's own `visibleFrom` / `hiddenFrom` |
 | `sidebarWidth` | `string` | `'300px'` | Width of the inline sidebar column |

@@ -2,6 +2,8 @@
 
 A floating informational label shown on hover, focus, or click. Built on `@floating-ui/react` with a directional arrow. Opens after a 500 ms delay on hover; immediately on focus/click. Closes immediately on mouse leave/blur/outside press.
 
+**Never wrap `Button` (or anything built on `Button` — `CloseButton`, `Toolbar.Action`) in `Tooltip`.** `Button` already renders its own internal `Tooltip` whenever `showLabel={false}` and a `label`/`tooltip` is present (`Button.tsx`, `tooltip ?? label` as content, `kbd` passed through). Wrapping it in a second, external `Tooltip` nests two tooltip instances on the same trigger and breaks rendering (the trigger ends up invisible). For an icon-only `Button`, pass `tooltip`/`kbd` to `Button` directly instead of wrapping it. Use `Tooltip` directly only on non-`Button` triggers — a custom `Box`-built control, a link, plain text, `Avatar`, etc.
+
 ## Import
 
 ```tsx
@@ -51,28 +53,44 @@ import { Tooltip } from 'altrone-ui';
 
 ```tsx
 <Tooltip content="This is a tooltip">
-  <Button label="Hover me" />
+  <Box asChild shape="rounded" material="translucent" padding={{ x: 12, y: 6 }} pressable focusable>
+    <button type="button">Hover me</button>
+  </Box>
 </Tooltip>
 ```
 
 ### On a non-interactive element
 
-Wrap the element if it doesn't natively accept `tabIndex` or event handlers.
+Wrap the element if it doesn't natively accept `tabIndex` or event handlers — a disabled native element fires no mouse/focus events at all, so the `Tooltip` needs to sit on a wrapper instead.
 
 ```tsx
 <Tooltip content="Archived items cannot be edited">
   <span>
-    <Button label="Edit" disabled />
+    <Box asChild shape="rounded" material="translucent" padding={{ x: 12, y: 6 }} style={{ opacity: 0.5 }}>
+      <button type="button" disabled>Edit</button>
+    </Box>
   </span>
 </Tooltip>
 ```
 
 ### With title and keyboard shortcut
 
+An icon-only trigger built from `Box` (not `Button` — see the warning above):
+
 ```tsx
 <Tooltip title="Save document" content="Saves all unsaved changes." kbd="⌘S">
-  <Button label="Save" icon={<Save />} showLabel={false} onClick={save} />
+  <Box asChild shape="circle" size="s" material="translucent" pressable focusable>
+    <button type="button" aria-label="Save" onClick={save}>
+      <Save size={14} />
+    </button>
+  </Box>
 </Tooltip>
+```
+
+The equivalent with an actual `Button` skips `Tooltip` entirely — `Button` builds its own:
+
+```tsx
+<Button label="Save" icon={<Save />} showLabel={false} tooltip="Saves all unsaved changes." kbd="⌘S" onClick={save} />
 ```
 
 ### Auto-generated help icon (no children)
@@ -118,7 +136,9 @@ When `children` is omitted, a `HelpCircle` button is rendered.
   trigger="click"
   onOpenChange={(open, event, reason) => console.log(open, reason)}
 >
-  <Button label="Info" />
+  <Box asChild shape="rounded" material="translucent" padding={{ x: 12, y: 6 }} pressable focusable>
+    <button type="button">Info</button>
+  </Box>
 </Tooltip>
 ```
 
@@ -126,16 +146,16 @@ When `children` is omitted, a `HelpCircle` button is rendered.
 
 ```tsx
 <Tooltip content="Visible on first render" defaultOpen>
-  <Button label="Hover me" />
+  <Box asChild shape="rounded" material="translucent" padding={{ x: 12, y: 6 }} pressable focusable>
+    <button type="button">Hover me</button>
+  </Box>
 </Tooltip>
 ```
 
-### Inside a Toolbar action
+### A Toolbar action's tooltip
 
-`Toolbar.Action` with `showLabel={false}` automatically wraps in a Tooltip using the `label` prop. Direct use is also possible:
+`Toolbar.Action` is a `Button` underneath (`variant="text"`) — it has the same built-in tooltip, and the same rule: never wrap it in `Tooltip`. Pass `tooltip`/`kbd` to it directly:
 
 ```tsx
-<Tooltip content="Delete selected items" kbd="⌫">
-  <Toolbar.Action label="Delete" icon={<Trash />} showLabel={false} onClick={deleteSelected} />
-</Tooltip>
+<Toolbar.Action label="Delete" icon={<Trash />} showLabel={false} tooltip="Delete selected items" kbd="⌫" onClick={deleteSelected} />
 ```

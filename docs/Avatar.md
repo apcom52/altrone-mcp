@@ -1,6 +1,6 @@
 # Avatar
 
-Displays a user's avatar. Shows a photo when `imageSrc` is provided and the image loads successfully; falls back to initials automatically on load error. Initials are derived from `firstName` and `lastName`. The element is `role="img"` labelled by the full name (the inner `<img>` is decorative, `alt=""`).
+Displays a user's avatar. Resolves in priority order: a photo (`imageSrc`), then an `icon`, then initials derived from `firstName`/`lastName`. A missing or failed-to-load photo falls back to the next tier automatically. The element is `role="img"` labelled by the full name (the inner `<img>` is decorative, `alt=""`).
 
 ## Import
 
@@ -14,24 +14,25 @@ import { Avatar } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `firstName` | `string` | — | **Required.** Used to derive the first initial and as part of the `aria-label`. |
+| `firstName` | `string` | — | Used to derive the first initial and as part of the `aria-label`. Optional — omit it for icon-only entities (bots, teams, placeholders). |
 | `lastName` | `string` | — | Optional last name. Adds a second initial when provided. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Avatar size |
-| `imageSrc` | `string` | — | URL of the user's photo. Falls back to initials if the image fails to load. When `imageSrc` changes, the error state resets and the new image is attempted. |
-| `backgroundColor` | `string` | — | Background color of the initials circle. Any valid CSS color value. When omitted, a categorical hue is picked deterministically from the name (the same person always gets the same colour). |
-| `textColor` | `string` | — | Color of the initials text. Overrides automatic contrast calculation. |
+| `imageSrc` | `string` | — | URL of the user's photo. Falls back to `icon` (or initials) if the image fails to load. When `imageSrc` changes, the error state resets and the new image is attempted. |
+| `icon` | `ReactElement` | — | Icon shown when there's no photo (or it failed to load), instead of initials. Takes priority over initials. |
+| `backgroundColor` | `string` | — | Background color of the circle. Any valid CSS color value. When omitted, a categorical hue is picked deterministically from the name (the same person always gets the same colour). |
+| `textColor` | `string` | — | Color of the initials/icon. Overrides automatic contrast calculation. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted.
 
 ---
 
-## Initials logic
+## Fallback logic
 
-- Initials = `firstName[0]` + `lastName[0]` (if `lastName` is provided).
-- Leading whitespace in either name is trimmed before taking the first character.
-- The container is `role="img"` with `aria-label` = the full name (`firstName + ' ' + lastName`). The initials `<span>` is `aria-hidden`, and the photo `<img>` uses `alt=""` — the container already provides the accessible name.
-- Text colour auto-contrasts against the fill (an `oklch` relative-colour calc); `textColor` overrides it.
+- Priority: photo (`imageSrc`) → `icon` → initials. Each tier falls through to the next when it's absent or (for the photo) fails to load.
+- Initials = `firstName[0]` + `lastName[0]` (if `lastName` is provided). Leading whitespace in either name is trimmed before taking the first character.
+- The container is `role="img"` with `aria-label` = the full name (`firstName + ' ' + lastName`). Without a `firstName`, no name-based `aria-label` is set — pass your own `aria-label` when rendering an icon-only avatar. The initials/icon `<span>` is `aria-hidden`, and the photo `<img>` uses `alt=""` — the container already provides the accessible name.
+- Icon/text colour auto-contrasts against the fill (an `oklch` relative-colour calc); `textColor` overrides it.
 
 ---
 
@@ -87,6 +88,14 @@ The component resets the error state when `imageSrc` changes, so swapping URLs w
   backgroundColor="#1e3a5f"
   textColor="#fbbf24"
 />
+```
+
+### Icon fallback (no name)
+
+```tsx
+import { Bot } from 'lucide-react';
+
+<Avatar icon={<Bot />} aria-label="Support bot" />
 ```
 
 ### Stacked group

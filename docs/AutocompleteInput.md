@@ -17,7 +17,11 @@ import { AutocompleteInput } from 'altrone-ui';
 - Keyboard navigation: `↑` / `↓` to move through items, `Enter` to select the highlighted item.
 - After a suggestion is selected the input value is updated via a synthetic React change event, ensuring compatibility with controlled inputs.
 - When `cacheResults={true}`, results for a given input value are stored in a `Map` for the lifetime of the component. Navigating back to a cached prefix skips the network call.
-- If `getSuggestions` throws, the error is passed to `onError` and an error icon (`Application.icons.error` by default, override via `errorIcon`) appears inside the input (via `TextInput.CustomIsland`).
+- While a request is in flight a `TextInput.LoadingIsland` is shown at the end of the field (hidden with `showControls={false}`).
+- When `getSuggestions` resolves with an empty array (and the text is at least `minChars` long) the dropdown shows an empty state instead of closing.
+- After a suggestion is picked no new request is made until the user edits the value again.
+- If `getSuggestions` throws, the error is passed to `onError` and an error icon (`Application.icons.error` by default, override via `errorIcon`) appears at the end of the input with a localized tooltip. It is cleared when the next request starts.
+- `onKeyDown` passed by the consumer runs before the field's own handler; call `event.preventDefault()` in it to skip the built-in `Escape` and `Enter`-to-select handling.
 
 ---
 
@@ -36,7 +40,7 @@ import { AutocompleteInput } from 'altrone-ui';
 | `onError` | `(error: unknown) => void` | — | Called when `getSuggestions` throws. |
 | `minChars` | `number` | `1` | Minimum input length required before `getSuggestions` is called. |
 | `cacheResults` | `boolean` | `false` | Cache suggestion results per input value for the component's lifetime. |
-| `showControls` | `boolean` | — | Show/hide the loading island. Inherits from context when omitted. |
+| `showControls` | `boolean` | `true` | Show/hide the loading island shown while suggestions are loading. |
 | `errorIcon` | `ReactElement` | `Application.icons.error` | Overrides the icon shown when `getSuggestions` throws. |
 
 ### Inherited from TextInput

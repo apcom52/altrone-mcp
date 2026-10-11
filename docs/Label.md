@@ -17,8 +17,9 @@ Renders a `<div>`. The text is passed as `children`, not a prop.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | — | Text content of the label |
+| `icon` | `ReactElement` | — | Leading icon. For `variant="status"` it renders inside the status dot instead of next to it |
 | `color` | `LabelColor` | `'default'` | Colour (see below) |
-| `variant` | `'solid' \| 'soft' \| 'outline'` | `'solid'` | Visual style |
+| `variant` | `'solid' \| 'soft' \| 'outline' \| 'status'` | `'solid'` | Visual style — `status` adds a pale fill, a border and a coloured dot before `children` |
 | `shape` | `'rounded' \| 'pill'` | `'rounded'` | Border-radius style |
 | `size` | `Size` | `'m'` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded ref |
@@ -98,4 +99,19 @@ The four semantic colours (`primary` → accent, `success` → green, `warning` 
   <Label color="indigo" variant="soft">TypeScript</Label>
   <Label color="pink" variant="soft">CSS</Label>
 </Flex>
+```
+
+### Status variant (dot, optionally with an icon)
+
+```tsx
+<Label color="warning" variant="status">In review</Label>
+<Label color="success" variant="status" icon={<Check />}>Completed</Label>
+<Label color="danger" variant="status" icon={<Ban />}>Blocked</Label>
+```
+
+### Leading icon (non-status variants)
+
+```tsx
+<Label color="primary" icon={<Clock />}>Pending</Label>
+<Label color="success" variant="soft" icon={<Check />}>Verified</Label>
 ```

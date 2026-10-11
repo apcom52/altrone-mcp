@@ -28,6 +28,8 @@ import { Popover } from 'altrone-ui';
 | `defaultOpen` | `boolean` | `false` | Initial open state for an uncontrolled popover. Ignored once `open` is passed. |
 | `enabled` | `boolean` | `true` | When `false`, renders only the trigger (no popover behavior). |
 | `listNavigation` | `boolean` | `false` | Enable arrow-key navigation over list items (used by `Dropdown`/`Select`). |
+| `defaultListNavigationIndex` | `number \| null` | `null` | Initial active index for `listNavigation`. |
+| `virtualNavigationFocus` | `boolean` | `false` | With `listNavigation`, keeps real DOM focus on the trigger and only highlights the active item visually (`aria-activedescendant` pattern, used by `AutocompleteInput`). |
 | `onOpenChange` | `(open: boolean, event?: Event, reason?: OpenChangeReason) => void` | — | Fires on every open-state change. `reason` is `'escape-key'`, `'outside-press'`, `'reference-press'`, `'hover'`, `'focus'`, … |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the trigger DOM element (merged with the trigger's own `ref`, if any). |
 | `controlRef` | `Ref<PopoverRef>` | — | Imperative API (see below). |
@@ -61,7 +63,7 @@ When you attach a `controlRef`, the following are exposed:
 - **Keyboard navigation**: `ArrowUp` / `ArrowDown` move through list items when `focusTrap` is active. Navigation loops, allows escape.
 - **Nested close**: content render function receives `hideAllSequence` which closes the entire popover chain (e.g. a sub-menu and its parent).
 - **Accessibility**: with `title` / `showCloseButton` the panel is `role="dialog"` + `aria-labelledby` (the header). Otherwise it has no role — set `role` yourself for tooltip/menu semantics. Esc and outside-press dismiss; focus returns to the trigger.
-- **Surface**: the panel is a `Box` (`material="plate"` glass fill + blur, `shape="rounded"` corners from `--popover-radius` (`--radius-xl`, 16px — matches the corner a `size="m"` `Button`'s `pill` shape produces, so the panel reads as rounded in harmony with buttons without itself looking like a pill), `elevation="overlay"` shadow + z-index). Only the header/content layout lives in the component's own stylesheet.
+- **Surface**: the panel is a `Box` (`material="plate"` glass fill + blur, `shape="rounded"` corners from `--popover-radius` (24px, matching the panel's original pre-`Box` corner), `elevation="overlay"` shadow + z-index). Only the header/content layout lives in the component's own stylesheet.
 - **`overlap`**: implemented with native floating-ui middleware — a negative main-axis `offset` (reference size) + `shift`; no `flip` (flipping a covering panel makes no sense).
 - **Portal target**: the trigger's own `closest('[data-altrone-root]')` — so a popover always portals into its own Altrone app instance, even with several on the page. Falls back to `document.body`.
 - **Animation**: `AnimatePresence` scale/opacity transition using `transformOrigin` from the resolved placement. Respects `prefers-reduced-motion` (global `MotionConfig`).

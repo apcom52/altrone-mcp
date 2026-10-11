@@ -19,7 +19,7 @@ import { Dropdown } from 'altrone-ui';
 | `children` | `ReactNode \| ((ctx: { open: boolean; hide: () => void }) => ReactNode)` | — | **Required.** Trigger element. Can be a render function to access `open` state. |
 | `content` | `ReactNode \| ((ctx: { hide: () => void; hideAllSequence: () => void }) => ReactNode)` | — | **Required.** Dropdown content. |
 | `placement` | `Placement \| 'auto'` | `'bottom'` | Floating UI placement (e.g. `'bottom-start'`, `'top-end'`) |
-| `trigger` | `'click' \| 'focus' \| 'hover' \| Array` | `['click']` | What opens the dropdown |
+| `trigger` | `'click' \| 'focus' \| 'hover' \| Array` | `'click'` | What opens the dropdown |
 | `closeParentPopover` | `boolean` | `true` | When inside a nested dropdown, whether clicking an action closes the entire chain or just the innermost popover. |
 | `focusTrap` | `boolean` | `true` | Trap focus inside the dropdown while open |
 
@@ -102,7 +102,7 @@ An individual option inside `Dropdown.RadioList`.
 
 ### Dropdown.ChildMenu
 
-A menu item that opens a nested sub-menu on hover/click.
+A menu item that opens a nested sub-menu on click, positioned to the side of the parent item.
 
 | Prop | Type | Description |
 |------|------|-------------|
