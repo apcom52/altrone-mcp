@@ -59,7 +59,7 @@ When you attach a `controlRef`, the following are exposed:
 ## Behavior
 
 - **Controlled vs. uncontrolled** — pass `open` to drive visibility from your own state (`onOpenChange` reports every requested change: escape, outside-press, and `controlRef.show()`/`hide()` all route through it instead of updating an internal flag); omit it and the popover tracks its own state internally, starting from `defaultOpen`.
-- **Hover trigger**: opens after 500 ms delay, closes after 250 ms delay. Uses `safePolygon` so the pointer can move from trigger to panel without accidental close.
+- **Hover trigger**: opens after 500 ms delay, closes after 250 ms delay. Uses `safePolygon` so the pointer can move from trigger to panel without accidental close. Hover reacts to a mouse only — on touch devices a hover-triggered popover opens and closes on tap instead.
 - **Keyboard navigation**: `ArrowUp` / `ArrowDown` move through list items when `focusTrap` is active. Navigation loops, allows escape.
 - **Nested close**: content render function receives `hideAllSequence` which closes the entire popover chain (e.g. a sub-menu and its parent).
 - **Accessibility**: with `title` / `showCloseButton` the panel is `role="dialog"` + `aria-labelledby` (the header). Otherwise it has no role — set `role` yourself for tooltip/menu semantics. Esc and outside-press dismiss; focus returns to the trigger.

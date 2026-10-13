@@ -1,6 +1,6 @@
 # Tooltip
 
-A floating informational label shown on hover, focus, or click. Built on `@floating-ui/react` with a directional arrow. Opens after a 500 ms delay on hover; immediately on focus/click. Closes immediately on mouse leave/blur/outside press.
+A floating informational label shown on hover, focus, or click. Built on `@floating-ui/react` with a directional arrow. Opens after a 500 ms delay on hover; immediately on focus/click. Closes immediately on mouse leave/blur/outside press. The hover trigger reacts to a mouse only, so a tap on a touch device doesn't open the tooltip.
 
 **Never wrap `Button` (or anything built on `Button` — `CloseButton`, `Toolbar.Action`) in `Tooltip`.** `Button` already renders its own internal `Tooltip` whenever `showLabel={false}` and a `label`/`tooltip` is present (`Button.tsx`, `tooltip ?? label` as content, `kbd` passed through). Wrapping it in a second, external `Tooltip` nests two tooltip instances on the same trigger and breaks rendering (the trigger ends up invisible). For an icon-only `Button`, pass `tooltip`/`kbd` to `Button` directly instead of wrapping it. Use `Tooltip` directly only on non-`Button` triggers — a custom `Box`-built control, a link, plain text, `Avatar`, etc.
 
