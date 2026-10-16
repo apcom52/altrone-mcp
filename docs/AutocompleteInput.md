@@ -1,6 +1,6 @@
 # AutocompleteInput
 
-A text input with a dropdown suggestion list. Extends `TextInput` — all `TextInput` props and island sub-components are available. Suggestions are fetched via a callback (sync or async) with built-in debounce, optional caching, keyboard navigation, and error display.
+A text input with a dropdown suggestion list. Extends `TextInput` — all `TextInput` props and island sub-components are available, except the native `onSelect` (text selection), which is replaced by the suggestion `onSelect` below. Suggestions are fetched via a callback (sync or async) with built-in debounce, optional caching, keyboard navigation, and error display.
 
 ## Import
 

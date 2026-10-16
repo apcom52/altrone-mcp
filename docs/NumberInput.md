@@ -15,6 +15,7 @@ import { NumberInput } from 'altrone-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `number` | — | Controlled value. `undefined` renders an empty input. |
+| `defaultValue` | `string \| number` | — | Initial value passed to the formatter. Narrower than the native `defaultValue` (no string arrays). |
 | `onChange` | `(value?: number, event?: SyntheticEvent<HTMLInputElement>) => void` | — | Called with the parsed number. If there is nothing to parse (an empty field), `0` is passed instead. |
 | `min` | `number` | `0` | Minimum allowed value — values below it are refused as you type |
 | `max` | `number` | — | Maximum allowed value — values above it are refused as you type |
