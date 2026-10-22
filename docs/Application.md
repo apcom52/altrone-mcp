@@ -244,6 +244,7 @@ instead of joining this set — see that component's own docs.
 | `success` | `CheckCircle2` | Notifications, Result |
 | `warning` | `AlertTriangle` | Notifications, Result |
 | `danger` | `XCircle` | Notifications, Result |
+| `dismiss` | `X` | CloseButton (and everything that renders it: Modal, Drawer, Popover, Message, toasts, notifications) |
 
 Every value is a `ReactElement` (an already-instantiated icon, e.g. `<MyIcon />`),
 matching how icon props work everywhere else in the library.

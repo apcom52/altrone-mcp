@@ -31,14 +31,15 @@ All standard `HTMLAttributes<HTMLHRElement>` are also accepted (except `children
 
 ### Vertical
 
-Use inside a flex row to separate items horizontally. The divider needs a constrained height from its context.
+Use inside a flex row to separate items horizontally. The divider has `align-self: stretch`, so it takes the height of the row by itself (minus a small `--xs-gap` inset at each end) — even when the row uses `align="center"`. It needs a flex parent; outside one it has no height.
 
 ```tsx
-<div style={{ display: 'flex', alignItems: 'center', height: 32 }}>
-  <span>Item A</span>
+<Flex gap="m" align="center">
+  <Button label="Cut" />
+  <Button label="Copy" />
   <Divider orientation="vertical" />
-  <span>Item B</span>
-</div>
+  <Button label="Paste" />
+</Flex>
 ```
 
 ### Separating sections

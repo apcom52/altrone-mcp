@@ -14,17 +14,17 @@ import { Skeleton } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `width` | `string` | `'100%'` | CSS width. Also sets `minWidth` and `maxWidth` if those are not provided. |
-| `minWidth` | `string` | same as `width` | CSS min-width override |
-| `maxWidth` | `string` | same as `width` | CSS max-width override |
-| `height` | `string` | `'100%'` | CSS height. Also sets `minHeight` and `maxHeight` if those are not provided. |
-| `minHeight` | `string` | same as `height` | CSS min-height override |
-| `maxHeight` | `string` | same as `height` | CSS max-height override |
-| `radius` | `string` | — | CSS `border-radius` value |
+| `width` | `string \| number` | `'100%'` | CSS width; a number is in px |
+| `minWidth` | `string \| number` | — | CSS min-width |
+| `maxWidth` | `string \| number` | — | CSS max-width — caps a fluid `width` (e.g. `width="100%" maxWidth={320}`) |
+| `height` | `string \| number` | `'100%'` | CSS height; a number is in px |
+| `minHeight` | `string \| number` | `'1lh'` without `height` | CSS min-height. Without `height` the skeleton is at least one text line tall, so it doesn't collapse in an auto-height parent |
+| `maxHeight` | `string \| number` | — | CSS max-height |
+| `radius` | `string \| number` | `max(var(--radius-outer), var(--radius-mini))` | CSS `border-radius`. Without it the corners follow the ambient radius, never below `--radius-mini` (like `Box`) |
 | `animateLayout` | `boolean` | `false` | Smoothly animate size/position changes via `motion`'s `layout`. Off by default — a static placeholder doesn't need the per-render FLIP measuring. |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref |
 
-All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `children`).
+All standard `HTMLAttributes<HTMLDivElement>` are also accepted (except `children`). `className` is merged with the component's own class; `style` is applied last and can override the computed sizes. The block has `flex-shrink: 0`, so it keeps its size in a `Flex` row.
 
 > **Note:** With `animateLayout` off (the default) `Skeleton` renders a plain `<div>` — no `motion` overhead. Turn it on only when a skeleton's dimensions actually change between renders.
 

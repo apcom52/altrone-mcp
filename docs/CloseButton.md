@@ -1,6 +1,6 @@
 # CloseButton
 
-A pre-built icon button for closing/dismissing UI surfaces. Wraps `Button` with an `X` icon by default (overridable via `icon`), `showLabel={false}`, and a localized accessible label from `closeButton.ariaLabel`. The `tooltip` is intentionally set to an empty string so no tooltip is shown on hover.
+A pre-built icon button for closing/dismissing UI surfaces. Wraps `Button` with the shared `dismiss` icon role (an `X` by default; overridable per button via `icon` or globally via `Application`'s `icons`), `showLabel={false}`, and a localized accessible label from `closeButton.ariaLabel`. The `tooltip` is intentionally set to an empty string so no tooltip is shown on hover.
 
 ## Import
 
@@ -16,8 +16,8 @@ import { CloseButton } from 'altrone-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Control tier, forwarded to `Button` |
-| `icon` | `ReactElement` | `X` | Overrides the glyph |
+| `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Control tier, forwarded to `Button`. `mini` is 16px with a 24px hit area |
+| `icon` | `ReactElement` | `useIcons().dismiss` (`X`) | Overrides the glyph on this button |
 | `label` | `string` | localized `closeButton.ariaLabel` | Overrides the accessible name |
 | `disabled` | `boolean` | `false` | — |
 | `onClick` | `(e: MouseEvent) => void` | — | Click handler |
@@ -50,6 +50,20 @@ Plus the native `<button>` attributes (`id`, `type`, `data-*`, `onFocus`, …) e
 ```tsx
 <CloseButton size="s" onClick={handleClose} />
 ```
+
+### Custom icon
+
+```tsx
+import { CircleX } from 'lucide-react';
+
+<CloseButton icon={<CircleX />} />
+
+<Application icons={{ dismiss: <CircleX /> }}>
+  <App />
+</Application>
+```
+
+`icon` replaces the cross on one button. The `dismiss` role in `Application`'s `icons` replaces it for every `CloseButton` without its own `icon`, including those built into `Modal`, `Drawer`, `Popover`, `Message`, toasts and notifications.
 
 ---
 
