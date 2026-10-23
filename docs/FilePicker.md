@@ -161,7 +161,7 @@ Pass existing files (without a `file` object) to show them as already-uploaded c
 
 ## Behavior details
 
-- In **single-file mode** (`multiple=false`), selecting a new file automatically deletes the previous one — it calls `removeFileFn` or the default delete request before updating the list.
+- In **single-file mode** (`multiple=false`), selecting a new file automatically deletes the previous one — it calls `removeFileFn` or the default delete request before updating the list. If that request rejects, the new file is still applied; an unfinished built-in upload of the old file is aborted when its chip unmounts.
 - Removing a chip with `autoUpload` waits for `removeFileFn` or the default `DELETE`; if that request rejects, the file is still removed from the list.
 - Each file is assigned a UUID as `id` if none is provided.
 - The hidden `<input type="file">` is reset after each selection so the same file can be picked again.
