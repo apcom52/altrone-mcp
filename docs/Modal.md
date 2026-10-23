@@ -25,6 +25,7 @@ import { Modal } from 'altrone-ui';
 | `showCloseButton` | `boolean` | `true` | Show the header close (X) button. |
 | `showCancelButton` | `boolean` | `true` | Show the built-in Cancel button before `actions` in the footer. |
 | `onClose` | `(event?: MouseEvent \| KeyboardEvent) => void` | — | Called when the modal closes (Escape key, backdrop click, CloseButton, or any `hide()` call). `event` is undefined for a `hide()` call. For a controlled modal, this is the only thing that actually flips `open` back to `false` — the component does not close itself. |
+| `onExitComplete` | `() => void` | — | Called once the close animation has finished and the modal has unmounted. Use it when the next step must wait for the modal to disappear (e.g. `DialogProvider` shows the next queued dialog from here). |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded ref to the modal root element (the backdrop). |
 
 ---

@@ -163,7 +163,7 @@ const password = await showPrompt({
 
 ## Behavior details
 
-- Only one dialog can be open at a time. Opening a second before the first resolves replaces the current one and the first promise never settles — always `await` one dialog before opening the next.
+- Only one dialog is shown at a time. A dialog opened while another is still open is queued and shown after the current one closes; every promise settles, in call order.
 - Default button labels and titles come from the active locale (`useLocalization`), not hardcoded English.
 - Closing the dialog via the `×` button or backdrop:
   - `showAlert` → resolves with `undefined`
