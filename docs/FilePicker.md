@@ -22,7 +22,7 @@ import { FilePicker } from 'altrone-ui';
 | `placeholder` | `string` | localized default | Label on the upload button. |
 | `size` | `'mini' \| 's' \| 'm' \| 'l' \| 'xl'` | `'m'` | Scales the pick button and the file chips (height, text, inline retry/delete buttons). |
 | `autoUpload` | `boolean` | `true` | Automatically upload files after selection using `url`/`method`/`name` or `autoUploadFn`. |
-| `url` | `string` | — | Upload endpoint URL. Required when `autoUpload=true` and no `autoUploadFn` is provided. |
+| `url` | `string` | — | Upload endpoint URL, also used for the default `DELETE` request. Without it (and without `autoUploadFn`/`removeFileFn`) no request is sent and files just stay selected. |
 | `method` | `HTMLFormElement['method']` | — | HTTP method for upload (`'post'`, `'put'`, etc.). |
 | `name` | `string` | — | Form field name used in the upload request. |
 | `autoUploadFn` | `(ctx: FilePickerUploadContext) => Promise<void>` | — | Custom upload handler. Replaces the default `fetch` upload. Receives helpers to track progress. |
