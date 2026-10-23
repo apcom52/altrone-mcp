@@ -66,7 +66,7 @@ Collects related actions into a translucent capsule, inherited from the parent t
 | `justify` | `'start' \| 'center' \| 'end' \| 'between'` | `'start'` | Justification of items inside the group. |
 | `weight` | `number` | — | `flex` value — `weight={1}` makes the group eat the remaining space. |
 | `variant` | `'plain' \| 'grouped' \| 'solid'` | inherited | Overrides the toolbar's `variant` for this group only: `plain` removes the capsule, `grouped`/`solid` force it on. |
-| `priority` | `'high' \| 'medium' \| 'low'` | `'medium'` | Collapse priority for the whole group as one unit — see [Overflow](#overflow). |
+| `priority` | `'high' \| 'medium' \| 'low'` | `'medium'` | Collapse priority for the whole group as one unit; ignored unless every child is a `Toolbar.Action`/`Toolbar.SidebarToggleAction` — see [Overflow](#overflow). |
 | `ref` | `Ref<HTMLDivElement>` | — | Forwarded. |
 
 ---
@@ -139,10 +139,13 @@ whatever doesn't fit into an overflow `Dropdown` — lowest `priority` first:
 - Within a tier, items collapse in reading order — leftmost (or topmost, for a vertical toolbar)
   first.
 
-`Toolbar.Action` and `Toolbar.Group` are the collapsible units — a `Toolbar.Group` collapses as
-one atomic block, and when it does, its own actions are flattened into the overflow menu as plain
-items (no nested grouping). Other children (`Toolbar.Title`, `Toolbar.Logo`, `Toolbar.Separator`,
-arbitrary nodes) don't support `priority` and are never collapsed.
+`Toolbar.Action`, `Toolbar.SidebarToggleAction` and `Toolbar.Group` are the collapsible units — a
+`Toolbar.Group` collapses as one atomic block, and when it does, its own actions are flattened into
+the overflow menu as plain items (no nested grouping). A group collapses only if every child is a
+`Toolbar.Action` or `Toolbar.SidebarToggleAction`; a group containing anything else (`Search`,
+`TextInput`, text, a custom element) ignores its `priority` and stays in the row. Other children
+(`Toolbar.Title`, `Toolbar.Logo`, `Toolbar.Separator`, arbitrary nodes) don't support `priority`
+and are never collapsed.
 
 The trigger renders at whichever edge of the region sits closest to the toolbar's center, chevrons
 pointing further inward:
