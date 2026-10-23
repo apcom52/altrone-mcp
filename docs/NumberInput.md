@@ -16,7 +16,7 @@ import { NumberInput } from 'altrone-ui';
 |------|------|---------|-------------|
 | `value` | `number` | — | Controlled value. `undefined` renders an empty input. |
 | `defaultValue` | `string \| number` | — | Initial value passed to the formatter. Narrower than the native `defaultValue` (no string arrays). |
-| `onChange` | `(value?: number, event?: SyntheticEvent<HTMLInputElement>) => void` | — | Called with the parsed number. If there is nothing to parse (an empty field), `0` is passed instead. |
+| `onChange` | `(value?: number, event?: SyntheticEvent<HTMLInputElement>) => void` | — | Called with the parsed number, or `undefined` when there is nothing to parse (an empty field, a lone `-`). |
 | `min` | `number` | — | Minimum allowed value. Smaller values are accepted while typing (on the way to a valid one) and snap to `min` on blur, reported via `onChange` |
 | `max` | `number` | — | Maximum allowed value. Positive values past it are refused as you type; anything else above it snaps to `max` on blur |
 | `digitsAfterPoint` | `number` | `2` | Number of decimal places |
