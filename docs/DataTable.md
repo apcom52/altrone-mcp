@@ -48,7 +48,7 @@ type DataTableColumnBase<T> = {
   label?: string;
   width?: number;
   visible?: boolean;
-  filterable?: boolean | DataTableColumnType;  // true = auto type, or explicit type
+  filterable?: boolean | DataTableColumnType;  // true = auto type (link → text, custom → not filterable), or explicit type
   sortable?: boolean;
   resizable?: boolean;     // opt this column out of resizing when `resizableColumns` is on
 };
