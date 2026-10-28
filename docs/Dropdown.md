@@ -55,7 +55,7 @@ A clickable menu item.
 | `disabled` | `boolean` | `false` | Disables the item |
 | `asChild` | `boolean` | `false` | Merges action styles onto the single child element (Slot pattern) |
 | `ref` | `Ref<HTMLButtonElement>` | — | Forwarded ref (or the child element's ref when `asChild` is used) |
-| `onClick` | `(event: MouseEvent) => void` | — | Click handler |
+| `onClick` | `(event: MouseEvent) => void` | — | Click handler; runs before the menu closes, `event.preventDefault()` keeps it open |
 
 ---
 
@@ -68,6 +68,7 @@ A toggleable checkbox item inside the menu.
 | `label` | `string` | **Required.** Item label |
 | `checked` | `boolean` | **Required.** Checked state |
 | `onChange` | `(state: boolean, event: MouseEvent \| KeyboardEvent) => void` | **Required.** Called with the next state |
+| `onClick` / `onKeyDown` | native handlers | Run before the toggle; `event.preventDefault()` skips it |
 | `disabled` | `boolean` | — |
 | `ref` | `Ref<HTMLButtonElement>` | Forwarded ref |
 
@@ -96,6 +97,7 @@ An individual option inside `Dropdown.RadioList`.
 | `value` | `T` | **Required.** This item's value |
 | `label` | `string` | **Required.** Display label |
 | `disabled` | `boolean` | — |
+| `onClick` / `onKeyDown` | native handlers | Run before the selection; `event.preventDefault()` skips it |
 | `ref` | `Ref<HTMLButtonElement>` | Forwarded ref |
 
 ---
