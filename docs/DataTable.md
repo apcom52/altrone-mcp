@@ -47,7 +47,7 @@ type DataTableColumnBase<T> = {
   accessor: keyof T;       // required
   label?: string;
   width?: number;
-  visible?: boolean;
+  enabled?: boolean;       // false = column excluded entirely: not rendered, sorted or filtered (e.g. no permission)
   filterable?: boolean | DataTableColumnType;  // true = auto type (link → text, custom → not filterable), or explicit type
   sortable?: boolean;
   resizable?: boolean;     // opt this column out of resizing when `resizableColumns` is on
