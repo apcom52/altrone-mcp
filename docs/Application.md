@@ -16,7 +16,7 @@ import {
 } from 'altrone-ui';
 ```
 
-Types: `ApplicationProps`, `Theme`, `Accent`, `Language`, `IconSet`.
+Types: `ApplicationProps`, `Theme`, `ResolvedTheme`, `Accent`, `Language`, `IconSet`.
 
 ---
 
@@ -24,8 +24,8 @@ Types: `ApplicationProps`, `Theme`, `Accent`, `Language`, `IconSet`.
 
 Rendering `Application` sets up the following globally:
 
-- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Sets the `data-altrone-theme` attribute on both the root element and `<html>`. Overlays (`Popover`, `Tooltip`, …) portal into an Altrone root element, so they inherit the theme and accent; the attribute on `<html>` covers global styles and the `<body>` fallback for triggers rendered outside any `Application`. Read/change it with `useAltroneTheme()` → `{ theme, setTheme }`.
-- **Theme persistence** (opt-in via `persistTheme`) — remembers the resolved theme in `localStorage` (key `altrone-theme`) once the user has explicitly switched it, and restores it on the next visit ahead of `theme`/system preference.
+- **Theme** — `light`, `dark`, or `auto` (follows `prefers-color-scheme`). Sets the `data-altrone-theme` attribute on both the root element and `<html>`. Overlays (`Popover`, `Tooltip`, …) portal into an Altrone root element, so they inherit the theme and accent; the attribute on `<html>` covers global styles and the `<body>` fallback for triggers rendered outside any `Application`. Read/change it with `useAltroneTheme()` → `{ theme, themePreference, setTheme }`: `theme` is the theme actually shown (`'light' | 'dark'`, `auto` already resolved), `themePreference` is the chosen value (`'auto' | 'light' | 'dark'`), and `setTheme('auto')` goes back to following the system.
+- **Theme persistence** (opt-in via `persistTheme`) — remembers the value passed to `setTheme` (`'auto'` included) in `localStorage` (key `altrone-theme`), and restores it on the next visit ahead of the `theme` prop.
 - **FOUC prevention** — renders a blocking inline script that sets `data-altrone-theme` on `<html>` before the tree paints (best-effort). For a hard guarantee under streaming SSR, render `getThemeInitScript(theme, persistTheme)` in the document `<head>` yourself, with the same values you pass to `Application`.
 - **Document background** — mirrors the resolved app background color onto `<body>` and `<html>` (inline style, restored on unmount), re-applied when the theme changes. Keeps the browser overscroll / rubber-band area from flashing white on scroll (notably in Safari), since the color tokens are scoped to the root element and not to `<html>`.
 - **Accent color** — applied via `data-altrone-accent` attribute; controls the `--accent-*` tokens and the `info` status color across all components. `danger`/`success`/`warning` keep their own fixed hues.
@@ -44,7 +44,7 @@ Rendering `Application` sets up the following globally:
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Color theme. `auto` follows the OS `prefers-color-scheme` and updates at runtime when the system theme changes. |
-| `persistTheme` | `boolean` | `false` | Remember the resolved theme (`light`/`dark`) in `localStorage` and restore it on the next visit, once the user has explicitly switched it at least once. Takes priority over `theme`/system preference after that point. |
+| `persistTheme` | `boolean` | `false` | Remember the value passed to `setTheme` (`auto`/`light`/`dark`) in `localStorage` and restore it on the next visit. Takes priority over `theme` once something has been stored. |
 | `accent` | `'red' \| 'orange' \| 'amber' \| 'green' \| 'teal' \| 'blue' \| 'indigo' \| 'purple' \| 'pink' \| 'brown'` | `'blue'` | Accent color for the design system |
 | `applicationName` | `string` | — | Appended to `document.title` as "`<Screen.title>` - `applicationName`" whenever a `Screen` with a `title` is mounted. With no `Screen.title`, the document title is just `applicationName`. |
 | `manageTitle` | `boolean` | `true` | `false` turns off the automatic `document.title` sync from `Screen.title`/`applicationName` — `setPageTitle` still works, you own `document.title` yourself otherwise. |
@@ -141,11 +141,16 @@ import { MyChevronLeft, MyChevronRight } from './my-icons';
 import { useAltroneTheme } from 'altrone-ui';
 
 function ThemeSwitcher() {
-  const { theme, setTheme } = useAltroneTheme();
+  const { theme, themePreference, setTheme } = useAltroneTheme();
   return (
-    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-      Current: {theme}
-    </button>
+    <>
+      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+        Current: {theme}
+      </button>
+      {themePreference !== 'auto' && (
+        <button onClick={() => setTheme('auto')}>Follow system</button>
+      )}
+    </>
   );
 }
 ```
