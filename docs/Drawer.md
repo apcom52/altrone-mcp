@@ -122,6 +122,8 @@ receives `hide`. The title stays centred on the panel regardless.
 
 ## Behavior details
 
+If `onDone` throws or rejects, the drawer stays open, shakes, and restores the Done button for another attempt. The rejection is handled internally; show specific error details in your content. Closing or unmounting invalidates pending completion, so an earlier operation cannot close a reopened drawer or change its loading state. The shake uses the same feedback as a blocked dismiss attempt and remains enabled under reduced motion.
+
 - **Controlled vs. uncontrolled** — pass `open` to drive visibility from your own state (`onClose` must set it back to `false`); omit it and the drawer tracks its own state internally, starting from `defaultOpen`.
 - Closing: a click on the backdrop, the close button, or the `Escape` key. `onClose` fires for all three (and after `onDone` resolves to anything but `false`).
 - Focus: trapped inside the panel while open (`focus-trap-react`), returned to whatever had focus before opening on close. The panel body carries `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` when a `title` is set.
