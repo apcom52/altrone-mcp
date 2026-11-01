@@ -2,6 +2,8 @@
 
 A floating menu anchored to a trigger element. Built on `Popover` with list keyboard navigation. The content area is a `CloseDropdownContext` provider — sub-components inside the menu can call `useCloseDropdown()` to close the popover programmatically.
 
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 ## Import
 
 ```tsx

@@ -2,6 +2,8 @@
 
 A dropdown select input. Supports single and multiple selection, search filtering, a clear button, and a transparent variant. Built on `Dropdown` with a `TextInput` trigger and a scrollable options list.
 
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 ## Import
 
 ```tsx

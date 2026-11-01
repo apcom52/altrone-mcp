@@ -2,6 +2,8 @@
 
 A dialog overlay with a title, content area, and action buttons. Unlike `Popover`/`Dropdown`/`Tooltip`, a modal isn't attached to a trigger element — open it explicitly via `open` (controlled) or let it manage its own state via `defaultOpen` (uncontrolled), and close it via `onClose`. The panel is rendered in a portal attached to `[data-altrone-root="true"]` (or `<body>` as fallback).
 
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 Escape is handled only by the most recently opened Modal, Drawer or Dialog. Closing it restores the previous window as the Escape target. Controlled windows retain ownership until `open` becomes `false`; a non-dismissible top window blocks Escape for lower windows.
 
 ## Import

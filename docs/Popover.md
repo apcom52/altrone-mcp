@@ -2,6 +2,8 @@
 
 A generic floating panel anchored to a trigger element. The base primitive used by `Dropdown`, `ColorPicker`, `AutocompleteInput`, and `DatePicker`. Built on `@floating-ui/react`.
 
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 ## Import
 
 ```tsx
