@@ -2,6 +2,8 @@
 
 An imperative API for showing native-style alert, confirm, and prompt dialogs. Rendering is handled by `DialogProvider` (mounted automatically inside `Application`); the newest mounted provider handles new dialogs, so nested providers and tests don't clobber each other. All functions return Promises and can be used with `async/await`.
 
+Escape is handled only by the most recently opened Modal, Drawer or Dialog. Closing it restores the previous window as the Escape target. Controlled windows retain ownership until `open` becomes `false`; a non-dismissible top window blocks Escape for lower windows.
+
 ## Import
 
 ```tsx
