@@ -2,6 +2,8 @@
 
 A floating menu anchored to a trigger element. Built on `Popover` with list keyboard navigation. The content area is a `CloseDropdownContext` provider — sub-components inside the menu can call `useCloseDropdown()` to close the popover programmatically.
 
+Opening a menu transfers DOM focus to its first available item; the first ArrowDown moves to the next available item. Escape returns focus to the trigger. Virtual navigation keeps DOM focus on the trigger.
+
 Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
 
 ## Import
@@ -151,6 +153,8 @@ A menu item that opens a nested sub-menu on click, positioned to the side of the
 ```
 
 ### Action activation
+
+Custom `asChild` roots receive a roving `tabIndex` (0 for the active item, -1 for other items) so even a `<div>` can receive DOM focus. An explicit action `tabIndex` takes precedence over the child's `tabIndex`; either overrides the automatic value.
 
 A native `Dropdown.Action` button uses native Enter/Space activation. With `asChild`, native buttons and Enter on links with `href` retain browser activation; other roots synthesize one click for Enter/Space, including Space on links. Each gesture calls `onClick` once. `onKeyDown` can cancel activation with `preventDefault()`; `onClick` can prevent menu closure with `preventDefault()`.
 

@@ -2,6 +2,8 @@
 
 A generic floating panel anchored to a trigger element. The base primitive used by `Dropdown`, `ColorPicker`, `AutocompleteInput`, and `DatePicker`. Built on `@floating-ui/react`.
 
+With `listNavigation`, real DOM focus is managed by list navigation from opening; the first arrow key press moves from the initial item. `virtualNavigationFocus` preserves focus on the trigger.
+
 Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
 
 ## Import
