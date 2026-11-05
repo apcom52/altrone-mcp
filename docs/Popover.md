@@ -2,6 +2,10 @@
 
 A generic floating panel anchored to a trigger element. The base primitive used by `Dropdown`, `ColorPicker`, `AutocompleteInput`, and `DatePicker`. Built on `@floating-ui/react`.
 
+With `listNavigation`, real DOM focus is managed by list navigation from opening; the first arrow key press moves from the initial item. `virtualNavigationFocus` preserves focus on the trigger.
+
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 ## Import
 
 ```tsx
@@ -17,7 +21,7 @@ import { Popover } from 'altrone-ui';
 | `children` | `ReactElement \| ((ctx: { open: boolean; hide: () => void }) => ReactNode)` | — | **Required.** Trigger element. A render function gets the open state + a close callback. The trigger's own `ref` is merged (not overwritten). |
 | `content` | `ReactElement \| ((ctx: { hide: () => void; hideAllSequence: () => void }) => ReactNode)` | — | **Required.** Panel content. Render function receives `hide` and `hideAllSequence` (closes the whole nested chain). |
 | `placement` | `Placement \| 'auto'` | `'auto'` | floating-ui placement (`'top'`, `'bottom-start'`, …) or `'auto'` for best-fit. |
-| `trigger` | `'click' \| 'focus' \| 'hover' \| Array<…>` | `'click'` | What opens the popover. |
+| `trigger` | `'click' \| 'focus' \| 'hover' \| 'contextmenu' \| Array<…>` | `'click'` | What opens the popover. |
 | `title` | `string` | — | Header title. Makes the panel a labelled `role="dialog"`. |
 | `showCloseButton` | `boolean` | `false` | Render a close button in the header. Also triggers the dialog role. |
 | `focusTrap` | `boolean` | `true` | Trap keyboard focus inside the panel while open. |
@@ -30,7 +34,7 @@ import { Popover } from 'altrone-ui';
 | `listNavigation` | `boolean` | `false` | Enable arrow-key navigation over list items (used by `Dropdown`/`Select`). |
 | `defaultListNavigationIndex` | `number \| null` | `null` | Initial active index for `listNavigation`. |
 | `virtualNavigationFocus` | `boolean` | `false` | With `listNavigation`, keeps real DOM focus on the trigger and only highlights the active item visually (`aria-activedescendant` pattern, used by `AutocompleteInput`). |
-| `onOpenChange` | `(open: boolean, event?: Event, reason?: OpenChangeReason) => void` | — | Fires on every open-state change. `reason` is `'escape-key'`, `'outside-press'`, `'reference-press'`, `'hover'`, `'focus'`, … |
+| `onOpenChange` | `(open: boolean, event?: Event, reason?: PopoverOpenChangeReason) => void` | — | Fires on every open-state change. `reason` is `'escape-key'`, `'outside-press'`, `'reference-press'`, `'hover'`, `'focus'`, … |
 | `ref` | `Ref<HTMLElement>` | — | Forwarded to the trigger DOM element (merged with the trigger's own `ref`, if any). |
 | `controlRef` | `Ref<PopoverRef>` | — | Imperative API (see below). |
 
@@ -179,5 +183,17 @@ const triggerRef = useRef<HTMLElement>(null);
   )}
 >
   <Button label="Open parent" />
+</Popover>
+```
+
+## Context menu
+
+Use `trigger="contextmenu"` for right-click and 500 ms touch hold. A movement over 10 px, pointer release/cancel, scrolling, disabling, or unmounting cancels the pending hold. Native context menus and the iOS callout are suppressed only on the enabled trigger; Android's native long-press contextmenu is deduplicated. The following synthetic click is suppressed.
+
+The menu is positioned at the pointer; another right-click moves it. ContextMenu and Shift+F10 open at the trigger's bottom-left corner. Context-menu opening defaults to `focusTrapTargets={['content', 'reference']}` so focus enters the panel. `placement="auto"` resolves to `bottom-start` with flip/shift at viewport edges. Explicit placements are relative to the point. `overlap` and `parentWidth` are ignored with a development warning. Escape, outside press, and `controlRef.hide()` close it and restore focus. Opening reports `onOpenChange(true, event, 'context-menu')`; exported `PopoverOpenChangeReason` extends Floating UI's `OpenChangeReason` with `'context-menu'`. Combine triggers with `['click', 'contextmenu']`.
+
+```tsx
+<Popover trigger="contextmenu" content={<Text>Context details</Text>}>
+  <Button label="Show context details" />
 </Popover>
 ```

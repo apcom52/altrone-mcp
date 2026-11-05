@@ -136,6 +136,8 @@ Nested links appear when the parent has `selected={true}`.
 
 ### Router links (asChild)
 
+With `asChild`, Enter preserves native link activation and Space dispatches a click through the router link. Native buttons retain their Enter/Space behavior without an extra click. `disabled` blocks keyboard activation; `onKeyDown` can cancel it with `preventDefault()`.
+
 ```tsx
 <NavigationList.Link label="Dashboard" icon={<Home />} asChild selected={pathname === '/'}>
   <Link to="/" />

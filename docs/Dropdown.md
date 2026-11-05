@@ -2,6 +2,10 @@
 
 A floating menu anchored to a trigger element. Built on `Popover` with list keyboard navigation. The content area is a `CloseDropdownContext` provider — sub-components inside the menu can call `useCloseDropdown()` to close the popover programmatically.
 
+Opening a menu transfers DOM focus to its first available item; the first ArrowDown moves to the next available item. Escape returns focus to the trigger. Virtual navigation keeps DOM focus on the trigger.
+
+Popover-based panels are keyboard-accessible inside Modal and Drawer. Trapped panels temporarily own focus according to `focusTrapTargets`, including nested panels, and return focus to their trigger on close. With `focusTrap={false}`, the portal joins the parent sheet’s focus boundary.
+
 ## Import
 
 ```tsx
@@ -18,8 +22,8 @@ import { Dropdown } from 'altrone-ui';
 |------|------|---------|-------------|
 | `children` | `ReactNode \| ((ctx: { open: boolean; hide: () => void }) => ReactNode)` | — | **Required.** Trigger element. Can be a render function to access `open` state. |
 | `content` | `ReactNode \| ((ctx: { hide: () => void; hideAllSequence: () => void }) => ReactNode)` | — | **Required.** Dropdown content. |
-| `placement` | `Placement \| 'auto'` | `'bottom'` | Floating UI placement (e.g. `'bottom-start'`, `'top-end'`) |
-| `trigger` | `'click' \| 'focus' \| 'hover' \| Array` | `'click'` | What opens the dropdown |
+| `placement` | `Placement \| 'auto'` | `'bottom'` (`'auto'` for contextmenu) | Floating UI placement (e.g. `'bottom-start'`, `'top-end'`) |
+| `trigger` | `'click' \| 'focus' \| 'hover' \| 'contextmenu' \| Array` | `'click'` | What opens the dropdown |
 | `closeParentPopover` | `boolean` | `true` | When inside a nested dropdown, whether clicking an action closes the entire chain or just the innermost popover. |
 | `focusTrap` | `boolean` | `true` | Trap focus inside the dropdown while open |
 
@@ -60,6 +64,8 @@ A clickable menu item.
 ---
 
 ### Dropdown.Checkbox
+
+Checkboxes and radio items use native button activation: Enter, Space or a mouse click calls `onChange` once with a click event. `onKeyDown` can cancel keyboard activation with `preventDefault()`; `onClick` can cancel the value change the same way. The menu stays open after selection.
 
 A toggleable checkbox item inside the menu.
 
@@ -148,6 +154,12 @@ A menu item that opens a nested sub-menu on click, positioned to the side of the
 </Dropdown>
 ```
 
+### Action activation
+
+Custom `asChild` roots receive a roving `tabIndex` (0 for the active item, -1 for other items) so even a `<div>` can receive DOM focus. An explicit action `tabIndex` takes precedence over the child's `tabIndex`; either overrides the automatic value.
+
+A native `Dropdown.Action` button uses native Enter/Space activation. With `asChild`, native buttons and Enter on links with `href` retain browser activation; other roots synthesize one click for Enter/Space, including Space on links. Each gesture calls `onClick` once. `onKeyDown` can cancel activation with `preventDefault()`; `onClick` can prevent menu closure with `preventDefault()`.
+
 ### With keyboard shortcuts (hintText)
 
 ```tsx
@@ -227,5 +239,19 @@ const [theme, setTheme] = useState('system');
   }
 >
   <Avatar firstName="Alex" lastName="Petrov" size="s" />
+</Dropdown>
+```
+
+## Context menu
+
+Use `trigger="contextmenu"` for right-click and 500 ms touch hold. A movement over 10 px, pointer release/cancel, scrolling, disabling, or unmounting cancels the pending hold. Native context menus and the iOS callout are suppressed only on the enabled trigger; Android's native long-press contextmenu is deduplicated. The following synthetic click is suppressed.
+
+The menu is positioned at the pointer; another right-click moves it. ContextMenu and Shift+F10 open at the trigger's bottom-left corner. `placement="auto"` resolves to `bottom-start` with flip/shift at viewport edges. Explicit placements are relative to the point. `overlap` and `parentWidth` are ignored with a development warning. Escape, outside press, and `controlRef.hide()` close it and restore focus. Opening reports `onOpenChange(true, event, 'context-menu')`; exported `PopoverOpenChangeReason` extends Floating UI's `OpenChangeReason` with `'context-menu'`. Combine triggers with `['click', 'contextmenu']`.
+
+Dropdown defaults to `placement="auto"` when its triggers include `contextmenu`; other dropdowns still default to `bottom`. Context menus supplement primary actions: expose every menu action through visible controls or a regular menu as well.
+
+```tsx
+<Dropdown trigger="contextmenu" content={<Dropdown.Menu><Dropdown.Action label="Duplicate" /><Dropdown.Action label="Delete" danger /></Dropdown.Menu>}>
+  <Button label="File actions" />
 </Dropdown>
 ```
