@@ -65,6 +65,8 @@ A clickable menu item.
 
 ### Dropdown.Checkbox
 
+Checkboxes and radio items use native button activation: Enter, Space or a mouse click calls `onChange` once with a click event. `onKeyDown` can cancel keyboard activation with `preventDefault()`; `onClick` can cancel the value change the same way. The menu stays open after selection.
+
 A toggleable checkbox item inside the menu.
 
 | Prop | Type | Description |
