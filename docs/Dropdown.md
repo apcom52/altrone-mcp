@@ -150,6 +150,10 @@ A menu item that opens a nested sub-menu on click, positioned to the side of the
 </Dropdown>
 ```
 
+### Action activation
+
+A native `Dropdown.Action` button uses native Enter/Space activation. With `asChild`, native buttons and Enter on links with `href` retain browser activation; other roots synthesize one click for Enter/Space, including Space on links. Each gesture calls `onClick` once. `onKeyDown` can cancel activation with `preventDefault()`; `onClick` can prevent menu closure with `preventDefault()`.
+
 ### With keyboard shortcuts (hintText)
 
 ```tsx
