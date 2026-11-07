@@ -114,9 +114,9 @@ A slot for the product mark — pass an `<svg>` or `<img>` as children. It is si
 
 ### Toolbar.Leading / Toolbar.Center / Toolbar.Trailing
 
-Optional layout regions. Present them and the toolbar lays out as a three-track
-grid (`1fr auto 1fr`) so the centre stays optically centred no matter how wide
-the sides get. Omit them for a plain left-to-right row.
+Optional layout regions. Multiple regions share a three-track grid. A single
+region spans the available width (height in a vertical toolbar) and keeps its
+start, centre or end alignment. Omit regions for a plain left-to-right row.
 
 | Component | Description |
 |-----------|-------------|
