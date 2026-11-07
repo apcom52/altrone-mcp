@@ -23,7 +23,7 @@ import { Slider } from 'altrone-ui';
 |------|------|---------|-------------|
 | `value` | `number` | — | **Required.** Controlled current value |
 | `onChange` | `(value: number, event: PointerEvent \| KeyboardEvent) => void` | — | **Required.** Called on every value change during drag and on keyboard input |
-| `onChangeEnd` | `(value: number, event: PointerEvent \| KeyboardEvent) => void` | — | Called when a drag ends (`pointerup`) or a keyboard key is released. Use this to avoid firing expensive side effects on every pixel of drag. |
+| `onChangeEnd` | `(value: number, event: PointerEvent \| KeyboardEvent) => void` | — | Called on pointer release with the last value sent to `onChange`, or on a supported keyboard press. |
 | `min` | `number` | `0` | Minimum value |
 | `max` | `number` | `100` | Maximum value |
 | `step` | `number` | `1` | Step increment |
