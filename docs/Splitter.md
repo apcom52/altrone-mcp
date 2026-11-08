@@ -23,7 +23,7 @@ import { Splitter } from 'altrone-ui';
 | `collapsedControlsVisibility` | `'always' \| 'hover' \| 'never'` | `'always'` | How a collapsed panel's expand button is shown. `'always'` — persistently visible while collapsed. `'hover'` — only on divider hover / button focus. `'never'` — not rendered; expand via `controlRef`. |
 | `onResize` | `(sizes: number[], event: PointerEvent) => void` | — | Fired on every pointer-move during drag. `sizes` is an array of panel percentages (0–100). |
 | `onResizeStart` | `(sizes: number[], event: PointerEvent) => void` | — | Fired when drag begins |
-| `onResizeEnd` | `(sizes: number[], event: PointerEvent) => void` | — | Fired when drag ends |
+| `onResizeEnd` | `(sizes: number[], event: PointerEvent) => void` | — | Fired on pointer release. A cancelled drag restores the latest confirmed sizes without firing `onResizeEnd` or `onSizesChange`. |
 | `onCollapse` | `(panelIndex: number, collapsed: boolean, event?: MouseEvent) => void` | — | Fired when a panel is collapsed or expanded |
 | `controlRef` | `Ref<SplitterHandle>` | — | Ref exposing the imperative API (see below) |
 | `icons` | `Partial<SplitterIconSet>` | — | Overrides for the four directional chevrons used by the collapse controls (`chevronLeft`, `chevronRight`, `chevronUp`, `chevronDown`), each a `ReactElement` |
@@ -181,7 +181,7 @@ const [sizes, setSizes] = useState(() => loadSavedSizes() ?? [30, 70]);
 
 ### Respond to a live drag
 
-`onResize` fires on every pointer-move; `onResizeEnd` once, when the drag ends. Both work the same whether `sizes` is controlled or not.
+`onResize` fires on every pointer-move; `onResizeEnd` once, when the pointer is released. Both work the same whether `sizes` is controlled or not.
 
 ```tsx
 <Splitter onResize={(sizes) => setLiveSizes(sizes)}>
