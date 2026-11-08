@@ -79,7 +79,7 @@ Column types and their extra `options`:
 
 ### DataTable.RowAction
 
-An individual action button, passed to the table's `rowActions` prop (directly, or as an array for several). `DataTable` renders them in a trailing column, folding any `collapsed` ones into an overflow menu (`Dropdown` behind an ellipsis button) once there's more than one action.
+An individual action button, passed to the table's `rowActions` prop (directly, or as an array for several). `DataTable` renders them in a trailing column, folding any `collapsed` ones into an overflow menu (`Dropdown` behind an ellipsis button) once there's more than one action. All actions for the row also appear above the built-in commands in its cell context menu.
 
 | Prop | Type | Description |
 |------|------|-------------|
