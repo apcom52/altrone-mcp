@@ -24,7 +24,11 @@ import { DataTable } from 'altrone-ui';
 | `showFooter` | `boolean` | `true` | Show/hide the pagination footer |
 | `showEmptyBanner` | `boolean` | `true` | Show an empty state banner when there are no rows to display |
 | `resizableColumns` | `boolean` | `false` | Let columns be resized by dragging their header edge (per-column opt-out via `resizable: false`) |
-| `icons` | `Partial<DataTableIconSet>` | — | Overrides for icons unique to `DataTable` (`sortAsc`, `sortDesc`, `filter`, `addFilter`, `deleteFilter`, `enableSelection`, `disableSelection`, `rowActions`, `booleanTrue`, `booleanFalse`), each a `ReactElement` |
+| `hideableColumns` | `boolean` | `false` | Shows a column picker in the toolbar. |
+| `hiddenColumns` | `Array<keyof T>` | — | Controlled list of hidden column accessors. |
+| `defaultHiddenColumns` | `Array<keyof T>` | `[]` | Initial hidden list in uncontrolled mode and target for Reset in either mode. |
+| `onHiddenColumnsChange` | `(hidden: Array<keyof T>, event?: React.SyntheticEvent) => void` | — | Receives the next hidden list and the event for a user action. |
+| `icons` | `Partial<DataTableIconSet>` | — | Overrides for icons unique to `DataTable` (`sortAsc`, `sortDesc`, `filter`, `columnVisibility` (defaults to `Columns3Cog`), `addFilter`, `deleteFilter`, `enableSelection`, `disableSelection`, `rowActions`, `booleanTrue`, `booleanFalse`), each a `ReactElement` |
 | `rowActions` | `StrictReactElements<DataTableRowActionProps> \| ((ctx: DataTableRenderRowActionsContext<T>) => StrictReactElements<DataTableRowActionProps>)` | — | Adds a trailing actions column: one `DataTable.RowAction`, or several (as an array), per row. A `collapsed` `RowAction` folds into an overflow menu. |
 | `actions` | `ReactNode \| ((ctx: DataTableRenderContext<T>) => ReactNode)` | — | Content added to the header `Toolbar`, alongside the select-mode toggle and filter control (both live in `Toolbar.Leading`). `DataTable.Action` element(s) join them there by default; wrap content in `Toolbar.Leading` / `Toolbar.Center` / `Toolbar.Trailing` to place it in a specific region instead. Receives `{ selectableMode, selectedItems }` when used as a function. |
 | `defaultPage` | `number` | `0` | Initial page index (zero-based), uncontrolled |
@@ -91,6 +95,8 @@ A toolbar action button rendered via `actions`. Wraps `Toolbar.Action`, so it ac
 
 ## Examples
 
+Right-click a data cell or press Shift+F10 while it is focused to open the cell context menu. **Copy** copies the displayed text and keeps passwords masked. With `selectable`, **Select this row** selects the row and enters selection mode if needed. **Deselect this row** clears the row selection and keeps selection mode active.
+
 ### Basic table
 
 ```tsx
@@ -106,6 +112,27 @@ type User = { id: number; name: string; email: string; active: boolean };
   ]}
 />
 ```
+
+### Controlled column visibility
+
+```tsx
+const [hiddenColumns, setHiddenColumns] = useState<Array<keyof User>>(['email']);
+
+<DataTable<User>
+  data={users}
+  columns={columns}
+  hideableColumns
+  hiddenColumns={hiddenColumns}
+  defaultHiddenColumns={['email']}
+  onHiddenColumnsChange={setHiddenColumns}
+/>
+```
+
+The toolbar picker stages visibility changes until you click **Apply**. **Show all** immediately shows every enabled column and closes the picker. **Reset** restores the draft to `defaultHiddenColumns`. The last enabled data column stays visible. The picker is disabled in loading mode and omits row selection and row actions. The hidden lists also work without the toolbar picker.
+
+Right-click a column header or press Shift+F10 while it is focused. For sortable columns, the context menu offers no sorting, ascending, and descending as radio options. With `hideableColumns` enabled, **Hide** immediately hides the column.
+
+A user-hidden column stays available to filters and sorting and retains its width. `enabled: false` excludes a column from the table, filter builder, and picker. Unknown and disabled accessors in the hidden lists are ignored.
 
 ### With sorting and filtering defaults
 
