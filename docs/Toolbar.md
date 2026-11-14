@@ -156,6 +156,8 @@ the overflow menu as plain items (no nested grouping). A group collapses only if
 (`Toolbar.Title`, `Toolbar.Logo`, `Toolbar.Separator`, arbitrary nodes) don't support `priority`
 and are never collapsed.
 
+Collapsed actions preserve `asChild` links, child event handlers and `kbd` shortcut hints. `selected` shows a checkbox checkmark and exposes `aria-pressed`. `state="loading"` replaces the icon with a menu-sized `Loading` spinner and exposes `aria-busy`; loading takes visual precedence over selected. Disabled actions and actions in any non-idle state cannot be activated, including links. `Toolbar.SidebarToggleAction` uses the same mapping while retaining its sidebar behavior.
+
 The trigger renders at whichever edge of the region sits closest to the toolbar's center, chevrons
 pointing further inward:
 
