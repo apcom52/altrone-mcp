@@ -127,6 +127,8 @@ Optional layout regions. Multiple regions share a three-track grid. A single
 region spans the available width (height in a vertical toolbar) and keeps its
 start, centre or end alignment. Omit regions for a plain left-to-right row.
 
+Regions may mount and unmount conditionally. The balance updates even if the toolbar size and the restored region's natural size are unchanged. Unmounting a side region clears the previous track allocation; unmounting `Center` releases its reserved space. Registration is scoped to the current region instance, so stale measurements from a replaced region are ignored.
+
 | Component | Description |
 |-----------|-------------|
 | `Toolbar.Leading` | Start region (left, or top when vertical). |
