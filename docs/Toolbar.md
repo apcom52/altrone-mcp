@@ -158,6 +158,8 @@ and are never collapsed.
 
 Collapsed actions preserve `asChild` links, child event handlers and `kbd` shortcut hints. `selected` shows a checkbox checkmark and exposes `aria-pressed`. `state="loading"` replaces the icon with a menu-sized `Loading` spinner and exposes `aria-busy`; loading takes visual precedence over selected. Disabled actions and actions in any non-idle state cannot be activated, including links. `Toolbar.SidebarToggleAction` uses the same mapping while retaining its sidebar behavior.
 
+Fragments are transparent to overflow: their actions retain individual priorities, while groups remain atomic. Custom components returning `null`, text, multiple roots or portals do not shift neighboring measurements. Only nodes occupying the row contribute to its size and gaps. Size changes and changes to custom roots are tracked automatically; resize notifications are batched once per animation frame using a shared observer per row.
+
 The trigger renders at whichever edge of the region sits closest to the toolbar's center, chevrons
 pointing further inward:
 
