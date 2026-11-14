@@ -33,6 +33,15 @@ import { Toolbar } from 'altrone-ui';
 
 All standard `HTMLAttributes<HTMLDivElement>` are also accepted (`role` included — override it to render a plain `<div>`-shaped bar without the toolbar semantics).
 
+Strings and numbers can be direct children of `Toolbar` and its `Leading`, `Center` and `Trailing` regions. Adjacent text is kept together, including zero values. Text contributes to overflow measurements and stays visible while collapsible actions move into the menu.
+
+```tsx
+<Toolbar>
+  <Toolbar.Leading>Untitled document</Toolbar.Leading>
+  <Toolbar.Trailing>{count} items</Toolbar.Trailing>
+</Toolbar>
+```
+
 ---
 
 ### Toolbar.Action
